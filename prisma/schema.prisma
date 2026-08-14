@@ -1,0 +1,379 @@
+// HeyStudy — MVP Fase 1
+// Modelo de datos según sección 4 del spec: un solo estudiante cargando sus
+// propios datos manualmente. Sin Institution / multi-tenant / roles.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Auth / perfil
+// ---------------------------------------------------------------------------
+
+// Refleja auth.users de Supabase. El id es el mismo UUID que Supabase Auth
+// asigna al usuario; no se genera aquí. Se crea vía trigger o en el primer
+// login/registro.
+model User {
+  id        String   @id @db.Uuid
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  studentProfile StudentProfile?
+  subscription   Subscription?
+  aiUsageLogs    AIUsageLog[]
+
+  @@map("users")
+}
+
+enum EducationLevel {
+  PRIMARIA
+  SECUNDARIA
+  PREPARATORIA
+  UNIVERSIDAD
+  OTRO
+}
+
+model StudentProfile {
+  id             String         @id @default(uuid()) @db.Uuid
+  userId         String         @unique @db.Uuid
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName    String
+  educationLevel EducationLevel
+  timezone       String         @default("America/Mexico_City")
+  onboardedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  subjects         Subject[]
+  knowledgeMastery KnowledgeMastery[]
+  studySessions    StudySession[]
+  errorPatterns    ErrorPattern[]
+  studyPlans       StudyPlan[]
+  grades           Grade[]
+
+  @@map("student_profiles")
+}
+
+// ---------------------------------------------------------------------------
+// Materias, tareas, exámenes, materiales — cargados manualmente
+// ---------------------------------------------------------------------------
+
+model Subject {
+  id               String         @id @default(uuid()) @db.Uuid
+  studentProfileId String         @db.Uuid
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  name             String
+  color            String         @default("#6366F1")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  assignments     Assignment[]
+  exams           Exam[]
+  materials       Material[]
+  knowledgeTopics KnowledgeTopic[]
+  grades          Grade[]
+
+  @@index([studentProfileId])
+  @@map("subjects")
+}
+
+enum AssignmentStatus {
+  PENDIENTE
+  COMPLETADA
+}
+
+model Assignment {
+  id          String           @id @default(uuid()) @db.Uuid
+  subjectId   String           @db.Uuid
+  subject     Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  dueDate     DateTime
+  status      AssignmentStatus @default(PENDIENTE)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([subjectId])
+  @@map("assignments")
+}
+
+model Exam {
+  id        String   @id @default(uuid()) @db.Uuid
+  subjectId String   @db.Uuid
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title     String
+  examDate  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  topics        ExamTopic[]
+  grades        Grade[]
+  studySessions StudySession[]
+
+  @@index([subjectId])
+  @@map("exams")
+}
+
+// Relación N:M entre Exam y KnowledgeTopic, con un peso para el cálculo
+// explicable del Exam Readiness Score (sección 5, etapa 3).
+model ExamTopic {
+  id               String         @id @default(uuid()) @db.Uuid
+  examId           String         @db.Uuid
+  exam             Exam           @relation(fields: [examId], references: [id], onDelete: Cascade)
+  knowledgeTopicId String         @db.Uuid
+  knowledgeTopic   KnowledgeTopic @relation(fields: [knowledgeTopicId], references: [id], onDelete: Cascade)
+  weight           Float          @default(1)
+
+  @@unique([examId, knowledgeTopicId])
+  @@map("exam_topics")
+}
+
+enum MaterialType {
+  PDF
+  IMAGEN
+}
+
+model Material {
+  id          String       @id @default(uuid()) @db.Uuid
+  subjectId   String       @db.Uuid
+  subject     Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  fileName    String
+  fileType    MaterialType
+  storagePath String
+  fileSizeKb  Int?
+  uploadedAt  DateTime     @default(now())
+
+  @@index([subjectId])
+  @@map("materials")
+}
+
+model Grade {
+  id               String         @id @default(uuid()) @db.Uuid
+  studentProfileId String         @db.Uuid
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  subjectId        String         @db.Uuid
+  subject          Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  examId           String?        @db.Uuid
+  exam             Exam?          @relation(fields: [examId], references: [id], onDelete: SetNull)
+  label            String
+  score            Float
+  maxScore         Float          @default(100)
+  recordedAt       DateTime       @default(now())
+
+  @@index([studentProfileId])
+  @@index([subjectId])
+  @@map("grades")
+}
+
+// ---------------------------------------------------------------------------
+// Knowledge map
+// ---------------------------------------------------------------------------
+
+// Concepto dentro de una materia. Jerárquico: Álgebra → Funciones → Cuadráticas.
+model KnowledgeTopic {
+  id          String           @id @default(uuid()) @db.Uuid
+  subjectId   String           @db.Uuid
+  subject     Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  parentId    String?          @db.Uuid
+  parent      KnowledgeTopic?  @relation("TopicHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    KnowledgeTopic[] @relation("TopicHierarchy")
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+
+  mastery        KnowledgeMastery[]
+  questions      Question[]
+  errorPatterns  ErrorPattern[]
+  examTopics     ExamTopic[]
+  studyPlanItems StudyPlanItem[]
+
+  @@index([subjectId])
+  @@index([parentId])
+  @@map("knowledge_topics")
+}
+
+// Mastery de un StudentProfile sobre un KnowledgeTopic. Se actualiza con
+// evidencia acumulativa (cada Answer nueva), no es un diagnóstico fijo.
+model KnowledgeMastery {
+  id               String         @id @default(uuid()) @db.Uuid
+  studentProfileId String         @db.Uuid
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  knowledgeTopicId String         @db.Uuid
+  knowledgeTopic   KnowledgeTopic @relation(fields: [knowledgeTopicId], references: [id], onDelete: Cascade)
+  score            Float          @default(0) // 0-1
+  confidence       Float          @default(0) // 0-1, qué tanta evidencia respalda el score
+  lastReviewed     DateTime?
+  nextReview       DateTime?
+  errorCount       Int            @default(0)
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([studentProfileId, knowledgeTopicId])
+  @@map("knowledge_mastery")
+}
+
+// ---------------------------------------------------------------------------
+// Diagnóstico / práctica
+// ---------------------------------------------------------------------------
+
+enum StudySessionMode {
+  DIAGNOSTICO
+  PRACTICA
+}
+
+model StudySession {
+  id               String           @id @default(uuid()) @db.Uuid
+  studentProfileId String           @db.Uuid
+  studentProfile   StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  examId           String?          @db.Uuid
+  exam             Exam?            @relation(fields: [examId], references: [id], onDelete: SetNull)
+  mode             StudySessionMode @default(DIAGNOSTICO)
+  startedAt        DateTime         @default(now())
+  completedAt      DateTime?
+
+  questions Question[]
+
+  @@index([studentProfileId])
+  @@map("study_sessions")
+}
+
+enum QuestionDifficulty {
+  FACIL
+  MEDIO
+  DIFICIL
+}
+
+model Question {
+  id               String             @id @default(uuid()) @db.Uuid
+  studySessionId   String             @db.Uuid
+  studySession     StudySession       @relation(fields: [studySessionId], references: [id], onDelete: Cascade)
+  knowledgeTopicId String             @db.Uuid
+  knowledgeTopic   KnowledgeTopic     @relation(fields: [knowledgeTopicId], references: [id], onDelete: Cascade)
+  prompt           String
+  difficulty       QuestionDifficulty
+  correctAnswer    String?
+  options          Json?
+  createdAt        DateTime           @default(now())
+
+  answer Answer?
+
+  @@index([studySessionId])
+  @@index([knowledgeTopicId])
+  @@map("questions")
+}
+
+// Cada respuesta se analiza más allá de correcto/incorrecto: se extrae una
+// estimación de mastery y, si aplica, un patrón de error.
+model Answer {
+  id              String        @id @default(uuid()) @db.Uuid
+  questionId      String        @unique @db.Uuid
+  question        Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  studentResponse String
+  isCorrect       Boolean?
+  masteryEstimate Float?
+  feedback        String?
+  errorPatternId  String?       @db.Uuid
+  errorPattern    ErrorPattern? @relation(fields: [errorPatternId], references: [id], onDelete: SetNull)
+  answeredAt      DateTime      @default(now())
+
+  @@map("answers")
+}
+
+model ErrorPattern {
+  id               String         @id @default(uuid()) @db.Uuid
+  studentProfileId String         @db.Uuid
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  knowledgeTopicId String         @db.Uuid
+  knowledgeTopic   KnowledgeTopic @relation(fields: [knowledgeTopicId], references: [id], onDelete: Cascade)
+  description      String
+  occurrences      Int            @default(1)
+  firstDetectedAt  DateTime       @default(now())
+  lastDetectedAt   DateTime       @default(now())
+
+  answers Answer[]
+
+  @@index([studentProfileId])
+  @@index([knowledgeTopicId])
+  @@map("error_patterns")
+}
+
+// ---------------------------------------------------------------------------
+// Plan de estudio
+// ---------------------------------------------------------------------------
+
+model StudyPlan {
+  id               String         @id @default(uuid()) @db.Uuid
+  studentProfileId String         @db.Uuid
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  forDate          DateTime       @db.Date
+  generatedAt      DateTime       @default(now())
+
+  items StudyPlanItem[]
+
+  @@unique([studentProfileId, forDate])
+  @@map("study_plans")
+}
+
+model StudyPlanItem {
+  id               String          @id @default(uuid()) @db.Uuid
+  studyPlanId      String          @db.Uuid
+  studyPlan        StudyPlan       @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  knowledgeTopicId String?         @db.Uuid
+  knowledgeTopic   KnowledgeTopic? @relation(fields: [knowledgeTopicId], references: [id], onDelete: SetNull)
+  title            String
+  reason           String
+  minutes          Int
+  orderIndex       Int             @default(0)
+  completed        Boolean         @default(false)
+
+  @@index([studyPlanId])
+  @@map("study_plan_items")
+}
+
+// ---------------------------------------------------------------------------
+// Freemium / observabilidad de costo
+// ---------------------------------------------------------------------------
+
+enum PlanTier {
+  FREE
+  PAID
+}
+
+model Subscription {
+  id                    String   @id @default(uuid()) @db.Uuid
+  userId                String   @unique @db.Uuid
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                  PlanTier @default(FREE)
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  currentPeriodStart    DateTime @default(now())
+  currentPeriodEnd      DateTime
+  diagnosticsUsed       Int      @default(0)
+  documentsAnalyzedUsed Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("subscriptions")
+}
+
+// Un registro por llamada a la API de Anthropic. Crítico para validar costo
+// real por usuario activo (sección 8).
+model AIUsageLog {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @db.Uuid
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model            String
+  feature          String
+  inputTokens      Int
+  outputTokens     Int
+  estimatedCostUsd Float
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([feature])
+  @@map("ai_usage_logs")
+}
