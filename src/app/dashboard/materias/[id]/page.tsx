@@ -110,7 +110,12 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
           <div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border">
             {subject.exams.map((exam) => (
               <div key={exam.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                <span className="text-sm font-medium text-foreground">{exam.title}</span>
+                <Link
+                  href={`/dashboard/materias/${subject.id}/examenes/${exam.id}`}
+                  className="text-sm font-medium text-foreground hover:text-accent"
+                >
+                  {exam.title}
+                </Link>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-muted">{formatDate(exam.examDate)}</span>
                   <form action={deleteExamAction.bind(null, exam.id, subject.id)}>

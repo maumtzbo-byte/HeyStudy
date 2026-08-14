@@ -4,7 +4,12 @@ import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listSubjects } from "@/services/subjects/subjectService";
 import { listUpcomingAssignments } from "@/services/assignments/assignmentService";
 import { listUpcomingExams } from "@/services/exams/examService";
+import { calculateExamReadiness } from "@/services/exams/readinessService";
+import { getTodayPlan } from "@/services/studyplan/studyPlanService";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
+import { ReadinessBadge } from "@/components/exams/ReadinessBadge";
+import { GeneratePlanForm } from "@/components/dashboard/GeneratePlanForm";
+import { StudyPlanList } from "@/components/dashboard/StudyPlanList";
 
 export const metadata: Metadata = { title: "Hoy — HeyStudy" };
 
@@ -12,21 +17,29 @@ function formatDate(date: Date) {
   return new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short" }).format(date);
 }
 
-function daysUntil(date: Date) {
-  const diff = Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+function daysUntilLabel(diff: number) {
   if (diff <= 0) return "hoy";
   if (diff === 1) return "mañana";
   return `en ${diff} días`;
 }
 
+function daysUntil(date: Date) {
+  return daysUntilLabel(Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+}
+
 export default async function DashboardHomePage() {
   const { studentProfile } = await requireStudentProfile();
 
-  const [subjects, assignments, exams] = await Promise.all([
+  const [subjects, assignments, exams, todayPlan] = await Promise.all([
     listSubjects(studentProfile.id),
     listUpcomingAssignments(studentProfile.id, 5),
     listUpcomingExams(studentProfile.id, 3),
+    getTodayPlan(studentProfile.id),
   ]);
+
+  const examReadiness = await Promise.all(
+    exams.map((exam) => calculateExamReadiness(studentProfile.id, exam.id)),
+  );
 
   const todoItems = [
     ...assignments.map((a) => ({
@@ -71,16 +84,62 @@ export default async function DashboardHomePage() {
         </Card>
       </div>
 
-      <Card className="bg-accent/5 border-accent/20">
-        <CardTitle>Tu nivel de preparación</CardTitle>
-        <CardDescription className="mt-1">
-          El diagnóstico de conocimiento y el puntaje de preparación por examen llegan en la próxima etapa. Por
-          ahora, esto es lo que tienes cargado.
-        </CardDescription>
-      </Card>
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-foreground">Qué tan preparado estás</h2>
+        {examReadiness.length === 0 ? (
+          <Card className="text-center">
+            <CardDescription>No tienes exámenes próximos registrados.</CardDescription>
+          </Card>
+        ) : (
+          <div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+            {examReadiness.map((readiness) => (
+              <Link
+                key={readiness.examId}
+                href={`/dashboard/materias/${exams.find((e) => e.id === readiness.examId)?.subjectId}/examenes/${readiness.examId}`}
+                className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-border/20"
+              >
+                <div>
+                  <p className="text-sm font-medium text-foreground">{readiness.examTitle}</p>
+                  <p className="text-xs text-muted">
+                    {readiness.subjectName} · {daysUntilLabel(readiness.daysUntilExam)}
+                  </p>
+                </div>
+                <ReadinessBadge status={readiness.status} score={readiness.score} />
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold text-foreground">Qué hacer ahora</h2>
+        <h2 className="text-lg font-semibold text-foreground">Tu plan de hoy</h2>
+        {todayPlan && todayPlan.items.length > 0 ? (
+          <Card className="flex flex-col gap-4">
+            <StudyPlanList
+              items={todayPlan.items.map((item) => ({
+                id: item.id,
+                title: item.title,
+                reason: item.reason,
+                minutes: item.minutes,
+                completed: item.completed,
+              }))}
+            />
+            <GeneratePlanForm regenerate />
+          </Card>
+        ) : (
+          <Card className="flex flex-col gap-3">
+            <CardTitle>Todavía no tienes un plan para hoy</CardTitle>
+            <CardDescription>
+              Con lo que hayas diagnosticado, armamos qué estudiar hoy y por qué. Si no has diagnosticado ningún
+              tema todavía, hazlo primero desde el mapa de conocimiento de una materia.
+            </CardDescription>
+            <GeneratePlanForm />
+          </Card>
+        )}
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-foreground">Tareas y exámenes próximos</h2>
         {todoItems.length === 0 ? (
           <Card className="text-center">
             <CardDescription>
