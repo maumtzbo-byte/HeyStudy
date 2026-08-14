@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Trash2, Brain } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getSubject } from "@/services/subjects/subjectService";
 import { toggleAssignmentAction, deleteAssignmentAction, deleteExamAction } from "@/app/dashboard/materias/actions";
-import { Card, CardTitle } from "@/components/ui/Card";
+import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { CreateAssignmentForm } from "@/components/subjects/CreateAssignmentForm";
 import { CreateExamForm } from "@/components/subjects/CreateExamForm";
 import { MaterialUploadForm } from "@/components/subjects/MaterialUploadForm";
@@ -40,6 +42,21 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
         </div>
         <DeleteSubjectButton subjectId={subject.id} subjectName={subject.name} />
       </div>
+
+      <Card className="flex items-center justify-between gap-4 bg-accent/5 border-accent/20">
+        <div className="flex items-center gap-3">
+          <Brain className="h-5 w-5 text-accent" />
+          <div>
+            <CardTitle>Mapa de conocimiento</CardTitle>
+            <CardDescription>Diagnostica qué tanto dominas cada tema de {subject.name}.</CardDescription>
+          </div>
+        </div>
+        <Link href={`/dashboard/materias/${subject.id}/diagnostico`}>
+          <Button variant="secondary" size="sm">
+            Ver mapa
+          </Button>
+        </Link>
+      </Card>
 
       <Card className="flex flex-col gap-4">
         <CardTitle>Tareas</CardTitle>
