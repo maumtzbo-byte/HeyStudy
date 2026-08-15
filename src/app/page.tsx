@@ -68,7 +68,7 @@ function KnowledgeMapVisual() {
                   style={{ width: `${Math.round(row.score * 100)}%` }}
                 />
               </div>
-              <span className="w-10 shrink-0 text-right text-sm font-medium text-[#6b6790]">
+              <span className="w-10 shrink-0 text-right text-sm font-medium tabular-nums text-[#6b6790]">
                 {Math.round(row.score * 100)}%
               </span>
             </div>

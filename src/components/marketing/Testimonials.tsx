@@ -34,6 +34,10 @@ function initials(name: string) {
     .toUpperCase();
 }
 
+// Desfase vertical sutil por tarjeta para romper el patrón genérico de
+// "3 tarjetas idénticas en fila" — misma grid, pero con ritmo, no una fila plana.
+const OFFSET_CLASS = ["sm:mt-0", "sm:mt-8", "sm:mt-2"];
+
 export function Testimonials() {
   return (
     <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-4 sm:grid-cols-3">
@@ -44,7 +48,7 @@ export function Testimonials() {
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.6, delay: 0.1 * i, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col rounded-2xl border border-border bg-surface p-6 shadow-soft"
+          className={`flex flex-col rounded-2xl border border-border bg-surface p-6 shadow-soft ${OFFSET_CLASS[i % OFFSET_CLASS.length]}`}
         >
           <p className="flex-1 text-sm text-foreground">&ldquo;{testimonial.quote}&rdquo;</p>
           <div className="mt-6 flex items-center gap-3">

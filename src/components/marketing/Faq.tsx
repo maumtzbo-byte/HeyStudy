@@ -43,7 +43,7 @@ function FaqRow({ question, answer }: { question: string; answer: string }) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex w-full items-center justify-between gap-4 py-5 text-left"
+        className="flex w-full items-center justify-between gap-4 py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded-sm"
       >
         <span className="text-base font-medium text-foreground">{question}</span>
         <motion.span
