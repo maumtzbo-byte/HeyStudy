@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Sparkles, Lightbulb, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
+import { Sparkles, Lightbulb, ArrowRight, CheckCircle2, XCircle, Target, ListChecks, LayoutGrid, FileText } from "lucide-react";
 import { getAuthUser } from "@/lib/auth/getCurrentUser";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { DemoInteractivo } from "@/components/marketing/DemoInteractivo";
 import { Constellation } from "@/components/marketing/Constellation";
+import { ParallaxField, ParallaxLayer } from "@/components/marketing/Parallax";
+import { cn } from "@/lib/utils/cn";
 
 export const metadata: Metadata = {
   title: "HeyStudy — Sabe qué estudiar, hoy",
@@ -22,6 +24,38 @@ const DIAGNOSTIC_ITEMS = [
 const TUTOR_CHAT = [
   { role: "user" as const, text: "¿Por qué la derivada de x² es 2x?" },
   { role: "assistant" as const, text: "Buena pregunta — ¿qué pasa si primero desarrollas (x+h)² y ves qué tan rápido crece?" },
+];
+
+const FEATURES = [
+  {
+    icon: Target,
+    title: "Preparación explicable",
+    description: "Un puntaje de preparación por examen que puedes entender: qué temas pesan más y por qué.",
+  },
+  {
+    icon: ListChecks,
+    title: "Plan de estudio diario",
+    description: "Qué estudiar hoy, cuánto tiempo, y por qué — enfocado en tu debilidad más urgente.",
+  },
+  {
+    icon: LayoutGrid,
+    title: "Organiza tus materias",
+    description: "Materias, tareas y exámenes en un solo lugar. Sin conectar nada, sin fricción.",
+  },
+  {
+    icon: FileText,
+    title: "Sube tus materiales",
+    description: "PDFs e imágenes de tus apuntes — HeyStudy los analiza para armar tus temas de estudio.",
+  },
+];
+
+// Layout tipo bento: la 1 (preparación) queda ancha arriba, la 4
+// (materiales) queda alta a la derecha, las otras dos abajo.
+const BENTO_POSITION = [
+  "sm:col-start-1 sm:col-end-3 sm:row-start-1 sm:row-end-2",
+  "sm:col-start-1 sm:col-end-2 sm:row-start-2 sm:row-end-3",
+  "sm:col-start-2 sm:col-end-3 sm:row-start-2 sm:row-end-3",
+  "sm:col-start-3 sm:col-end-4 sm:row-start-1 sm:row-end-3",
 ];
 
 const PLAN_PREVIEW = [
@@ -185,16 +219,18 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col bg-background">
-      {/* Header + Hero — banda atmosférica */}
-      <div className="relative overflow-hidden bg-atmosphere">
-        <Image
-          src="/images/hero-gate.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-top"
-        />
+      {/* Header + Hero — banda atmosférica con paralaje 3D */}
+      <ParallaxField className="relative overflow-hidden bg-atmosphere">
+        <ParallaxLayer depth={0.4} className="absolute inset-0">
+          <Image
+            src="/images/hero-gate.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-top"
+          />
+        </ParallaxLayer>
         <div
           className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--deep)]"
           aria-hidden
@@ -263,11 +299,11 @@ export default async function Home() {
             <p className="mt-4 text-sm text-deep-muted">Gratis para empezar · Sin tarjeta</p>
           </div>
 
-          <div className="relative mx-auto mt-16 w-full max-w-5xl">
+          <ParallaxLayer depth={1.1} className="relative mx-auto mt-16 w-full max-w-5xl">
             <DashboardPreview />
-          </div>
+          </ParallaxLayer>
         </section>
-      </div>
+      </ParallaxField>
 
       {/* Cómo funciona — historia en tarjetas, como en la referencia */}
       <section id="como-funciona" className="relative overflow-hidden bg-atmosphere px-4 py-20 sm:py-28">
@@ -327,6 +363,38 @@ export default async function Home() {
               </div>
               <TutorChatVisual />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Qué más incluye — bento grid */}
+      <section className="border-t border-border bg-surface px-4 py-20">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            Qué más incluye
+          </h2>
+          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:grid-rows-2">
+            {FEATURES.map((feature, i) => (
+              <div
+                key={feature.title}
+                className={cn(
+                  "rounded-xl border p-6 shadow-soft transition-transform hover:-translate-y-0.5",
+                  BENTO_POSITION[i],
+                  i === 0 || i === 3 ? "border-accent/20 bg-accent-soft" : "border-border bg-background",
+                )}
+              >
+                <span
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-full",
+                    i === 0 || i === 3 ? "bg-accent text-accent-foreground" : "bg-accent-soft text-accent-hover",
+                  )}
+                >
+                  <feature.icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-4 text-base font-semibold text-foreground">{feature.title}</h3>
+                <p className="mt-2 text-sm text-muted">{feature.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
