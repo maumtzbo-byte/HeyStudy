@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Trash2, Brain } from "lucide-react";
+import { Trash2, Brain, MessageCircle } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getSubject } from "@/services/subjects/subjectService";
 import { toggleAssignmentAction, deleteAssignmentAction, deleteExamAction } from "@/app/dashboard/materias/actions";
@@ -54,6 +54,21 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
         <Link href={`/dashboard/materias/${subject.id}/diagnostico`}>
           <Button variant="secondary" size="sm">
             Ver mapa
+          </Button>
+        </Link>
+      </Card>
+
+      <Card className="flex items-center justify-between gap-4 bg-accent/5 border-accent/20">
+        <div className="flex items-center gap-3">
+          <MessageCircle className="h-5 w-5 text-accent" />
+          <div>
+            <CardTitle>Tutor IA</CardTitle>
+            <CardDescription>Pregunta lo que no entiendas de {subject.name}, en el modo que prefieras.</CardDescription>
+          </div>
+        </div>
+        <Link href={`/dashboard/materias/${subject.id}/tutor`}>
+          <Button variant="secondary" size="sm">
+            Abrir tutor
           </Button>
         </Link>
       </Card>

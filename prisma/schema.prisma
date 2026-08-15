@@ -49,12 +49,13 @@ model StudentProfile {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  subjects         Subject[]
-  knowledgeMastery KnowledgeMastery[]
-  studySessions    StudySession[]
-  errorPatterns    ErrorPattern[]
-  studyPlans       StudyPlan[]
-  grades           Grade[]
+  subjects           Subject[]
+  knowledgeMastery   KnowledgeMastery[]
+  studySessions      StudySession[]
+  errorPatterns      ErrorPattern[]
+  studyPlans         StudyPlan[]
+  grades             Grade[]
+  tutorConversations TutorConversation[]
 
   @@map("student_profiles")
 }
@@ -72,11 +73,12 @@ model Subject {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
-  assignments     Assignment[]
-  exams           Exam[]
-  materials       Material[]
-  knowledgeTopics KnowledgeTopic[]
-  grades          Grade[]
+  assignments        Assignment[]
+  exams              Exam[]
+  materials          Material[]
+  knowledgeTopics    KnowledgeTopic[]
+  grades             Grade[]
+  tutorConversations TutorConversation[]
 
   @@index([studentProfileId])
   @@map("subjects")
@@ -332,6 +334,52 @@ model StudyPlanItem {
 
   @@index([studyPlanId])
   @@map("study_plan_items")
+}
+
+// ---------------------------------------------------------------------------
+// Tutor IA — chat contextual por materia
+// ---------------------------------------------------------------------------
+
+enum TutorConversationMode {
+  SOCRATICO
+  EXPLICAR
+  PISTA
+  PRACTICA
+}
+
+enum TutorMessageRole {
+  USER
+  ASSISTANT
+}
+
+model TutorConversation {
+  id               String                @id @default(uuid()) @db.Uuid
+  studentProfileId String                @db.Uuid
+  studentProfile   StudentProfile        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  subjectId        String                @db.Uuid
+  subject          Subject               @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  mode             TutorConversationMode @default(EXPLICAR)
+  title            String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  messages TutorChatMessage[]
+
+  @@index([studentProfileId])
+  @@index([subjectId])
+  @@map("tutor_conversations")
+}
+
+model TutorChatMessage {
+  id                  String            @id @default(uuid()) @db.Uuid
+  tutorConversationId String            @db.Uuid
+  tutorConversation   TutorConversation @relation(fields: [tutorConversationId], references: [id], onDelete: Cascade)
+  role                TutorMessageRole
+  content             String
+  createdAt           DateTime          @default(now())
+
+  @@index([tutorConversationId])
+  @@map("tutor_chat_messages")
 }
 
 // ---------------------------------------------------------------------------
