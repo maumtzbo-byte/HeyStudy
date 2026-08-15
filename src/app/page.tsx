@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Sparkles, Brain, Target, ListChecks, MessageCircle, ArrowRight } from "lucide-react";
@@ -188,7 +189,18 @@ export default async function Home() {
     <div className="flex flex-1 flex-col bg-background">
       {/* Header + Hero — banda atmosférica */}
       <div className="relative overflow-hidden bg-atmosphere">
-        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-30" />
+        <Image
+          src="/images/hero-gate.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-top"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--deep)]"
+          aria-hidden
+        />
 
         <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-6">
           <Logo inverted />
