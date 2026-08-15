@@ -5,6 +5,12 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 
+const NAV_LINKS = [
+  { href: "#como-funciona", label: "Cómo funciona" },
+  { href: "#demo", label: "Demo" },
+  { href: "#precios", label: "Precios" },
+];
+
 function HeaderRow({ tone }: { tone: "dark" | "light" }) {
   const dark = tone === "dark";
   return (
@@ -17,26 +23,19 @@ function HeaderRow({ tone }: { tone: "dark" | "light" }) {
             : "hidden items-center gap-1 rounded-full border border-border bg-surface p-1 md:flex"
         }
       >
-        <a
-          href="#como-funciona"
-          className={
-            dark
-              ? "rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
-              : "rounded-full px-4 py-1.5 text-sm font-medium text-muted hover:text-foreground"
-          }
-        >
-          Cómo funciona
-        </a>
-        <a
-          href="#demo"
-          className={
-            dark
-              ? "rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
-              : "rounded-full px-4 py-1.5 text-sm font-medium text-muted hover:text-foreground"
-          }
-        >
-          Demo
-        </a>
+        {NAV_LINKS.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className={
+              dark
+                ? "rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
+                : "rounded-full px-4 py-1.5 text-sm font-medium text-muted hover:text-foreground"
+            }
+          >
+            {link.label}
+          </a>
+        ))}
       </nav>
       <div className="flex items-center gap-3">
         <Link

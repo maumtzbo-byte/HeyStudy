@@ -9,6 +9,9 @@ import { DemoInteractivo } from "@/components/marketing/DemoInteractivo";
 import { Constellation } from "@/components/marketing/Constellation";
 import { HeroScene } from "@/components/marketing/HeroScene";
 import { SiteHeader } from "@/components/marketing/SiteHeader";
+import { Testimonials } from "@/components/marketing/Testimonials";
+import { Pricing } from "@/components/marketing/Pricing";
+import { Faq } from "@/components/marketing/Faq";
 import { Reveal } from "@/components/marketing/Reveal";
 import { KNOWLEDGE_MAP, DIAGNOSTIC_ITEMS, TUTOR_CHAT, levelFromScore, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
 import { cn } from "@/lib/utils/cn";
@@ -246,6 +249,41 @@ export default async function Home() {
         </Reveal>
         <Reveal delay={0.15} className="mt-10">
           <DemoInteractivo />
+        </Reveal>
+      </section>
+
+      {/* Testimonios */}
+      <section className="border-t border-border bg-surface px-4 py-20">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            Estudiantes que dejaron de adivinar
+          </h2>
+        </Reveal>
+        <div className="mt-12">
+          <Testimonials />
+        </div>
+      </section>
+
+      {/* Precios */}
+      <section id="precios" className="px-4 py-20">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            Empieza gratis, escala cuando lo necesites
+          </h2>
+          <p className="mt-4 text-muted">Sin tarjeta para probar el diagnóstico y el plan de estudio.</p>
+        </Reveal>
+        <Reveal delay={0.1} className="mt-12">
+          <Pricing />
+        </Reveal>
+      </section>
+
+      {/* Preguntas frecuentes */}
+      <section className="border-t border-border bg-surface px-4 py-20">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Preguntas frecuentes</h2>
+        </Reveal>
+        <Reveal delay={0.1} className="mt-12">
+          <Faq />
         </Reveal>
       </section>
 
