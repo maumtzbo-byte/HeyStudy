@@ -2,7 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import type { OnboardingInput } from "@/lib/validation/onboardingSchemas";
 
-const SUBJECT_COLORS = ["#4F46E5", "#0EA5E9", "#F59E0B", "#10B981", "#EC4899", "#8B5CF6"];
+const SUBJECT_COLORS = ["#C1502E", "#2A6F73", "#B8860B", "#4B7B5D", "#7D4F6D", "#B15D5D"];
 
 export async function completeOnboarding(params: { userId: string; input: OnboardingInput }) {
   const { userId, input } = params;

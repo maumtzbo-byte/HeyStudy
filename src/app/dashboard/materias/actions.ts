@@ -14,7 +14,7 @@ export async function createSubjectAction(_prev: FormActionState, formData: Form
   const { studentProfile } = await requireStudentProfile();
   const parsed = subjectSchema.safeParse({
     name: formData.get("name"),
-    color: formData.get("color") || "#4F46E5",
+    color: formData.get("color") || "#C1502E",
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 
@@ -31,7 +31,7 @@ export async function updateSubjectAction(
   const { studentProfile } = await requireStudentProfile();
   const parsed = subjectSchema.safeParse({
     name: formData.get("name"),
-    color: formData.get("color") || "#4F46E5",
+    color: formData.get("color") || "#C1502E",
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 

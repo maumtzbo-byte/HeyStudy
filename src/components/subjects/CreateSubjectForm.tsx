@@ -5,7 +5,7 @@ import { createSubjectAction } from "@/app/dashboard/materias/actions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
-const COLOR_OPTIONS = ["#4F46E5", "#0EA5E9", "#F59E0B", "#10B981", "#EC4899", "#8B5CF6"];
+const COLOR_OPTIONS = ["#C1502E", "#2A6F73", "#B8860B", "#4B7B5D", "#7D4F6D", "#B15D5D"];
 
 export function CreateSubjectForm() {
   const [state, formAction, isPending] = useActionState(createSubjectAction, undefined);

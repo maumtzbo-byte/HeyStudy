@@ -5,7 +5,7 @@ export const subjectSchema = z.object({
   color: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/, "Color inválido")
-    .default("#4F46E5"),
+    .default("#C1502E"),
 });
 
 export type SubjectInput = z.infer<typeof subjectSchema>;

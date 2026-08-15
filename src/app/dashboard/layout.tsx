@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
+import { Logo } from "@/components/ui/Logo";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const { studentProfile } = await requireStudentProfile();
@@ -10,8 +11,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-4">
           <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="text-lg font-semibold tracking-tight text-foreground">
-              HeyStudy
+            <Link href="/dashboard">
+              <Logo />
             </Link>
             <nav className="flex items-center gap-6 text-sm font-medium text-muted">
               <Link href="/dashboard" className="hover:text-foreground">
