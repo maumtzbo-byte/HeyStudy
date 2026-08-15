@@ -1,25 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f7f5;
+  --background: #f5f4fc;
   --surface: #ffffff;
-  --foreground: #111111;
-  --muted: #4b4b4f;
-  --border: #e8e8e5;
-  --accent: #22d394;
-  --accent-hover: #1bb77f;
-  --accent-foreground: #0b0f0d;
-  --accent-soft: #e3fbf1;
+  --foreground: #201f3d;
+  --muted: #6b6790;
+  --border: #e3e0f5;
+  --accent: #6c74d6;
+  --accent-hover: #565ec2;
+  --accent-foreground: #ffffff;
+  --accent-soft: #ecebfa;
   --success: #3f7d52;
   --warning: #b4790a;
   --danger: #b3341c;
-  --shadow-color: 0 0% 7%;
+  --shadow-color: 245 35% 20%;
 
-  --deep: #0b1310;
-  --deep-surface: #12211b;
-  --deep-foreground: #f3f7f5;
-  --deep-muted: #9db3ac;
-  --deep-border: #22352c;
+  --deep: #6c74d6;
+  --deep-surface: #eeecfb;
+  --deep-foreground: #ffffff;
+  --deep-muted: #dcdcf7;
+  --deep-border: rgba(255, 255, 255, 0.2);
 }
 
 @theme inline {
@@ -40,25 +40,24 @@
   --color-deep-foreground: var(--deep-foreground);
   --color-deep-muted: var(--deep-muted);
   --color-deep-border: var(--deep-border);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-fredoka);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #111111;
-    --surface: #1c1c1c;
-    --foreground: #f7f7f5;
-    --muted: #a8a8ac;
-    --border: #2e2e2e;
-    --accent: #22d394;
-    --accent-hover: #45e3a8;
-    --accent-foreground: #0b0f0d;
-    --accent-soft: #113026;
+    --background: #18173a;
+    --surface: #211f47;
+    --foreground: #f1effc;
+    --muted: #aca8d6;
+    --border: #34325f;
+    --accent: #8b92e8;
+    --accent-hover: #a3a9f0;
+    --accent-foreground: #1b1a3d;
+    --accent-soft: #2b2a57;
     --success: #6fbf83;
     --warning: #e0a83f;
     --danger: #e2705a;
-    --shadow-color: 0 0% 2%;
+    --shadow-color: 245 45% 3%;
   }
 }
 
@@ -76,8 +75,4 @@ body {
 
 .bg-atmosphere {
   background-color: var(--deep);
-  background-image:
-    radial-gradient(ellipse 60% 50% at 25% 0%, color-mix(in oklab, var(--accent) 22%, transparent), transparent),
-    radial-gradient(ellipse 50% 40% at 85% 15%, color-mix(in oklab, #e0a83f 14%, transparent), transparent),
-    radial-gradient(ellipse 70% 60% at 50% 100%, color-mix(in oklab, var(--accent) 10%, transparent), transparent);
 }

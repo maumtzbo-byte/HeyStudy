@@ -169,8 +169,8 @@ function KnowledgeMapShowcase() {
           );
         })}
       </div>
-      <div className="mt-6 flex items-start gap-2 rounded-lg bg-[#e3fbf1] px-4 py-3">
-        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#1bb77f]" />
+      <div className="mt-6 flex items-start gap-2 rounded-lg bg-[#ecebfa] px-4 py-3">
+        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#565ec2]" />
         <p className="text-sm text-[#111111]">
           Ejemplo: HeyStudy encontró que <strong>Funciones</strong> es tu punto más débil — por eso es lo primero en
           tu plan de hoy.
@@ -188,7 +188,7 @@ export default async function Home() {
     <div className="flex flex-1 flex-col bg-background">
       {/* Header + Hero — banda atmosférica */}
       <div className="relative overflow-hidden bg-atmosphere">
-        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-accent" />
+        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-30" />
 
         <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-6">
           <Logo inverted />
@@ -217,14 +217,16 @@ export default async function Home() {
               Iniciar sesión
             </Link>
             <Link href="/registro">
-              <Button size="sm">Crear cuenta</Button>
+              <Button size="sm" className="bg-white text-accent-hover shadow-none hover:bg-white/90">
+                Crear cuenta
+              </Button>
             </Link>
           </div>
         </header>
 
         <section className="relative px-4 pt-10 pb-20 sm:pt-16">
           <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-accent backdrop-blur-md">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
               <Sparkles className="h-3.5 w-3.5" />
               Tu copiloto de estudio con IA
             </span>
@@ -239,7 +241,7 @@ export default async function Home() {
             </p>
             <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
               <Link href="/registro" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full bg-white text-accent-hover shadow-none hover:bg-white/90 sm:w-auto">
                   Empezar gratis
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -290,7 +292,7 @@ export default async function Home() {
 
       {/* Mapa de conocimiento */}
       <section id="mapa-conocimiento" className="relative overflow-hidden bg-atmosphere px-4 py-20">
-        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-accent opacity-60" />
+        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-20" />
         <div className="relative mx-auto max-w-3xl text-center">
           <h2 className="text-2xl font-semibold tracking-tight text-deep-foreground sm:text-3xl">
             Conoce tu nivel real
@@ -354,7 +356,7 @@ export default async function Home() {
 
       {/* CTA final */}
       <section className="relative overflow-hidden bg-atmosphere px-4 py-24 text-center">
-        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-accent opacity-40" />
+        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-20" />
         <div className="relative mx-auto max-w-xl">
           <h2 className="text-2xl font-semibold tracking-tight text-deep-foreground sm:text-3xl">
             Tu próximo examen no debería decidir qué estudias.
@@ -362,7 +364,7 @@ export default async function Home() {
             HeyStudy sí.
           </h2>
           <Link href="/registro" className="mt-8 inline-block">
-            <Button size="lg">
+            <Button size="lg" className="bg-white text-accent-hover shadow-none hover:bg-white/90">
               Descubre qué deberías estudiar hoy
               <ArrowRight className="h-4 w-4" />
             </Button>
