@@ -163,25 +163,25 @@ export default async function Home() {
       <SiteHeader />
       <HeroScene />
 
-      {/* Cómo funciona — historia en tarjetas, como en la referencia */}
-      <section id="como-funciona" className="relative overflow-hidden bg-atmosphere px-4 py-20 sm:py-28">
-        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-20" />
+      {/* Cómo funciona — historia en tarjetas */}
+      <section id="como-funciona" className="relative overflow-hidden bg-surface px-4 py-20 sm:py-28">
+        <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-accent opacity-10" />
 
         <Reveal className="relative mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-deep-foreground sm:text-4xl">
-            Deja de adivinar.
+          <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+            Deja de adivinar qué estudiar.
             <br />
             Empieza a{" "}
-            <span className="mx-1 inline-flex h-9 w-9 -translate-y-1 items-center justify-center rounded-lg bg-white align-middle">
+            <span className="mx-1 inline-flex h-9 w-9 -translate-y-1 items-center justify-center rounded-lg bg-white align-middle shadow-soft">
               <Lightbulb className="h-5 w-5 text-accent-hover" />
             </span>{" "}
-            saber.
+            saber qué toca hoy.
           </h2>
         </Reveal>
 
         <div className="relative mx-auto mt-16 w-full max-w-4xl">
           <Reveal delay={0.15}>
-            <p className="text-center text-xs font-semibold tracking-wide text-deep-muted uppercase">
+            <p className="text-center text-xs font-semibold tracking-wide text-muted uppercase">
               Así es como funciona:
             </p>
           </Reveal>
@@ -287,22 +287,22 @@ export default async function Home() {
         </Reveal>
       </section>
 
-      {/* CTA final */}
-      <section className="relative overflow-hidden bg-atmosphere px-4 py-24 text-center">
+      {/* CTA final — único momento de color sólido, como cierre */}
+      <section className="relative overflow-hidden bg-accent px-4 py-24 text-center">
         <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-20" />
         <Reveal className="relative mx-auto max-w-xl">
-          <h2 className="text-2xl font-semibold tracking-tight text-deep-foreground sm:text-3xl">
-            Tu próximo examen no debería decidir qué estudias.
+          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+            Deja de estudiar a ciegas.
             <br />
-            HeyStudy sí.
+            Sabe qué repasar antes de tu próximo examen.
           </h2>
           <Link href="/registro" className="mt-8 inline-block">
             <Button size="lg" className="bg-white text-accent-hover shadow-none hover:bg-white/90">
-              Descubre qué deberías estudiar hoy
+              Empezar gratis
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-          <p className="mt-4 text-sm text-deep-muted">Gratis para empezar · Sin tarjeta</p>
+          <p className="mt-4 text-sm text-white/80">Gratis para empezar · Sin tarjeta</p>
         </Reveal>
       </section>
 

@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f4fc;
-  --surface: #ffffff;
-  --foreground: #201f3d;
-  --muted: #6b6790;
-  --border: #e3e0f5;
+  --background: #ffffff;
+  --surface: #f7f7fa;
+  --foreground: #17172b;
+  --muted: #6b6b7c;
+  --border: #e7e6ee;
   --accent: #6c74d6;
   --accent-hover: #565ec2;
   --accent-foreground: #ffffff;
@@ -15,11 +15,13 @@
   --danger: #b3341c;
   --shadow-color: 245 35% 20%;
 
-  --deep: #6c74d6;
-  --deep-surface: #eeecfb;
-  --deep-foreground: #ffffff;
-  --deep-muted: #dcdcf7;
-  --deep-border: rgba(255, 255, 255, 0.2);
+  /* Bandas "suaves" (antes oscuras/atmosféricas): mismo rol de sección
+     destacada, ahora en tono claro para el fondo blanco minimalista. */
+  --deep: #f2f1fb;
+  --deep-surface: #ffffff;
+  --deep-foreground: #17172b;
+  --deep-muted: #6b6b7c;
+  --deep-border: #e3e0f5;
 }
 
 @theme inline {
@@ -58,6 +60,12 @@
     --warning: #e0a83f;
     --danger: #e2705a;
     --shadow-color: 245 45% 3%;
+
+    --deep: #211f47;
+    --deep-surface: #18173a;
+    --deep-foreground: #f1effc;
+    --deep-muted: #aca8d6;
+    --deep-border: #34325f;
   }
 }
 
