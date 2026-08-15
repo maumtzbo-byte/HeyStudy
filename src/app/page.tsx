@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { DemoInteractivo } from "@/components/marketing/DemoInteractivo";
 import { Constellation } from "@/components/marketing/Constellation";
+import { cn } from "@/lib/utils/cn";
 
 export const metadata: Metadata = {
   title: "HeyStudy — Sabe qué estudiar, hoy",
@@ -58,6 +59,15 @@ const FEATURES = [
     title: "Tutor IA a tu ritmo",
     description: "Pregunta lo que no entiendas. Modo socrático, explicación directa, pista o práctica — tú eliges.",
   },
+];
+
+// Layout tipo bento: la 1 (diagnóstico) queda ancha arriba, la 4 (tutor)
+// queda alta a la derecha, las otras dos rellenan la fila de abajo.
+const BENTO_POSITION = [
+  "sm:col-start-1 sm:col-end-3 sm:row-start-1 sm:row-end-2",
+  "sm:col-start-1 sm:col-end-2 sm:row-start-2 sm:row-end-3",
+  "sm:col-start-2 sm:col-end-3 sm:row-start-2 sm:row-end-3",
+  "sm:col-start-3 sm:col-end-4 sm:row-start-1 sm:row-end-3",
 ];
 
 const PLAN_PREVIEW = [
@@ -182,6 +192,26 @@ export default async function Home() {
 
         <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-6">
           <Logo inverted />
+          <nav className="hidden items-center gap-1 rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-md md:flex">
+            <a
+              href="#como-funciona"
+              className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
+            >
+              Cómo funciona
+            </a>
+            <a
+              href="#mapa-conocimiento"
+              className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
+            >
+              Mapa de conocimiento
+            </a>
+            <a
+              href="#que-incluye"
+              className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
+            >
+              Qué incluye
+            </a>
+          </nav>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm font-medium text-deep-muted hover:text-deep-foreground">
               Iniciar sesión
@@ -194,7 +224,7 @@ export default async function Home() {
 
         <section className="relative px-4 pt-10 pb-20 sm:pt-16">
           <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-deep-surface px-3 py-1 text-xs font-medium text-accent">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-accent backdrop-blur-md">
               <Sparkles className="h-3.5 w-3.5" />
               Tu copiloto de estudio con IA
             </span>
@@ -218,7 +248,7 @@ export default async function Home() {
                 <Button
                   size="lg"
                   variant="secondary"
-                  className="w-full border-deep-border bg-deep-surface text-deep-foreground hover:bg-deep-border sm:w-auto"
+                  className="w-full border-white/15 bg-white/10 text-deep-foreground backdrop-blur-md hover:bg-white/15 sm:w-auto"
                 >
                   Ver cómo funciona
                 </Button>
@@ -259,7 +289,7 @@ export default async function Home() {
       </section>
 
       {/* Mapa de conocimiento */}
-      <section className="relative overflow-hidden bg-atmosphere px-4 py-20">
+      <section id="mapa-conocimiento" className="relative overflow-hidden bg-atmosphere px-4 py-20">
         <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-accent opacity-60" />
         <div className="relative mx-auto max-w-3xl text-center">
           <h2 className="text-2xl font-semibold tracking-tight text-deep-foreground sm:text-3xl">
@@ -276,18 +306,29 @@ export default async function Home() {
       </section>
 
       {/* Qué incluye */}
-      <section className="border-t border-border bg-surface px-4 py-20">
+      <section id="que-incluye" className="border-t border-border bg-surface px-4 py-20">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             Qué incluye
           </h2>
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {FEATURES.map((feature) => (
+          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:grid-rows-2">
+            {FEATURES.map((feature, i) => (
               <div
                 key={feature.title}
-                className="rounded-xl border border-border bg-background p-6 shadow-soft transition-transform hover:-translate-y-0.5"
+                className={cn(
+                  "rounded-xl border p-6 shadow-soft transition-transform hover:-translate-y-0.5",
+                  BENTO_POSITION[i],
+                  i === 0 || i === 3
+                    ? "border-accent/20 bg-accent-soft"
+                    : "border-border bg-background",
+                )}
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent-hover">
+                <span
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-full",
+                    i === 0 || i === 3 ? "bg-accent text-accent-foreground" : "bg-accent-soft text-accent-hover",
+                  )}
+                >
                   <feature.icon className="h-5 w-5" />
                 </span>
                 <h3 className="mt-4 text-base font-semibold text-foreground">{feature.title}</h3>
