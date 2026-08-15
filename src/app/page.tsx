@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Sparkles, Lightbulb, ArrowRight, CheckCircle2, XCircle, Target, ListChecks, LayoutGrid, FileText } from "lucide-react";
@@ -8,23 +7,14 @@ import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { DemoInteractivo } from "@/components/marketing/DemoInteractivo";
 import { Constellation } from "@/components/marketing/Constellation";
-import { ParallaxField, ParallaxLayer } from "@/components/marketing/Parallax";
+import { HeroScene } from "@/components/marketing/HeroScene";
+import { Reveal } from "@/components/marketing/Reveal";
+import { KNOWLEDGE_MAP, DIAGNOSTIC_ITEMS, TUTOR_CHAT, levelFromScore, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
 import { cn } from "@/lib/utils/cn";
 
 export const metadata: Metadata = {
   title: "HeyStudy — Sabe qué estudiar, hoy",
 };
-
-const DIAGNOSTIC_ITEMS = [
-  { question: "¿Cuál es el vértice de f(x) = x² − 4x + 3?", correct: true, detail: "Dominas este concepto" },
-  { question: "Factoriza x² − 5x + 6", correct: false, detail: "Confundes el signo del término medio" },
-  { question: "Resuelve 2x + 3 = 11", correct: true, detail: "Dominas este concepto" },
-];
-
-const TUTOR_CHAT = [
-  { role: "user" as const, text: "¿Por qué la derivada de x² es 2x?" },
-  { role: "assistant" as const, text: "Buena pregunta — ¿qué pasa si primero desarrollas (x+h)² y ves qué tan rápido crece?" },
-];
 
 const FEATURES = [
   {
@@ -57,82 +47,6 @@ const BENTO_POSITION = [
   "sm:col-start-2 sm:col-end-3 sm:row-start-2 sm:row-end-3",
   "sm:col-start-3 sm:col-end-4 sm:row-start-1 sm:row-end-3",
 ];
-
-const PLAN_PREVIEW = [
-  { title: "Funciones cuadráticas", reason: "Tu tema más débil ahora mismo", minutes: 20, level: "danger" as const },
-  { title: "Factorización", reason: "4 errores detectados esta semana", minutes: 15, level: "warning" as const },
-  { title: "Ecuaciones lineales", reason: "Repaso rápido para mantener el nivel", minutes: 10, level: "success" as const },
-];
-
-const KNOWLEDGE_MAP = [
-  { topic: "Funciones", score: 0.42 },
-  { topic: "Factorización", score: 0.67 },
-  { topic: "Ecuaciones", score: 0.91 },
-  { topic: "Polinomios", score: 0.73 },
-  { topic: "Geometría", score: 0.88 },
-];
-
-function levelFromScore(score: number): "danger" | "warning" | "success" {
-  if (score >= 0.7) return "success";
-  if (score >= 0.4) return "warning";
-  return "danger";
-}
-
-// Estos dos mockups son "capturas de producto" flotando sobre las bandas
-// oscuras: deben verse siempre igual (claros), sin adaptarse al modo
-// oscuro del sistema — por eso usan colores fijos en vez de los tokens de tema.
-const FIXED_LEVEL_BAR_CLASS: Record<"danger" | "warning" | "success", string> = {
-  danger: "bg-[#b3341c]",
-  warning: "bg-[#b4790a]",
-  success: "bg-[#3f7d52]",
-};
-
-function DashboardPreview() {
-  return (
-    <div className="mx-auto w-full max-w-2xl rounded-2xl border border-[#e8e8e5] bg-white p-6 shadow-soft sm:p-8">
-      <p className="text-sm text-[#4b4b4f]">Buenas tardes, Alex 👋</p>
-
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs font-medium tracking-wide text-[#4b4b4f] uppercase">Tu preparación</p>
-          <p className="mt-1 text-sm font-medium text-[#111111]">Matemáticas · Examen en 6 días</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-3xl font-semibold text-[#111111]">72%</span>
-          <span className="rounded-full bg-[#b4790a]/10 px-2.5 py-1 text-xs font-medium text-[#b4790a]">
-            Bien preparado
-          </span>
-        </div>
-      </div>
-      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#e8e8e5]">
-        <div className="h-full rounded-full bg-[#b4790a]" style={{ width: "72%" }} />
-      </div>
-
-      <div className="mt-6 border-t border-[#e8e8e5] pt-6">
-        <p className="text-xs font-medium tracking-wide text-[#4b4b4f] uppercase">Tu plan de hoy</p>
-        <div className="mt-3 flex flex-col divide-y divide-[#e8e8e5]">
-          {PLAN_PREVIEW.map((item) => (
-            <div key={item.title} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
-              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${FIXED_LEVEL_BAR_CLASS[item.level]}`} />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-[#111111]">{item.title}</p>
-                <p className="text-xs text-[#4b4b4f]">{item.reason}</p>
-              </div>
-              <span className="shrink-0 text-xs font-medium text-[#4b4b4f]">{item.minutes} min</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <Link href="/registro" className="mt-6 block">
-        <Button className="w-full">
-          Empezar sesión
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-      </Link>
-    </div>
-  );
-}
 
 function KnowledgeMapVisual() {
   return (
@@ -213,103 +127,42 @@ function TutorChatVisual() {
   );
 }
 
+const STORY_CARDS = [
+  {
+    eyebrow: "Diagnóstico con IA",
+    title: "No solo si acertaste — qué tanto sabes",
+    description:
+      "Respondes preguntas generadas para ti. Analizamos tu respuesta más allá de correcto o incorrecto para detectar patrones de error específicos.",
+    Visual: DiagnosticVisual,
+  },
+  {
+    eyebrow: "Mapa de conocimiento",
+    title: "Conoce tu nivel real, tema por tema",
+    description:
+      'No es una lista de temas marcados como "visto". Es tu dominio real, actualizado cada vez que practicas.',
+    Visual: KnowledgeMapVisual,
+  },
+  {
+    eyebrow: "Tutor IA",
+    title: "Pregunta lo que no entiendas, a tu ritmo",
+    description: "Modo socrático, explicación directa, pista o práctica — tú eliges cómo quieres que te expliquen.",
+    Visual: TutorChatVisual,
+  },
+];
+
 export default async function Home() {
   const user = await getAuthUser();
   if (user) redirect("/dashboard");
 
   return (
     <div className="flex flex-1 flex-col bg-background">
-      {/* Header + Hero — banda atmosférica con paralaje 3D */}
-      <ParallaxField className="relative overflow-hidden bg-atmosphere">
-        <ParallaxLayer depth={0.4} className="absolute inset-0">
-          <Image
-            src="/images/hero-gate.png"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-top"
-          />
-        </ParallaxLayer>
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[var(--deep)]"
-          aria-hidden
-        />
-
-        <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-6">
-          <Logo inverted />
-          <nav className="hidden items-center gap-1 rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-md md:flex">
-            <a
-              href="#como-funciona"
-              className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
-            >
-              Cómo funciona
-            </a>
-            <a
-              href="#demo"
-              className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
-            >
-              Demo
-            </a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm font-medium text-deep-muted hover:text-deep-foreground">
-              Iniciar sesión
-            </Link>
-            <Link href="/registro">
-              <Button size="sm" className="bg-white text-accent-hover shadow-none hover:bg-white/90">
-                Crear cuenta
-              </Button>
-            </Link>
-          </div>
-        </header>
-
-        <section className="relative px-4 pt-10 pb-20 sm:pt-16">
-          <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5" />
-              Tu copiloto de estudio con IA
-            </span>
-            <h1 className="mt-6 text-4xl leading-[1.1] font-semibold tracking-tight text-deep-foreground sm:text-5xl">
-              Estudia lo que necesitas.
-              <br />
-              No lo que crees que necesitas.
-            </h1>
-            <p className="mt-6 max-w-xl text-lg text-deep-muted">
-              HeyStudy analiza lo que realmente dominas, encuentra tus puntos débiles y convierte tus exámenes en un
-              plan de estudio personalizado.
-            </p>
-            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
-              <Link href="/registro" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full bg-white text-accent-hover shadow-none hover:bg-white/90 sm:w-auto">
-                  Empezar gratis
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <a href="#como-funciona" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="w-full border-white/15 bg-white/10 text-deep-foreground backdrop-blur-md hover:bg-white/15 sm:w-auto"
-                >
-                  Ver cómo funciona
-                </Button>
-              </a>
-            </div>
-            <p className="mt-4 text-sm text-deep-muted">Gratis para empezar · Sin tarjeta</p>
-          </div>
-
-          <ParallaxLayer depth={1.1} className="relative mx-auto mt-16 w-full max-w-5xl">
-            <DashboardPreview />
-          </ParallaxLayer>
-        </section>
-      </ParallaxField>
+      <HeroScene />
 
       {/* Cómo funciona — historia en tarjetas, como en la referencia */}
       <section id="como-funciona" className="relative overflow-hidden bg-atmosphere px-4 py-20 sm:py-28">
         <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-20" />
 
-        <div className="relative mx-auto max-w-2xl text-center">
+        <Reveal className="relative mx-auto max-w-2xl text-center">
           <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-deep-foreground sm:text-4xl">
             Deja de adivinar.
             <br />
@@ -319,50 +172,30 @@ export default async function Home() {
             </span>{" "}
             saber.
           </h2>
-        </div>
+        </Reveal>
 
         <div className="relative mx-auto mt-16 w-full max-w-4xl">
-          <p className="text-center text-xs font-semibold tracking-wide text-deep-muted uppercase">
-            Así es como funciona:
-          </p>
+          <Reveal delay={0.15}>
+            <p className="text-center text-xs font-semibold tracking-wide text-deep-muted uppercase">
+              Así es como funciona:
+            </p>
+          </Reveal>
 
           <div className="mt-8 flex flex-col gap-6">
-            <div className="grid grid-cols-1 items-center gap-6 rounded-3xl bg-white p-6 shadow-soft sm:grid-cols-2 sm:gap-10 sm:p-10">
-              <div>
-                <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Diagnóstico con IA</p>
-                <h3 className="mt-3 text-xl font-semibold text-[#111111]">No solo si acertaste — qué tanto sabes</h3>
-                <p className="mt-3 text-[#6b6790]">
-                  Respondes preguntas generadas para ti. Analizamos tu respuesta más allá de correcto o incorrecto
-                  para detectar patrones de error específicos.
-                </p>
-              </div>
-              <DiagnosticVisual />
-            </div>
-
-            <div className="grid grid-cols-1 items-center gap-6 rounded-3xl bg-white p-6 shadow-soft sm:grid-cols-2 sm:gap-10 sm:p-10">
-              <div>
-                <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">
-                  Mapa de conocimiento
-                </p>
-                <h3 className="mt-3 text-xl font-semibold text-[#111111]">Conoce tu nivel real, tema por tema</h3>
-                <p className="mt-3 text-[#6b6790]">
-                  No es una lista de temas marcados como &ldquo;visto&rdquo;. Es tu dominio real, actualizado cada
-                  vez que practicas.
-                </p>
-              </div>
-              <KnowledgeMapVisual />
-            </div>
-
-            <div className="grid grid-cols-1 items-center gap-6 rounded-3xl bg-white p-6 shadow-soft sm:grid-cols-2 sm:gap-10 sm:p-10">
-              <div>
-                <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Tutor IA</p>
-                <h3 className="mt-3 text-xl font-semibold text-[#111111]">Pregunta lo que no entiendas, a tu ritmo</h3>
-                <p className="mt-3 text-[#6b6790]">
-                  Modo socrático, explicación directa, pista o práctica — tú eliges cómo quieres que te expliquen.
-                </p>
-              </div>
-              <TutorChatVisual />
-            </div>
+            {STORY_CARDS.map(({ eyebrow, title, description, Visual }, i) => (
+              <Reveal key={eyebrow} delay={0.1 * i} y={40}>
+                <div className="grid grid-cols-1 items-center gap-6 rounded-3xl bg-white p-6 shadow-soft sm:grid-cols-2 sm:gap-10 sm:p-10">
+                  <div>
+                    <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">{eyebrow}</p>
+                    <h3 className="mt-3 text-xl font-semibold text-[#111111]">{title}</h3>
+                    <p className="mt-3 text-[#6b6790]">{description}</p>
+                  </div>
+                  <Reveal delay={0.1 * i + 0.15} y={16}>
+                    <Visual />
+                  </Reveal>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
@@ -370,30 +203,32 @@ export default async function Home() {
       {/* Qué más incluye — bento grid */}
       <section className="border-t border-border bg-surface px-4 py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-            Qué más incluye
-          </h2>
+          <Reveal>
+            <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+              Qué más incluye
+            </h2>
+          </Reveal>
           <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:grid-rows-2">
             {FEATURES.map((feature, i) => (
-              <div
-                key={feature.title}
-                className={cn(
-                  "rounded-xl border p-6 shadow-soft transition-transform hover:-translate-y-0.5",
-                  BENTO_POSITION[i],
-                  i === 0 || i === 3 ? "border-accent/20 bg-accent-soft" : "border-border bg-background",
-                )}
-              >
-                <span
+              <Reveal key={feature.title} delay={0.08 * i} className={BENTO_POSITION[i]}>
+                <div
                   className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-full",
-                    i === 0 || i === 3 ? "bg-accent text-accent-foreground" : "bg-accent-soft text-accent-hover",
+                    "h-full rounded-xl border p-6 shadow-soft transition-transform hover:-translate-y-0.5",
+                    i === 0 || i === 3 ? "border-accent/20 bg-accent-soft" : "border-border bg-background",
                   )}
                 >
-                  <feature.icon className="h-5 w-5" />
-                </span>
-                <h3 className="mt-4 text-base font-semibold text-foreground">{feature.title}</h3>
-                <p className="mt-2 text-sm text-muted">{feature.description}</p>
-              </div>
+                  <span
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-full",
+                      i === 0 || i === 3 ? "bg-accent text-accent-foreground" : "bg-accent-soft text-accent-hover",
+                    )}
+                  >
+                    <feature.icon className="h-5 w-5" />
+                  </span>
+                  <h3 className="mt-4 text-base font-semibold text-foreground">{feature.title}</h3>
+                  <p className="mt-2 text-sm text-muted">{feature.description}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -401,21 +236,21 @@ export default async function Home() {
 
       {/* Demo interactiva */}
       <section id="demo" className="px-4 py-20">
-        <div className="mx-auto max-w-3xl text-center">
+        <Reveal className="mx-auto max-w-3xl text-center">
           <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             ¿Quieres ver cómo funciona?
           </h2>
           <p className="mt-4 text-muted">Elige una materia y mira un ejemplo de tu plan del día — sin registrarte.</p>
-        </div>
-        <div className="mt-10">
+        </Reveal>
+        <Reveal delay={0.15} className="mt-10">
           <DemoInteractivo />
-        </div>
+        </Reveal>
       </section>
 
       {/* CTA final */}
       <section className="relative overflow-hidden bg-atmosphere px-4 py-24 text-center">
         <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-20" />
-        <div className="relative mx-auto max-w-xl">
+        <Reveal className="relative mx-auto max-w-xl">
           <h2 className="text-2xl font-semibold tracking-tight text-deep-foreground sm:text-3xl">
             Tu próximo examen no debería decidir qué estudias.
             <br />
@@ -428,7 +263,7 @@ export default async function Home() {
             </Button>
           </Link>
           <p className="mt-4 text-sm text-deep-muted">Gratis para empezar · Sin tarjeta</p>
-        </div>
+        </Reveal>
       </section>
 
       <footer className="border-t border-border px-4 py-12">
