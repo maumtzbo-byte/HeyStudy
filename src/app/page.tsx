@@ -8,6 +8,7 @@ import { Logo } from "@/components/ui/Logo";
 import { DemoInteractivo } from "@/components/marketing/DemoInteractivo";
 import { Constellation } from "@/components/marketing/Constellation";
 import { HeroScene } from "@/components/marketing/HeroScene";
+import { SiteHeader } from "@/components/marketing/SiteHeader";
 import { Reveal } from "@/components/marketing/Reveal";
 import { KNOWLEDGE_MAP, DIAGNOSTIC_ITEMS, TUTOR_CHAT, levelFromScore, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
 import { cn } from "@/lib/utils/cn";
@@ -156,6 +157,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col bg-background">
+      <SiteHeader />
       <HeroScene />
 
       {/* Cómo funciona — historia en tarjetas, como en la referencia */}

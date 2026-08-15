@@ -6,7 +6,6 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Logo } from "@/components/ui/Logo";
 import { ParallaxField, ParallaxLayer } from "@/components/marketing/Parallax";
 import { PLAN_PREVIEW, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
 
@@ -71,13 +70,15 @@ export function HeroScene() {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
 
-  // Al hacer scroll: el texto se va primero, la tarjeta un poco después,
-  // y la imagen se funde a color sólido — igual que en el video de
-  // referencia (headline se va, mockup se va, fondo pasa de foto a color).
+  // Al hacer scroll: el texto se va primero, la tarjeta un poco después
+  // (con un ligero acercamiento, no solo fade), y la imagen se funde a
+  // color sólido — igual que en el video de referencia (headline se va,
+  // mockup se va, fondo pasa de foto a color).
   const contentOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
   const contentY = useTransform(scrollYProgress, [0, 0.45], [0, -40]);
   const mockupOpacity = useTransform(scrollYProgress, [0.15, 0.7], [1, 0]);
   const mockupY = useTransform(scrollYProgress, [0.15, 0.7], [0, -30]);
+  const mockupScale = useTransform(scrollYProgress, [0, 0.7], [1, 1.06]);
   const overlayOpacity = useTransform(scrollYProgress, [0.35, 1], [0, 1]);
 
   return (
@@ -92,35 +93,7 @@ export function HeroScene() {
       {/* Se funde a color sólido conforme avanzas el scroll */}
       <motion.div className="absolute inset-0 bg-[var(--deep)]" style={{ opacity: overlayOpacity }} aria-hidden />
 
-      <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-6">
-        <Logo inverted />
-        <nav className="hidden items-center gap-1 rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-md md:flex">
-          <a
-            href="#como-funciona"
-            className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
-          >
-            Cómo funciona
-          </a>
-          <a
-            href="#demo"
-            className="rounded-full px-4 py-1.5 text-sm font-medium text-deep-foreground/90 hover:bg-white/10"
-          >
-            Demo
-          </a>
-        </nav>
-        <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm font-medium text-deep-muted hover:text-deep-foreground">
-            Iniciar sesión
-          </Link>
-          <Link href="/registro">
-            <Button size="sm" className="bg-white text-accent-hover shadow-none hover:bg-white/90">
-              Crear cuenta
-            </Button>
-          </Link>
-        </div>
-      </header>
-
-      <section className="relative px-4 pt-10 pb-20 sm:pt-16">
+      <section className="relative px-4 pt-28 pb-20 sm:pt-32">
         <motion.div
           style={{ opacity: contentOpacity, y: contentY }}
           className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center"
@@ -172,7 +145,7 @@ export function HeroScene() {
         </motion.div>
 
         <ParallaxLayer depth={1.1} className="relative mx-auto mt-16 w-full max-w-5xl">
-          <motion.div style={{ opacity: mockupOpacity, y: mockupY }}>
+          <motion.div style={{ opacity: mockupOpacity, y: mockupY, scale: mockupScale }}>
             <motion.div
               initial={{ opacity: 0, y: 32, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
