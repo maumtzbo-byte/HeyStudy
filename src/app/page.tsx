@@ -94,8 +94,8 @@ export default async function Home() {
             <span className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-medium text-accent-hover">
               Diagnóstico con IA · gratis para empezar
             </span>
-            <h1 className="mt-6 font-serif text-4xl leading-[1.1] font-semibold tracking-tight text-foreground sm:text-5xl">
-              ¿Qué debería <span className="italic text-accent">estudiar hoy</span>, y por qué?
+            <h1 className="mt-6 text-4xl leading-[1.1] font-semibold tracking-tight text-foreground sm:text-5xl">
+              ¿Qué debería <span className="text-accent-hover">estudiar hoy</span>, y por qué?
             </h1>
             <p className="mt-6 max-w-lg text-lg text-muted">
               HeyStudy diagnostica qué sabes realmente, no solo si respondiste bien o mal, y arma tu plan de
@@ -120,7 +120,7 @@ export default async function Home() {
           </div>
 
           <div className="relative hidden lg:block">
-            <div className="rounded-2xl border border-border bg-surface p-6 shadow-warm">
+            <div className="rounded-2xl border border-border bg-surface p-6 shadow-soft">
               <p className="text-xs font-medium tracking-wide text-muted uppercase">Tu plan de hoy</p>
               <div className="mt-4 flex flex-col divide-y divide-border">
                 {PLAN_PREVIEW.map((item) => (
@@ -140,7 +140,7 @@ export default async function Home() {
                 ))}
               </div>
             </div>
-            <div className="absolute -bottom-6 -left-6 flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 shadow-warm">
+            <div className="absolute -bottom-6 -left-6 flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3 shadow-soft">
               <span className="h-2.5 w-2.5 rounded-full bg-warning" />
               <span className="text-xs font-medium text-foreground">Cálculo: 62% dominado</span>
             </div>
@@ -151,13 +151,13 @@ export default async function Home() {
       {/* Cómo funciona */}
       <section className="border-t border-border bg-surface px-4 py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-center font-serif text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             Cómo funciona
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
             {STEPS.map((step) => (
               <div key={step.number} className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-accent font-serif text-base font-semibold text-accent">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-accent text-base font-semibold text-accent-hover">
                   {step.number}
                 </span>
                 <h3 className="mt-4 text-base font-semibold text-foreground">{step.title}</h3>
@@ -171,14 +171,14 @@ export default async function Home() {
       {/* Qué incluye */}
       <section className="px-4 py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-center font-serif text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          <h2 className="text-center text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             Qué incluye
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
             {FEATURES.map((feature) => (
               <div
                 key={feature.title}
-                className="rounded-xl border border-border bg-surface p-6 shadow-warm transition-transform hover:-translate-y-0.5"
+                className="rounded-xl border border-border bg-surface p-6 shadow-soft transition-transform hover:-translate-y-0.5"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent">
                   <feature.icon className="h-5 w-5" />
@@ -194,7 +194,7 @@ export default async function Home() {
       {/* CTA final */}
       <section className="border-t border-border px-4 py-20 text-center">
         <div className="mx-auto max-w-xl rounded-2xl border border-accent/20 bg-accent-soft px-8 py-14">
-          <h2 className="font-serif text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             Deja de adivinar qué estudiar
           </h2>
           <p className="mt-4 text-muted">Crea tu cuenta gratis y ten tu primer diagnóstico en minutos.</p>

@@ -23,8 +23,8 @@ export default async function OnboardingPage() {
         <div className="mb-8 flex justify-center">
           <Logo />
         </div>
-        <div className="rounded-2xl border border-border bg-surface p-8 shadow-warm">
-          <h1 className="mb-1 font-serif text-lg font-semibold text-foreground">Cuéntanos de ti</h1>
+        <div className="rounded-2xl border border-border bg-surface p-8 shadow-soft">
+          <h1 className="mb-1 text-lg font-semibold text-foreground">Cuéntanos de ti</h1>
           <p className="mb-6 text-sm text-muted">
             Con esto armamos tu espacio de estudio. Puedes ajustar todo después.
           </p>

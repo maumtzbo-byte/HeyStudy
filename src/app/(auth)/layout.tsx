@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <Logo />
           </Link>
         </div>
-        <div className="rounded-2xl border border-border bg-surface p-8 shadow-warm">{children}</div>
+        <div className="rounded-2xl border border-border bg-surface p-8 shadow-soft">{children}</div>
       </div>
     </div>
   );
