@@ -25,17 +25,17 @@
   --subtle: #8a938f;
   --border: #e6e4de;
   --border-strong: #9aa09c;
-  --accent: #1e5b67;
-  --accent-hover: #14434d;
+  --accent: #6d46e3;
+  --accent-hover: #5a37c4;
   --accent-foreground: #ffffff;
-  --accent-soft: #ebf3f4;
+  --accent-soft: #f0ecfd;
   --premium: #8d6a34;
   --premium-hover: #74562a;
   --premium-soft: #f5efe6;
   --success: #396a5a;
   --warning: #7e5e25;
   --danger: #974535;
-  --shadow-color: 190 30% 16%;
+  --shadow-color: 258 40% 20%;
 
   --deep: #eef3f3;
   --deep-surface: #fbfaf9;
@@ -70,7 +70,7 @@
   --color-deep-border: var(--deep-border);
 
   --font-sans: var(--font-inter);
-  --font-display: var(--font-fraunces);
+  --font-display: var(--font-jakarta);
 
   /* Escala de radios propia — cards y paneles se sienten "tallados", no
      genéricos. Sobrescribe la escala default de Tailwind para que
@@ -101,10 +101,10 @@
     --subtle: #7d8a89;
     --border: #2c3739;
     --border-strong: #445053;
-    --accent: #75bfc7;
-    --accent-hover: #8fcfd6;
-    --accent-foreground: #10191b;
-    --accent-soft: #243d42;
+    --accent: #b49dfb;
+    --accent-hover: #c9bafc;
+    --accent-foreground: #171326;
+    --accent-soft: #2a2444;
     --premium: #d3b073;
     --premium-hover: #e0c48f;
     --premium-soft: #443b2c;
