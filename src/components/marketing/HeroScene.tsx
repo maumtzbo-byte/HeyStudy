@@ -80,9 +80,18 @@ export function HeroScene() {
         }}
       />
 
-      <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-6 px-6 pt-12 pb-14 sm:gap-12 sm:px-8 sm:pt-20 sm:pb-24 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
-        {/* Columna izquierda — mensaje */}
-        <motion.div variants={container} initial="hidden" animate="show" className="max-w-xl">
+      {/* En móvil el orden es mensaje → escena → datos, para que la mascota
+          entre en la primera pantalla en vez de quedar debajo del pliegue.
+          En lg el mensaje y los datos vuelven a la columna izquierda y la
+          escena ocupa la derecha completa. */}
+      <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-y-8 px-6 pt-10 pb-14 sm:px-8 sm:pt-20 sm:pb-24 lg:grid-cols-[1.05fr_1fr] lg:gap-x-10 lg:gap-y-10">
+        {/* Mensaje */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="max-w-xl lg:col-start-1 lg:row-start-1"
+        >
           {/* Etiqueta discreta con filete, no una píldora con destello: la
               píldora con ✨ es la firma visual de landing generada, y esta
               página la repetía en cada sección. */}
@@ -96,7 +105,7 @@ export function HeroScene() {
 
           <motion.h1
             variants={item}
-            className="mt-5 font-display text-[2.6rem] leading-[1.05] font-semibold tracking-tight text-foreground sm:mt-6 sm:text-6xl sm:leading-[1.02] lg:text-[4.25rem]"
+            className="mt-4 font-display text-[2.85rem] leading-[0.98] font-semibold tracking-[-0.03em] text-foreground sm:mt-6 sm:text-6xl sm:leading-[1.02] sm:tracking-tight lg:text-[4.25rem]"
           >
             ¿Qué deberías
             <br />
@@ -108,35 +117,34 @@ export function HeroScene() {
             convierte tu próximo examen en un plan claro para hoy.
           </motion.p>
 
-          <motion.div variants={item} className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row sm:gap-4">
+          {/* Una sola acción primaria en móvil: dos botones apilados del mismo
+              peso reparten la atención y es el error más común en heroes
+              móviles. El secundario baja a enlace y sólo recupera forma de
+              botón cuando caben en fila. */}
+          <motion.div variants={item} className="mt-7 flex flex-col items-start gap-4 sm:mt-9 sm:flex-row sm:items-center">
             <ButtonLink href="/registro" size="lg" className="w-full sm:w-auto">
               Empezar gratis
               <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
             </ButtonLink>
-            <a href="#como-funciona" className="w-full sm:w-auto">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+            <a
+              href="#como-funciona"
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted underline-offset-4 hover:text-foreground hover:underline sm:hidden"
+            >
+              <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
+              Ver cómo funciona
+            </a>
+            <a href="#como-funciona" className="hidden sm:inline-flex">
+              <Button size="lg" variant="secondary">
                 <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
                 Ver cómo funciona
               </Button>
             </a>
           </motion.div>
-
-          {/* Sin tarjeta ni chips de ícono: una regla superior y tres datos.
-              El "ícono Lucide en cuadrito pastel" era el patrón más copiado
-              de la página. */}
-          <motion.div variants={item} className="mt-8 flex gap-6 border-t border-border pt-5 sm:mt-12 sm:gap-12 sm:pt-6">
-            {HERO_FACTS.map(({ top, bottom }) => (
-              <p key={top} className="text-sm leading-tight text-muted">
-                {top}
-                <br />
-                <span className="font-semibold text-foreground">{bottom}</span>
-              </p>
-            ))}
-          </motion.div>
         </motion.div>
 
-        {/* Columna derecha — escena con mascota y tarjetas de producto */}
-        <div className="relative flex min-h-[290px] items-center justify-center sm:min-h-[440px] lg:min-h-[520px]">
+        {/* Escena con mascota y tarjetas de producto. En móvil va justo
+            después del mensaje; en lg ocupa la columna derecha completa. */}
+        <div className="relative flex min-h-[290px] items-center justify-center sm:min-h-[440px] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:min-h-[520px]">
 
 
           <motion.div
@@ -216,6 +224,25 @@ export function HeroScene() {
             </div>
           </Floating>
         </div>
+
+        {/* Sin tarjeta ni chips de ícono: una regla superior y tres datos.
+            El "ícono Lucide en cuadrito pastel" era el patrón más copiado
+            de la página. */}
+        <motion.div
+          variants={item}
+          initial="hidden"
+          animate="show"
+          transition={{ delay: 0.5 }}
+          className="flex max-w-xl gap-6 border-t border-border pt-5 sm:gap-12 sm:pt-6 lg:col-start-1 lg:row-start-2 lg:self-start"
+        >
+          {HERO_FACTS.map(({ top, bottom }) => (
+            <p key={top} className="text-sm leading-tight text-muted">
+              {top}
+              <br />
+              <span className="font-semibold text-foreground">{bottom}</span>
+            </p>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

@@ -16,12 +16,17 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  // En móvil el botón del header sólo aparece cuando el hero ya salió de
+  // pantalla. Repetir la misma píldora justo encima del CTA del hero parte
+  // la atención en dos y es lo que hacía ver la primera pantalla floja.
+  const [pastHero, setPastHero] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     function onScroll() {
       setScrolled(window.scrollY > 8);
+      setPastHero(window.scrollY > window.innerHeight * 0.8);
     }
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -71,9 +76,20 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
-          <ButtonLink href="/registro" size="sm">
-            Empezar gratis
-          </ButtonLink>
+          <AnimatePresence initial={false}>
+            {pastHero && !menuOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: reduceMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <ButtonLink href="/registro" size="sm">
+                  Empezar gratis
+                </ButtonLink>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
@@ -120,6 +136,14 @@ export function SiteHeader() {
               >
                 Iniciar sesión
               </Link>
+              <ButtonLink
+                href="/registro"
+                size="lg"
+                className="mt-3 w-full"
+                onClick={() => setMenuOpen(false)}
+              >
+                Empezar gratis
+              </ButtonLink>
             </div>
           </motion.nav>
         )}
