@@ -20,12 +20,15 @@ export function Reveal({
   className?: string;
   once?: boolean;
 }) {
+  // useReducedMotion() devuelve null en SSR y se resuelve en el cliente —
+  // si "initial" dependiera de eso, el primer render del cliente no
+  // coincidiría con el HTML del servidor (hydration mismatch). Por eso
+  // "initial" siempre usa el mismo valor; solo "transition" varía.
   const reduceMotion = useReducedMotion();
-  const offsetY = reduceMotion ? 0 : y;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: offsetY }}
+      initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, amount: 0.25 }}
       transition={{ duration: reduceMotion ? 0.15 : 0.6, delay: reduceMotion ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}
