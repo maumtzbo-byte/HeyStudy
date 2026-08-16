@@ -13,7 +13,7 @@ const FAQ_ITEMS = [
   {
     question: "¿Cómo funciona el diagnóstico con IA?",
     answer:
-      "Respondes un set de preguntas generadas para tu materia. HeyStudy no solo revisa si acertaste — analiza el tipo de error para detectar patrones (por ejemplo, confundes signos al factorizar) y así ajustar tu plan.",
+      "Respondes un set de preguntas generadas para tu materia. HeyStudy no solo revisa si acertaste: analiza el tipo de error para detectar patrones (por ejemplo, confundes signos al factorizar) y así ajustar tu plan.",
   },
   {
     question: "¿Necesito subir materiales para empezar?",
@@ -28,7 +28,7 @@ const FAQ_ITEMS = [
   {
     question: "¿Mis materiales y datos de estudio están seguros?",
     answer:
-      "Sí. Tus materias, tareas y materiales quedan asociados solo a tu cuenta — no se comparten con otros usuarios ni se usan para nada fuera de generar tu propio diagnóstico y plan.",
+      "Sí. Tus materias, tareas y materiales quedan asociados solo a tu cuenta y no se comparten con otros usuarios ni se usan para nada fuera de generar tu propio diagnóstico y plan.",
   },
 ];
 

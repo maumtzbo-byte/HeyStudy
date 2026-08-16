@@ -17,7 +17,7 @@ import { KNOWLEDGE_MAP, DIAGNOSTIC_ITEMS, TUTOR_CHAT, levelFromScore, FIXED_LEVE
 import { cn } from "@/lib/utils/cn";
 
 export const metadata: Metadata = {
-  title: "HeyStudy — Sabe qué estudiar, hoy",
+  title: "HeyStudy: Sabe qué estudiar, hoy",
 };
 
 const FEATURES = [
@@ -29,7 +29,7 @@ const FEATURES = [
   {
     icon: ListChecks,
     title: "Plan de estudio diario",
-    description: "Qué estudiar hoy, cuánto tiempo, y por qué — enfocado en tu debilidad más urgente.",
+    description: "Qué estudiar hoy, cuánto tiempo y por qué, enfocado en tu debilidad más urgente.",
   },
   {
     icon: LayoutGrid,
@@ -39,7 +39,7 @@ const FEATURES = [
   {
     icon: FileText,
     title: "Sube tus materiales",
-    description: "PDFs e imágenes de tus apuntes — HeyStudy los analiza para armar tus temas de estudio.",
+    description: "PDFs e imágenes de tus apuntes: HeyStudy los analiza para armar tus temas de estudio.",
   },
 ];
 
@@ -78,7 +78,7 @@ function KnowledgeMapVisual() {
       <div className="mt-6 flex items-start gap-2 rounded-lg bg-white px-4 py-3">
         <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#565ec2]" />
         <p className="text-sm text-[#111111]">
-          Ejemplo: HeyStudy encontró que <strong>Funciones</strong> es tu punto más débil — por eso es lo primero en
+          Ejemplo: HeyStudy encontró que <strong>Funciones</strong> es tu punto más débil, por eso es lo primero en
           tu plan de hoy.
         </p>
       </div>
@@ -134,7 +134,7 @@ function TutorChatVisual() {
 const STORY_CARDS = [
   {
     eyebrow: "Diagnóstico con IA",
-    title: "No solo si acertaste — qué tanto sabes",
+    title: "No solo si acertaste: qué tanto sabes",
     description:
       "Respondes preguntas generadas para ti. Analizamos tu respuesta más allá de correcto o incorrecto para detectar patrones de error específicos.",
     Visual: DiagnosticVisual,
@@ -149,7 +149,7 @@ const STORY_CARDS = [
   {
     eyebrow: "Tutor IA",
     title: "Pregunta lo que no entiendas, a tu ritmo",
-    description: "Modo socrático, explicación directa, pista o práctica — tú eliges cómo quieres que te expliquen.",
+    description: "Modo socrático, explicación directa, pista o práctica: tú eliges cómo quieres que te expliquen.",
     Visual: TutorChatVisual,
   },
 ];
@@ -245,7 +245,7 @@ export default async function Home() {
           <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             ¿Quieres ver cómo funciona?
           </h2>
-          <p className="mt-4 text-muted">Elige una materia y mira un ejemplo de tu plan del día — sin registrarte.</p>
+          <p className="mt-4 text-muted">Elige una materia y mira un ejemplo de tu plan del día, sin registrarte.</p>
         </Reveal>
         <Reveal delay={0.15} className="mt-10">
           <DemoInteractivo />

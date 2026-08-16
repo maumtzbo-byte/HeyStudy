@@ -81,7 +81,7 @@ export function HeroScene() {
 
   return (
     <ParallaxField ref={heroRef} className="relative overflow-hidden bg-background">
-      <section className="relative px-4 pt-28 pb-20 sm:pt-32">
+      <section className="relative px-4 pt-24 pb-20">
         <ParallaxLayer
           depth={0.6}
           className="pointer-events-none absolute top-24 left-[6%] hidden w-28 sm:block lg:left-[12%] lg:w-36"
@@ -122,8 +122,7 @@ export function HeroScene() {
               antes de tu próximo examen.
             </motion.h1>
             <motion.p variants={item} className="mt-6 max-w-xl text-lg text-muted">
-              Respondes un diagnóstico corto, HeyStudy detecta lo que todavía no dominas y arma tu plan de estudio
-              del día — sin que tengas que adivinar por dónde empezar.
+              Respondes un diagnóstico corto, HeyStudy detecta lo que no dominas y arma tu plan de estudio del día.
             </motion.p>
             <motion.div variants={item} className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
               <Link href="/registro" className="w-full sm:w-auto">
@@ -138,9 +137,6 @@ export function HeroScene() {
                 </Button>
               </a>
             </motion.div>
-            <motion.p variants={item} className="mt-4 text-sm text-muted">
-              Gratis para empezar · Sin tarjeta
-            </motion.p>
           </motion.div>
         </motion.div>
 
