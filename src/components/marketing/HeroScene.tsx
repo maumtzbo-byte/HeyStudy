@@ -20,36 +20,36 @@ const item = {
 
 function DashboardPreview() {
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-2xl border border-[#e8e8e5] bg-white p-6 shadow-soft sm:p-8">
-      <p className="text-sm text-[#4b4b4f]">Buenas tardes, Alex 👋</p>
+    <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border bg-surface p-6 shadow-soft sm:p-8">
+      <p className="text-sm text-muted">Buenas tardes, Alex 👋</p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-medium tracking-wide text-[#4b4b4f] uppercase">Tu preparación</p>
-          <p className="mt-1 text-sm font-medium text-[#111111]">Matemáticas · Examen en 6 días</p>
+          <p className="text-xs font-medium tracking-wide text-muted uppercase">Tu preparación</p>
+          <p className="mt-1 text-sm font-medium text-foreground">Matemáticas · Examen en 6 días</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-3xl font-semibold text-[#111111]">72%</span>
-          <span className="rounded-full bg-[#b4790a]/10 px-2.5 py-1 text-xs font-medium text-[#b4790a]">
+          <span className="text-3xl font-semibold text-foreground">72%</span>
+          <span className="rounded-full bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning">
             Bien preparado
           </span>
         </div>
       </div>
-      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#e8e8e5]">
-        <div className="h-full rounded-full bg-[#b4790a]" style={{ width: "72%" }} />
+      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-border">
+        <div className="h-full rounded-full bg-warning" style={{ width: "72%" }} />
       </div>
 
-      <div className="mt-6 border-t border-[#e8e8e5] pt-6">
-        <p className="text-xs font-medium tracking-wide text-[#4b4b4f] uppercase">Tu plan de hoy</p>
-        <div className="mt-3 flex flex-col divide-y divide-[#e8e8e5]">
+      <div className="mt-6 border-t border-border pt-6">
+        <p className="text-xs font-medium tracking-wide text-muted uppercase">Tu plan de hoy</p>
+        <div className="mt-3 flex flex-col divide-y divide-border">
           {PLAN_PREVIEW.map((item) => (
             <div key={item.title} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
               <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${FIXED_LEVEL_BAR_CLASS[item.level]}`} />
               <div className="flex-1">
-                <p className="text-sm font-medium text-[#111111]">{item.title}</p>
-                <p className="text-xs text-[#4b4b4f]">{item.reason}</p>
+                <p className="text-sm font-medium text-foreground">{item.title}</p>
+                <p className="text-xs text-muted">{item.reason}</p>
               </div>
-              <span className="shrink-0 text-xs font-medium text-[#4b4b4f]">{item.minutes} min</span>
+              <span className="shrink-0 text-xs font-medium text-muted">{item.minutes} min</span>
             </div>
           ))}
         </div>

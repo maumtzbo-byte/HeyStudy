@@ -33,7 +33,7 @@ export function levelFromScore(score: number): "danger" | "warning" | "success" 
 // (claros), sin adaptarse al modo oscuro del sistema — por eso usan
 // colores fijos en vez de los tokens de tema.
 export const FIXED_LEVEL_BAR_CLASS: Record<"danger" | "warning" | "success", string> = {
-  danger: "bg-[#b3341c]",
-  warning: "bg-[#b4790a]",
-  success: "bg-[#3f7d52]",
+  danger: "bg-[#a14b36]",
+  warning: "bg-[#866327]",
+  success: "bg-[#407765]",
 };

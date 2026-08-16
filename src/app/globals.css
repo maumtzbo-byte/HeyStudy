@@ -1,26 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --surface: #f7f7fa;
+  /* Paleta con base en psicología ambiental, no en "azul relaja / rojo
+     estresa": (1) saturación/brillo pesan más que el tono — nada de
+     blanco puro ni colores de estado a máxima saturación, que suben la
+     activación fisiológica sin importar si son cálidos o fríos; (2) tonos
+     verde-azulados desaturados (éxito) restauran la atención (Kaplan &
+     Kaplan) en vez de solo "marcar correcto"; (3) contraste extremo
+     negro-sobre-blanco fuerza al ojo y compite con el foco, por eso el
+     fondo es blanco cálido y la tinta es casi-negra, no negra; (4) los
+     colores de alerta (aviso/peligro) están desaturados a propósito para
+     que "esto se te da mal" se lea como información, no como amenaza. El
+     periwinkle de acento no se toca: ya cae en el rango calma/confianza. */
+  --background: #fbfaf9;
+  --surface: #f6f6f9;
   --foreground: #17172b;
-  --muted: #6b6b7c;
-  --border: #e7e6ee;
+  --muted: #6c6d7a;
+  --border: #ece9e4;
   --accent: #6c74d6;
   --accent-hover: #565ec2;
   --accent-foreground: #ffffff;
   --accent-soft: #ecebfa;
-  --success: #3f7d52;
-  --warning: #b4790a;
-  --danger: #b3341c;
+  --success: #407765;
+  --warning: #866327;
+  --danger: #a14b36;
   --shadow-color: 245 35% 20%;
 
   /* Bandas "suaves" (antes oscuras/atmosféricas): mismo rol de sección
      destacada, ahora en tono claro para el fondo blanco minimalista. */
   --deep: #f2f1fb;
-  --deep-surface: #ffffff;
+  --deep-surface: #fbfaf9;
   --deep-foreground: #17172b;
-  --deep-muted: #6b6b7c;
+  --deep-muted: #6c6d7a;
   --deep-border: #e3e0f5;
 }
 
@@ -49,21 +60,21 @@
   :root {
     --background: #18173a;
     --surface: #211f47;
-    --foreground: #f1effc;
+    --foreground: #eae9f2;
     --muted: #aca8d6;
     --border: #34325f;
     --accent: #8b92e8;
     --accent-hover: #a3a9f0;
     --accent-foreground: #1b1a3d;
     --accent-soft: #2b2a57;
-    --success: #6fbf83;
-    --warning: #e0a83f;
-    --danger: #e2705a;
+    --success: #72b69d;
+    --warning: #c9a25e;
+    --danger: #ca8172;
     --shadow-color: 245 45% 3%;
 
     --deep: #211f47;
     --deep-surface: #18173a;
-    --deep-foreground: #f1effc;
+    --deep-foreground: #eae9f2;
     --deep-muted: #aca8d6;
     --deep-border: #34325f;
   }
