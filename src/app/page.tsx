@@ -13,6 +13,7 @@ import { Testimonials } from "@/components/marketing/Testimonials";
 import { Pricing } from "@/components/marketing/Pricing";
 import { Faq } from "@/components/marketing/Faq";
 import { Reveal } from "@/components/marketing/Reveal";
+import { Chispa } from "@/components/marketing/StudyIcons";
 import { KNOWLEDGE_MAP, DIAGNOSTIC_ITEMS, TUTOR_CHAT, levelFromScore, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
 import { cn } from "@/lib/utils/cn";
 
@@ -131,6 +132,13 @@ function TutorChatVisual() {
   );
 }
 
+const PAIN_POINTS = [
+  "¿Repasas todo el temario esperando que algo se te pegue?",
+  "¿Llegas al examen sin saber si de verdad estás listo?",
+  "¿Sigues el mismo tipo de error sin darte cuenta?",
+  "¿No sabes si hoy te conviene más repasar Álgebra o Historia?",
+];
+
 const STORY_CARDS = [
   {
     eyebrow: "Diagnóstico con IA",
@@ -174,7 +182,19 @@ export default async function Home() {
       <section id="como-funciona" className="relative scroll-mt-20 overflow-hidden bg-surface px-4 py-20 sm:py-28">
         <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-accent opacity-10" />
 
-        <Reveal className="relative mx-auto max-w-2xl text-center">
+        <Reveal className="relative mx-auto flex max-w-md justify-center">
+          <Chispa className="w-28 sm:w-32" />
+        </Reveal>
+
+        <Reveal delay={0.1} className="relative mx-auto mt-6 flex max-w-md flex-col items-center gap-2">
+          {PAIN_POINTS.map((question) => (
+            <p key={question} className="text-center text-sm text-muted sm:text-base">
+              {question}
+            </p>
+          ))}
+        </Reveal>
+
+        <Reveal delay={0.2} className="relative mx-auto mt-8 max-w-2xl text-center">
           <h2 className="text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
             Deja de adivinar qué estudiar.
             <br />
