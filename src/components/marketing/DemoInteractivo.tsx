@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
+import { Chispa } from "@/components/marketing/StudyIcons";
 
 type Step = "elegir" | "analizando" | "listo";
 
@@ -53,7 +54,8 @@ export function DemoInteractivo() {
   return (
     <div className="mx-auto max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-soft sm:p-8" aria-live="polite">
       {step === "elegir" && (
-        <div className="flex flex-col items-center gap-5 text-center">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Chispa className="w-20" />
           <p className="text-sm font-medium text-muted">Elige una materia para ver un ejemplo</p>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {SUBJECTS.map((s) => (
