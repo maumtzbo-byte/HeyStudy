@@ -163,12 +163,12 @@ function BentoCard({
   return (
     <div
       className={cn(
-        "flex h-full flex-col rounded-xl border border-border bg-surface p-6 sm:p-7",
+        "flex h-full flex-col rounded-xl border border-border bg-surface p-5 sm:p-7",
         className,
       )}
     >
       <p className="text-xs font-medium tracking-wide text-subtle uppercase">{eyebrow}</p>
-      <h3 className="mt-2 font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{title}</h3>
+      <h3 className="mt-2 font-display text-lg font-semibold tracking-tight text-foreground sm:text-2xl">{title}</h3>
       {children}
     </div>
   );
@@ -278,31 +278,32 @@ export default async function Home() {
         </section>
 
         {/* Problema */}
-        <section className="relative overflow-hidden px-6 py-20 sm:px-8 sm:py-24">
+        <section className="relative overflow-hidden px-6 py-14 sm:px-8 sm:py-24">
           <div className="relative mx-auto w-full max-w-3xl">
             <Reveal className="relative">
-              <h2 className="max-w-2xl font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="max-w-2xl font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
                 Estudiar más no siempre significa aprender más.
               </h2>
             </Reveal>
 
-            <div className="mt-12 flex flex-col">
+            <div className="mt-8 flex flex-col sm:mt-12">
               {PROBLEMS.map(({ title, description, Visual }, i) => (
                 <Reveal key={title} delay={0.07 * i}>
                   <div
                     className={cn(
-                      "flex flex-col items-start gap-5 border-t border-border py-7 sm:flex-row sm:items-center sm:gap-10",
+                      "flex items-start gap-4 border-t border-border py-6 sm:items-center sm:gap-10 sm:py-7",
                       i === PROBLEMS.length - 1 && "border-b",
                     )}
                   >
-                    <span className="font-display text-4xl leading-none font-semibold text-border-strong/70 select-none sm:text-5xl">
+                    <span className="w-7 shrink-0 font-display text-xl leading-none font-semibold text-border-strong/70 select-none sm:w-auto sm:text-5xl">
                       0{i + 1}
                     </span>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+                      <h3 className="text-base font-semibold text-foreground sm:text-lg">{title}</h3>
                       <p className="mt-1.5 text-sm text-muted">{description}</p>
                     </div>
-                    <div className="shrink-0 pl-11 sm:pl-0">
+                    {/* El micro-visual no vale su altura en un telefono. */}
+                    <div className="hidden shrink-0 sm:block">
                       <Visual />
                     </div>
                   </div>
@@ -315,16 +316,16 @@ export default async function Home() {
         {/* Cómo funciona */}
         <section
           id="como-funciona"
-          className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-24"
+          className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-14 sm:px-8 sm:py-24"
         >
           <div className="relative mx-auto w-full max-w-[1280px]">
             <Reveal className="relative max-w-2xl">
-              <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
                 De no saber por dónde empezar, a saber qué hacer hoy.
               </h2>
             </Reveal>
 
-            <div className="relative mt-14 grid grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-8">
+            <div className="relative mt-10 grid sm:mt-14 grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-8">
               <div
                 aria-hidden
                 className="absolute top-4 right-0 left-0 hidden h-px bg-border sm:block"
@@ -345,15 +346,15 @@ export default async function Home() {
         </section>
 
         {/* Producto — un solo bento en vez de tres secciones separadas */}
-        <section id="producto" className="relative scroll-mt-20 overflow-hidden px-6 py-20 sm:px-8 sm:py-24">
+        <section id="producto" className="relative scroll-mt-20 overflow-hidden px-6 py-14 sm:px-8 sm:py-24">
           <div className="relative mx-auto w-full max-w-[1280px]">
             <Reveal className="relative max-w-2xl">
-              <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
                 Todo lo que HeyStudy entiende de ti.
               </h2>
             </Reveal>
 
-            <div className="mt-14 grid grid-cols-1 gap-5 lg:grid-cols-3">
+            <div className="mt-9 grid grid-cols-1 gap-4 sm:mt-14 sm:gap-5 lg:grid-cols-3">
               {/* Mapa de conocimiento — ancho */}
               <Reveal className="lg:col-span-2">
                 <BentoCard eyebrow="Mapa de conocimiento" title="Entiende exactamente dónde estás.">
@@ -413,16 +414,18 @@ export default async function Home() {
                     <span className="h-px flex-1 bg-border" />
                   </div>
 
-                  <dl className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3">
+                  {/* Concepto y dominio caben lado a lado: apilados sumaban
+                      altura sin aportar nada en un teléfono. */}
+                  <dl className="grid grid-cols-2 gap-2.5">
+                    <div className="rounded-xl border border-border bg-background px-3.5 py-3">
                       <dt className="text-[11px] text-subtle">Concepto</dt>
-                      <dd className="text-sm font-semibold text-foreground">{DIAGNOSTIC_EXAMPLE.concept}</dd>
+                      <dd className="mt-0.5 text-sm font-semibold text-foreground">{DIAGNOSTIC_EXAMPLE.concept}</dd>
                     </div>
-                    <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3">
+                    <div className="rounded-xl border border-border bg-background px-3.5 py-3">
                       <dt className="text-[11px] text-subtle">Dominio</dt>
-                      <dd className="text-sm font-semibold text-danger tabular-nums">{DIAGNOSTIC_EXAMPLE.domain}%</dd>
+                      <dd className="mt-0.5 text-sm font-semibold text-danger tabular-nums">{DIAGNOSTIC_EXAMPLE.domain}%</dd>
                     </div>
-                    <div className="rounded-xl border border-border bg-background px-4 py-3">
+                    <div className="col-span-2 rounded-xl border border-border bg-background px-3.5 py-3">
                       <dt className="text-[11px] text-subtle">Patrón</dt>
                       <dd className="mt-0.5 text-sm text-foreground">{DIAGNOSTIC_EXAMPLE.pattern}</dd>
                     </div>
@@ -486,7 +489,7 @@ export default async function Home() {
               {/* Tres tarjetas chicas cierran el bento */}
               {BENTO_EXTRAS.map(({ icon: Icon, eyebrow, title, description, Visual }, i) => (
                 <Reveal key={eyebrow} delay={0.05 * i}>
-                  <div className="flex h-full flex-col rounded-xl border border-border bg-background p-6">
+                  <div className="flex h-full flex-col rounded-xl border border-border bg-background p-5 sm:p-6">
                     <div className="flex items-center gap-2.5">
                       <Icon aria-hidden className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.75} />
                       <p className="text-xs font-medium tracking-wide text-subtle uppercase">{eyebrow}</p>
@@ -504,49 +507,49 @@ export default async function Home() {
         {/* Demo interactiva */}
         <section
           id="demo"
-          className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-24"
+          className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-14 sm:px-8 sm:py-24"
         >
           <Reveal className="relative mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
               Mira tu plan antes de registrarte.
             </h2>
             <p className="mt-4 text-muted">Elige una materia y verás cómo se arma un día de estudio real.</p>
           </Reveal>
-          <Reveal delay={0.12} className="mt-10">
+          <Reveal delay={0.12} className="mt-8 sm:mt-10">
             <DemoInteractivo />
           </Reveal>
         </section>
 
         {/* Precios */}
-        <section id="precios" className="relative scroll-mt-20 overflow-hidden px-6 py-20 sm:px-8 sm:py-24">
+        <section id="precios" className="relative scroll-mt-20 overflow-hidden px-6 py-14 sm:px-8 sm:py-24">
           <Reveal className="relative mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
               Empieza gratis, escala cuando lo necesites
             </h2>
             <p className="mt-4 text-muted">Sin tarjeta para probar el diagnóstico y el plan de estudio.</p>
           </Reveal>
-          <Reveal delay={0.1} className="relative mt-12">
+          <Reveal delay={0.1} className="relative mt-8 sm:mt-12">
             <Pricing />
           </Reveal>
         </section>
 
         {/* Preguntas frecuentes */}
-        <section className="border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-24">
+        <section className="border-t border-border bg-surface px-6 py-14 sm:px-8 sm:py-24">
           <Reveal className="relative mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
               Preguntas frecuentes
             </h2>
           </Reveal>
-          <Reveal delay={0.1} className="mt-10">
+          <Reveal delay={0.1} className="mt-8 sm:mt-10">
             <Faq />
           </Reveal>
         </section>
 
         {/* CTA final */}
-        <section className="relative overflow-hidden bg-accent px-6 py-24 text-center sm:px-8 sm:py-28">
+        <section className="relative overflow-hidden bg-accent px-6 py-16 text-center sm:px-8 sm:py-28">
           <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-[0.12]" />
           <Reveal className="relative mx-auto max-w-xl">
-            <h2 className="font-display text-3xl leading-[1.1] font-semibold tracking-tight text-white sm:text-5xl">
+            <h2 className="font-display text-[1.75rem] leading-[1.15] font-semibold tracking-tight text-white sm:text-5xl sm:leading-[1.1]">
               Deja de adivinar qué estudiar.
             </h2>
             <p className="mt-4 text-lg text-white/80">Tu próximo examen ya tiene un plan.</p>
@@ -570,7 +573,7 @@ export default async function Home() {
 
 function Footer() {
   return (
-    <footer className="border-t border-border px-6 py-14 sm:px-8">
+    <footer className="border-t border-border px-6 py-10 sm:px-8 sm:py-14">
       <div className="mx-auto grid w-full max-w-[1280px] grid-cols-2 gap-10 sm:grid-cols-4">
         <div className="col-span-2 flex flex-col gap-3 sm:col-span-1">
           <Logo />

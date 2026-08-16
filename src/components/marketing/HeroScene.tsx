@@ -80,7 +80,7 @@ export function HeroScene() {
         }}
       />
 
-      <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-6 pt-16 pb-20 sm:px-8 sm:pt-20 sm:pb-24 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+      <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-6 px-6 pt-12 pb-14 sm:gap-12 sm:px-8 sm:pt-20 sm:pb-24 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
         {/* Columna izquierda — mensaje */}
         <motion.div variants={container} initial="hidden" animate="show" className="max-w-xl">
           {/* Etiqueta discreta con filete, no una píldora con destello: la
@@ -96,19 +96,19 @@ export function HeroScene() {
 
           <motion.h1
             variants={item}
-            className="mt-6 font-display text-5xl leading-[1.02] font-semibold tracking-tight text-foreground sm:text-6xl lg:text-[4.25rem]"
+            className="mt-5 font-display text-[2.6rem] leading-[1.05] font-semibold tracking-tight text-foreground sm:mt-6 sm:text-6xl sm:leading-[1.02] lg:text-[4.25rem]"
           >
             ¿Qué deberías
             <br />
             <span className="text-accent">estudiar hoy?</span>
           </motion.h1>
 
-          <motion.p variants={item} className="mt-6 text-lg leading-relaxed text-muted">
+          <motion.p variants={item} className="mt-5 text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
             HeyStudy detecta lo que <strong className="font-semibold text-foreground">todavía no dominas</strong> y
             convierte tu próximo examen en un plan claro para hoy.
           </motion.p>
 
-          <motion.div variants={item} className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <motion.div variants={item} className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row sm:gap-4">
             <ButtonLink href="/registro" size="lg" className="w-full sm:w-auto">
               Empezar gratis
               <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
@@ -124,7 +124,7 @@ export function HeroScene() {
           {/* Sin tarjeta ni chips de ícono: una regla superior y tres datos.
               El "ícono Lucide en cuadrito pastel" era el patrón más copiado
               de la página. */}
-          <motion.div variants={item} className="mt-12 flex gap-8 border-t border-border pt-6 sm:gap-12">
+          <motion.div variants={item} className="mt-8 flex gap-6 border-t border-border pt-5 sm:mt-12 sm:gap-12 sm:pt-6">
             {HERO_FACTS.map(({ top, bottom }) => (
               <p key={top} className="text-sm leading-tight text-muted">
                 {top}
@@ -136,7 +136,7 @@ export function HeroScene() {
         </motion.div>
 
         {/* Columna derecha — escena con mascota y tarjetas de producto */}
-        <div className="relative flex min-h-[340px] items-center justify-center sm:min-h-[440px] lg:min-h-[520px]">
+        <div className="relative flex min-h-[290px] items-center justify-center sm:min-h-[440px] lg:min-h-[520px]">
 
 
           <motion.div
@@ -168,7 +168,7 @@ export function HeroScene() {
           <Floating
             delay={0.45}
             duration={5.6}
-            className="absolute top-[2%] right-[2%] sm:top-[4%] sm:right-0 lg:-right-2"
+            className="absolute -top-2 -right-2 sm:top-[4%] sm:right-0 lg:-right-2"
           >
             <div className="max-w-[13rem] rounded-2xl rounded-br-md border border-border bg-surface px-4 py-3 shadow-lg">
               <p className="text-sm leading-snug font-medium text-foreground">
@@ -182,7 +182,7 @@ export function HeroScene() {
             delay={0.6}
             duration={6.4}
             distance={12}
-            className="absolute bottom-[6%] left-0 sm:bottom-[8%] lg:-left-6"
+            className="absolute bottom-0 -left-2 sm:bottom-[8%] sm:left-0 lg:-left-6"
           >
             <div className="w-[11.5rem] rounded-2xl border border-border bg-surface p-4 shadow-lg">
               <div className="flex items-center justify-between gap-2">
