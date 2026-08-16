@@ -47,15 +47,31 @@ export function HeroScene() {
             reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.9 }
           }
         >
-          <Image
-            src="/mascot/mascota-feliz.png"
-            alt=""
-            aria-hidden
-            width={351}
-            height={263}
-            priority
-            className="pointer-events-none w-[min(21rem,88vw)] sm:w-[26rem] lg:w-[33rem]"
-          />
+          {/* El PNG mide 351x263, pero el cuerpo sólo ocupa 300x238: la chispa
+              es un componente suelto arriba a la derecha que estira el marco.
+              Encuadrar contra el archivo dejaba al personaje descentrado y un
+              15% más chico de lo que aparenta.
+
+              La chispa (x300-338, filas 12-56) se traslapa con el cuerpo, que
+              llega a x=311 en las filas 152-214, así que ningún rectángulo
+              contiene el cuerpo entero y excluye la chispa. Se recortan 12px
+              de cada brazo — simétrico, para que lea como encuadre cerrado y
+              no como un lado cortado. El archivo no se toca: todo el recorte
+              es CSS. */}
+          <div
+            className="relative w-[94vw] max-w-[31rem] overflow-hidden sm:w-[26rem] sm:max-w-none lg:w-[32rem]"
+            style={{ aspectRatio: "276 / 238" }}
+          >
+            <Image
+              src="/mascot/mascota-feliz.png"
+              alt=""
+              aria-hidden
+              width={351}
+              height={263}
+              priority
+              className="pointer-events-none absolute top-[-5.46%] left-[-8.7%] w-[127.2%] max-w-none"
+            />
+          </div>
         </motion.div>
 
         {/* Acción antes que titular, como en la referencia. */}
