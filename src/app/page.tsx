@@ -1,21 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  ArrowRight,
-  ArrowDown,
-  Lightbulb,
-  Shuffle,
-  Network,
-  Target,
-  ListChecks,
-  ListOrdered,
-  TrendingUp,
-  CheckCircle2,
-  Compass,
-  BookOpen,
-  CalendarCheck,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { getAuthUser } from "@/lib/auth/getCurrentUser";
 import { ButtonLink } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
@@ -26,14 +12,14 @@ import { SiteHeader } from "@/components/marketing/SiteHeader";
 import { Pricing } from "@/components/marketing/Pricing";
 import { Faq } from "@/components/marketing/Faq";
 import { Reveal } from "@/components/marketing/Reveal";
+import { Comparison } from "@/components/marketing/Comparison";
+import { Frame, FrameHeading, SplitFrame } from "@/components/marketing/Frame";
 import {
-  KNOWLEDGE_MAP,
-  DIAGNOSTIC_EXAMPLE,
-  EXAM_PREP,
-  levelFromScore,
-  FIXED_LEVEL_BAR_CLASS,
-  FIXED_LEVEL_TEXT_CLASS,
-} from "@/components/marketing/visualData";
+  KnowledgeMapVisual,
+  DiagnosticVisual,
+  ExamPrepVisual,
+  DailyPlanVisual,
+} from "@/components/marketing/ProductVisuals";
 import { cn } from "@/lib/utils/cn";
 
 export const metadata: Metadata = {
@@ -93,159 +79,61 @@ const PROBLEMS = [
 ];
 
 /* ---------------------------------------------------------------------- */
-/* Cómo funciona — recorrido de 3 pasos                                    */
+/* Cómo funciona — 4 pasos                                                 */
 /* ---------------------------------------------------------------------- */
-
-function StepChips({ items }: { items: { icon: typeof BookOpen; label: string }[] }) {
-  return (
-    <div className="mt-5 flex flex-wrap gap-2">
-      {items.map(({ icon: Icon, label }) => (
-        <div
-          key={label}
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-        >
-          <Icon className="h-4 w-4 shrink-0 text-accent-hover" strokeWidth={1.75} />
-          {label}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 const JOURNEY_STEPS = [
   {
-    eyebrow: "01",
-    title: "Conecta tu realidad académica",
-    description: "Materias, tareas y exámenes reales, no un temario genérico.",
-    items: [
-      { icon: BookOpen, label: "Materias" },
-      { icon: ListChecks, label: "Tareas" },
-      { icon: CalendarCheck, label: "Exámenes" },
-    ],
+    n: "01",
+    title: "Carga tus materias",
+    description: "Tus materias reales, con sus tareas y las fechas de tus exámenes. No un temario genérico.",
   },
   {
-    eyebrow: "02",
-    title: "Descubre lo que realmente sabes",
-    description: "Preguntas adaptativas que revelan tu dominio real, no solo si acertaste.",
-    items: [
-      { icon: Shuffle, label: "Preguntas adaptativas" },
-      { icon: Network, label: "Dominio por concepto" },
-      { icon: Target, label: "Patrones de error" },
-    ],
+    n: "02",
+    title: "Haz un diagnóstico",
+    description: "Preguntas que se ajustan a tus respuestas para encontrar dónde se rompe tu entendimiento.",
   },
   {
-    eyebrow: "03",
-    title: "Recibe tu plan",
-    description: "Enfocado en lo que más te va a mover el puntaje, no en todo el temario.",
-    items: [
-      { icon: ListChecks, label: "Qué estudiar" },
-      { icon: TrendingUp, label: "Cuánto tiempo" },
-      { icon: Compass, label: "Por qué" },
-    ],
+    n: "03",
+    title: "Recibe tu plan de hoy",
+    description: "Qué estudiar, cuánto tiempo y por qué ese tema antes que los demás.",
+  },
+  {
+    n: "04",
+    title: "Mañana se reordena",
+    description: "Lo que dominaste baja de prioridad y lo que falló sube. El plan sigue tu progreso.",
   },
 ];
 
 /* ---------------------------------------------------------------------- */
-/* Bento del producto — micro-visuales                                     */
+/* Alcance — nube de materias                                              */
 /* ---------------------------------------------------------------------- */
 
-function BentoCard({
-  className,
-  eyebrow,
-  title,
-  children,
-}: {
-  className?: string;
-  eyebrow: string;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex h-full flex-col rounded-xl border border-border bg-surface p-5 sm:p-7",
-        className,
-      )}
-    >
-      <p className="text-xs font-medium tracking-wide text-subtle uppercase">{eyebrow}</p>
-      <h3 className="mt-2 font-display text-lg font-semibold tracking-tight text-foreground sm:text-2xl">{title}</h3>
-      {children}
-    </div>
-  );
-}
+const SUBJECTS = [
+  "Matemáticas", "Cálculo", "Álgebra", "Física", "Química", "Biología",
+  "Anatomía", "Historia", "Geografía", "Literatura", "Filosofía", "Inglés",
+  "Economía", "Contabilidad", "Derecho", "Estadística", "Programación", "Psicología",
+];
 
-function MiniChecklist() {
-  return (
-    <div className="mt-5 flex flex-col gap-2" aria-hidden>
-      {[
-        { w: "72%", done: true },
-        { w: "54%", done: false },
-      ].map((row, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <span
-            className={cn(
-              "flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border",
-              row.done ? "border-accent bg-accent" : "border-border-strong/60",
-            )}
-          >
-            {row.done && <CheckCircle2 className="h-3 w-3 text-accent-foreground" strokeWidth={2.5} />}
-          </span>
-          <span className="h-1.5 rounded-full bg-border" style={{ width: row.w }} />
-        </div>
-      ))}
-    </div>
-  );
-}
+/* ---------------------------------------------------------------------- */
+/* Para quién es                                                           */
+/* ---------------------------------------------------------------------- */
 
-function MiniRank() {
-  return (
-    <div className="mt-5 flex flex-col gap-2" aria-hidden>
-      {[100, 68, 42].map((w, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <span className="text-[10px] font-semibold text-subtle tabular-nums">{i + 1}</span>
-          <span className="h-1.5 rounded-full bg-accent" style={{ width: `${w * 0.55}px`, opacity: 1 - i * 0.28 }} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MiniSparkline() {
-  return (
-    <svg viewBox="0 0 90 26" className="mt-5 h-7 w-24" fill="none" aria-hidden>
-      <path
-        d="M2 22 L18 16 L34 18 L50 8 L66 11 L88 3"
-        stroke="var(--success)"
-        strokeWidth="2.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="88" cy="3" r="3" fill="var(--success)" />
-    </svg>
-  );
-}
-
-const BENTO_EXTRAS = [
+const AUDIENCES = [
   {
-    icon: ListChecks,
-    eyebrow: "Plan diario",
-    title: "Sabes por dónde empezar",
-    description: "Abres HeyStudy y ya está decidido. Sin adivinar.",
-    Visual: MiniChecklist,
+    title: "Preparatoria",
+    description:
+      "Seis o siete materias a la vez, exámenes encimados y cero claridad sobre cuál atender primero.",
   },
   {
-    icon: ListOrdered,
-    eyebrow: "Priorización",
-    title: "Ordenado por impacto",
-    description: "Lo urgente no siempre es lo importante.",
-    Visual: MiniRank,
+    title: "Universidad",
+    description:
+      "Materias que se construyen una sobre otra, donde un hueco de hace dos meses te tumba el parcial de hoy.",
   },
   {
-    icon: TrendingUp,
-    eyebrow: "Progreso",
-    title: "Ves cómo subes",
-    description: "Tu dominio, tema por tema, semana a semana.",
-    Visual: MiniSparkline,
+    title: "Exámenes de admisión",
+    description:
+      "Un temario enorme y meses por delante: necesitas saber qué mueve tu puntaje y qué ya no.",
   },
 ];
 
@@ -277,15 +165,13 @@ export default async function Home() {
           </Reveal>
         </section>
 
-        {/* Problema */}
+        {/* Frame — Problema */}
         <section className="relative overflow-hidden px-6 py-14 sm:px-8 sm:py-24">
           <div className="relative mx-auto w-full max-w-3xl">
-            <Reveal className="relative">
-              <h2 className="max-w-2xl font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
-                Estudiar más no siempre significa aprender más.
-              </h2>
-            </Reveal>
-
+            <FrameHeading
+              eyebrow="El problema"
+              title="Estudiar más no siempre significa aprender más."
+            />
             <div className="mt-8 flex flex-col sm:mt-12">
               {PROBLEMS.map(({ title, description, Visual }, i) => (
                 <Reveal key={title} delay={0.07 * i}>
@@ -313,237 +199,173 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Cómo funciona */}
-        <section
-          id="como-funciona"
-          className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-14 sm:px-8 sm:py-24"
-        >
-          <div className="relative mx-auto w-full max-w-[1280px]">
-            <Reveal className="relative max-w-2xl">
-              <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
-                De no saber por dónde empezar, a saber qué hacer hoy.
-              </h2>
-            </Reveal>
-
-            <div className="relative mt-10 grid sm:mt-14 grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-8">
-              <div
-                aria-hidden
-                className="absolute top-4 right-0 left-0 hidden h-px bg-border sm:block"
-                style={{ marginInline: "16.5%" }}
-              />
-              {JOURNEY_STEPS.map((step, i) => (
-                <Reveal key={step.eyebrow} delay={0.09 * i} className="relative">
-                  <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-background font-display text-sm font-semibold text-accent-hover">
-                    {step.eyebrow}
+        {/* Frame — Cómo funciona, 4 pasos */}
+        <Frame id="como-funciona" tone="raised">
+          <FrameHeading
+            eyebrow="Cómo funciona"
+            title="De no saber por dónde empezar, a saber qué hacer hoy."
+            lead="Cuatro pasos. El primero te toma unos minutos; los demás pasan solos."
+          />
+          <ol className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:mt-14 sm:grid-cols-2 lg:grid-cols-4">
+            {JOURNEY_STEPS.map((step, i) => (
+              <Reveal key={step.n} delay={0.07 * i} className="bg-background">
+                <li className="flex h-full flex-col p-6 sm:p-7">
+                  <span className="font-display text-4xl leading-none font-semibold text-border-strong/70 select-none">
+                    {step.n}
                   </span>
-                  <h3 className="mt-4 text-lg font-semibold text-foreground">{step.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted">{step.description}</p>
-                  <StepChips items={step.items} />
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Producto — un solo bento en vez de tres secciones separadas */}
-        <section id="producto" className="relative scroll-mt-20 overflow-hidden px-6 py-14 sm:px-8 sm:py-24">
-          <div className="relative mx-auto w-full max-w-[1280px]">
-            <Reveal className="relative max-w-2xl">
-              <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
-                Todo lo que HeyStudy entiende de ti.
-              </h2>
-            </Reveal>
-
-            <div className="mt-9 grid grid-cols-1 gap-4 sm:mt-14 sm:gap-5 lg:grid-cols-3">
-              {/* Mapa de conocimiento — ancho */}
-              <Reveal className="lg:col-span-2">
-                <BentoCard eyebrow="Mapa de conocimiento" title="Entiende exactamente dónde estás.">
-                  <p className="mt-2 text-sm text-muted">
-                    No es una lista de temas marcados como &quot;visto&quot;. Es tu dominio real por concepto.
-                  </p>
-                  <div className="mt-6 flex flex-col gap-4">
-                    {KNOWLEDGE_MAP.map((row) => {
-                      const level = levelFromScore(row.score);
-                      return (
-                        <div key={row.topic} className="flex items-center gap-4">
-                          <span className="w-24 shrink-0 text-sm font-medium text-foreground sm:w-28">{row.topic}</span>
-                          <div className="h-2 flex-1 overflow-hidden rounded-full bg-border">
-                            <div
-                              className={cn("h-full rounded-full", FIXED_LEVEL_BAR_CLASS[level])}
-                              style={{ width: `${Math.round(row.score * 100)}%` }}
-                            />
-                          </div>
-                          <span
-                            className={cn(
-                              "w-11 shrink-0 text-right text-sm font-semibold tabular-nums",
-                              FIXED_LEVEL_TEXT_CLASS[level],
-                            )}
-                          >
-                            {Math.round(row.score * 100)}%
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-6 flex items-start gap-2.5 rounded-xl bg-premium-soft px-4 py-3.5">
-                    <Lightbulb aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-premium" strokeWidth={1.75} />
-                    <p className="text-sm text-foreground">
-                      <strong>Factorización</strong> es tu punto más débil, así que lidera tu plan de hoy.
-                    </p>
-                  </div>
-                </BentoCard>
+                  <h3 className="mt-5 text-base font-semibold text-foreground">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">{step.description}</p>
+                </li>
               </Reveal>
+            ))}
+          </ol>
+        </Frame>
 
-              {/* Diagnóstico — alto */}
-              <Reveal delay={0.08} className="lg:row-span-2">
-                <BentoCard eyebrow="Diagnóstico con IA" title="No solo sabe si acertaste.">
-                  <p className="mt-2 text-sm text-muted">
-                    Analiza el patrón de error detrás de tu respuesta y ajusta tu plan.
-                  </p>
+        {/* Frame — Diagnóstico */}
+        <Frame id="producto">
+          <SplitFrame
+            eyebrow="Diagnóstico"
+            title="No solo sabe si acertaste. Sabe por qué fallaste."
+            lead="Una respuesta incorrecta no dice mucho. El patrón detrás de ella lo dice todo."
+            bullets={[
+              "Las preguntas se ajustan según respondes, para llegar antes al hueco real.",
+              "Cada error se clasifica por concepto, no por pregunta.",
+              "El resultado alimenta tu plan automáticamente.",
+            ]}
+            visual={<DiagnosticVisual />}
+          />
+        </Frame>
 
-                  <div className="mt-6 rounded-xl border border-border bg-background px-4 py-3">
-                    <p className="text-[11px] font-semibold tracking-wide text-subtle uppercase">Pregunta</p>
-                    <p className="mt-1 text-sm font-medium text-foreground">{DIAGNOSTIC_EXAMPLE.question}</p>
-                    <p className="mt-3 text-[11px] font-semibold tracking-wide text-subtle uppercase">Tu respuesta</p>
-                    <p className="mt-1 text-sm text-muted">{DIAGNOSTIC_EXAMPLE.studentAnswer}</p>
-                  </div>
+        {/* Frame — Mapa de conocimiento */}
+        <Frame tone="raised">
+          <SplitFrame
+            flip
+            eyebrow="Mapa de conocimiento"
+            title="Tu dominio real, tema por tema."
+            lead="No una lista de temas marcados como vistos. Un porcentaje por concepto que se mueve conforme estudias."
+            bullets={[
+              "Verde, ámbar y rojo: sabes de un vistazo qué está en riesgo.",
+              "Se actualiza con cada diagnóstico y cada sesión completada.",
+              "Los temas débiles suben solos al principio de tu plan.",
+            ]}
+            visual={<KnowledgeMapVisual />}
+          />
+        </Frame>
 
-                  <div className="my-4 flex items-center gap-3 text-subtle">
-                    <span className="h-px flex-1 bg-border" />
-                    <ArrowDown className="h-4 w-4" strokeWidth={1.75} />
-                    <span className="h-px flex-1 bg-border" />
-                  </div>
+        {/* Frame — Preparación de examen */}
+        <Frame>
+          <SplitFrame
+            eyebrow="Preparación para examen"
+            title="¿Estás listo para el examen? Ahora tienes un número."
+            lead="Un porcentaje de preparación calculado con tu dominio de los temas que ese examen cubre, y los días que faltan."
+            bullets={[
+              "Desglosado por tema, para saber dónde está el hueco.",
+              "Te dice cuánto podrías subir si refuerzas lo correcto.",
+              "Cambia solo conforme se acerca la fecha y avanzas.",
+            ]}
+            visual={<ExamPrepVisual />}
+          />
+        </Frame>
 
-                  {/* Concepto y dominio caben lado a lado: apilados sumaban
-                      altura sin aportar nada en un teléfono. */}
-                  <dl className="grid grid-cols-2 gap-2.5">
-                    <div className="rounded-xl border border-border bg-background px-3.5 py-3">
-                      <dt className="text-[11px] text-subtle">Concepto</dt>
-                      <dd className="mt-0.5 text-sm font-semibold text-foreground">{DIAGNOSTIC_EXAMPLE.concept}</dd>
-                    </div>
-                    <div className="rounded-xl border border-border bg-background px-3.5 py-3">
-                      <dt className="text-[11px] text-subtle">Dominio</dt>
-                      <dd className="mt-0.5 text-sm font-semibold text-danger tabular-nums">{DIAGNOSTIC_EXAMPLE.domain}%</dd>
-                    </div>
-                    <div className="col-span-2 rounded-xl border border-border bg-background px-3.5 py-3">
-                      <dt className="text-[11px] text-subtle">Patrón</dt>
-                      <dd className="mt-0.5 text-sm text-foreground">{DIAGNOSTIC_EXAMPLE.pattern}</dd>
-                    </div>
-                  </dl>
+        {/* Frame — Plan diario */}
+        <Frame tone="raised">
+          <SplitFrame
+            flip
+            eyebrow="Plan diario"
+            title="Abres HeyStudy y ya está decidido."
+            lead="Tres o cuatro cosas concretas, con minutos asignados y una razón por cada una. Nada de listas infinitas."
+            bullets={[
+              "Ordenado por impacto, no por urgencia aparente.",
+              "Cada tema viene con el porqué: qué error lo puso ahí.",
+              "Mañana es un plan nuevo, con lo que aprendiste hoy ya contado.",
+            ]}
+            visual={<DailyPlanVisual />}
+          />
+        </Frame>
 
-                  <div className="mt-4 flex items-start gap-2.5 rounded-xl bg-premium-soft px-4 py-3.5">
-                    <Lightbulb aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-premium" strokeWidth={1.75} />
-                    <p className="text-sm text-foreground">{DIAGNOSTIC_EXAMPLE.recommendation}</p>
-                  </div>
-                </BentoCard>
-              </Reveal>
-
-              {/* Preparación para examen — ancho */}
-              <Reveal delay={0.05} className="lg:col-span-2">
-                <BentoCard eyebrow="Preparación para examen" title="¿Estás listo? Ahora lo sabes.">
-                  <div className="mt-5 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">{EXAM_PREP.name}</p>
-                      <p className="text-xs text-subtle">{EXAM_PREP.date}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-display text-3xl font-semibold text-foreground tabular-nums">
-                        {EXAM_PREP.readiness}%
-                      </p>
-                      <p className="text-[11px] text-subtle">preparación</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-border">
-                    <div className="h-full rounded-full bg-accent" style={{ width: `${EXAM_PREP.readiness}%` }} />
-                  </div>
-
-                  <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-x-6">
-                    {EXAM_PREP.topics.map((row) => {
-                      const level = levelFromScore(row.score);
-                      return (
-                        <div key={row.topic} className="flex items-center gap-3">
-                          <span className="w-20 shrink-0 text-sm text-foreground">{row.topic}</span>
-                          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-border">
-                            <div
-                              className={cn("h-full rounded-full", FIXED_LEVEL_BAR_CLASS[level])}
-                              style={{ width: `${Math.round(row.score * 100)}%` }}
-                            />
-                          </div>
-                          <span className="w-9 shrink-0 text-right text-xs font-medium text-muted tabular-nums">
-                            {Math.round(row.score * 100)}%
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="mt-6 flex items-start gap-2.5 rounded-xl bg-premium-soft px-4 py-3.5">
-                    <TrendingUp aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-premium" strokeWidth={1.75} />
-                    <p className="text-sm text-foreground">
-                      Podría subir <strong>{EXAM_PREP.potential}%</strong> si refuerzas {EXAM_PREP.focus}.
-                    </p>
-                  </div>
-                </BentoCard>
-              </Reveal>
-
-              {/* Tres tarjetas chicas cierran el bento */}
-              {BENTO_EXTRAS.map(({ icon: Icon, eyebrow, title, description, Visual }, i) => (
-                <Reveal key={eyebrow} delay={0.05 * i}>
-                  <div className="flex h-full flex-col rounded-xl border border-border bg-background p-5 sm:p-6">
-                    <div className="flex items-center gap-2.5">
-                      <Icon aria-hidden className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.75} />
-                      <p className="text-xs font-medium tracking-wide text-subtle uppercase">{eyebrow}</p>
-                    </div>
-                    <h3 className="mt-3 text-base font-semibold text-foreground">{title}</h3>
-                    <p className="mt-1.5 text-sm text-muted">{description}</p>
-                    <Visual />
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Demo interactiva */}
-        <section
-          id="demo"
-          className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-14 sm:px-8 sm:py-24"
-        >
-          <Reveal className="relative mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
-              Mira tu plan antes de registrarte.
-            </h2>
-            <p className="mt-4 text-muted">Elige una materia y verás cómo se arma un día de estudio real.</p>
+        {/* Frame — Alcance */}
+        <Frame>
+          <FrameHeading
+            align="center"
+            eyebrow="Alcance"
+            title="Funciona con las materias que ya llevas."
+            lead="HeyStudy no trae un temario propio: aprende del tuyo. Si puedes escribir el nombre de la materia, puedes diagnosticarla."
+          />
+          <Reveal delay={0.1} className="mx-auto mt-9 flex max-w-3xl flex-wrap justify-center gap-2.5 sm:mt-12">
+            {SUBJECTS.map((s) => (
+              <span
+                key={s}
+                className="rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm text-muted"
+              >
+                {s}
+              </span>
+            ))}
+            <span className="rounded-full border border-dashed border-border-strong/60 px-3.5 py-1.5 text-sm text-subtle">
+              y la tuya
+            </span>
           </Reveal>
-          <Reveal delay={0.12} className="mt-8 sm:mt-10">
+        </Frame>
+
+        {/* Frame — Comparativa */}
+        <Frame tone="raised">
+          <FrameHeading
+            eyebrow="Comparativa"
+            title="Contra lo que ya estás haciendo."
+            lead="Un tutor particular sigue siendo mejor para resolver una duda en vivo. Para todo lo demás, esto es lo que cambia."
+          />
+          <Reveal delay={0.1} className="mt-9 sm:mt-12">
+            <Comparison />
+          </Reveal>
+        </Frame>
+
+        {/* Frame — Para quién es */}
+        <Frame>
+          <FrameHeading eyebrow="Para quién es" title="Si llevas más de tres materias, es para ti." />
+          <div className="mt-9 grid grid-cols-1 gap-4 sm:mt-12 sm:gap-5 lg:grid-cols-3">
+            {AUDIENCES.map((a, i) => (
+              <Reveal key={a.title} delay={0.07 * i}>
+                <div className="flex h-full flex-col rounded-2xl border border-border bg-surface p-6 sm:p-7">
+                  <h3 className="font-display text-xl font-semibold tracking-tight text-foreground">{a.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted">{a.description}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Frame>
+
+        {/* Frame — Demo interactiva */}
+        <Frame id="demo" tone="raised">
+          <FrameHeading
+            align="center"
+            eyebrow="Pruébalo"
+            title="Mira tu plan antes de registrarte."
+            lead="Elige una materia y verás cómo se arma un día de estudio real."
+          />
+          <Reveal delay={0.12} className="mt-8 sm:mt-12">
             <DemoInteractivo />
           </Reveal>
-        </section>
+        </Frame>
 
-        {/* Precios */}
-        <section id="precios" className="relative scroll-mt-20 overflow-hidden px-6 py-14 sm:px-8 sm:py-24">
-          <Reveal className="relative mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
-              Empieza gratis, escala cuando lo necesites
-            </h2>
-            <p className="mt-4 text-muted">Sin tarjeta para probar el diagnóstico y el plan de estudio.</p>
-          </Reveal>
-          <Reveal delay={0.1} className="relative mt-8 sm:mt-12">
+        {/* Frame — Precios */}
+        <Frame id="precios">
+          <FrameHeading
+            align="center"
+            eyebrow="Precios"
+            title="Empieza gratis, escala cuando lo necesites."
+            lead="Sin tarjeta para probar el diagnóstico y el plan de estudio."
+          />
+          <Reveal delay={0.1} className="mt-8 sm:mt-12">
             <Pricing />
           </Reveal>
-        </section>
+        </Frame>
 
-        {/* Preguntas frecuentes */}
-        <section className="border-t border-border bg-surface px-6 py-14 sm:px-8 sm:py-24">
-          <Reveal className="relative mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-[1.6rem] leading-[1.2] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.15]">
-              Preguntas frecuentes
-            </h2>
-          </Reveal>
-          <Reveal delay={0.1} className="mt-8 sm:mt-10">
+        {/* Frame — FAQ */}
+        <Frame tone="raised">
+          <FrameHeading align="center" eyebrow="Dudas" title="Preguntas frecuentes" />
+          <Reveal delay={0.1} className="mt-8 sm:mt-12">
             <Faq />
           </Reveal>
-        </section>
+        </Frame>
 
         {/* CTA final */}
         <section className="relative overflow-hidden bg-accent px-6 py-16 text-center sm:px-8 sm:py-28">
