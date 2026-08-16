@@ -15,27 +15,27 @@ export function levelFromScore(score: number): Level {
 // Clases fijas: estos mockups son "capturas de producto" y deben verse
 // siempre iguales (claros), sin adaptarse al modo oscuro del sistema.
 export const FIXED_LEVEL_BAR_CLASS: Record<Level, string> = {
-  danger: "bg-[#a14b36]",
-  warning: "bg-[#866327]",
-  success: "bg-[#407765]",
+  danger: "bg-[#974535]",
+  warning: "bg-[#7e5e25]",
+  success: "bg-[#396a5a]",
 };
 export const FIXED_LEVEL_TEXT_CLASS: Record<Level, string> = {
-  danger: "text-[#a14b36]",
-  warning: "text-[#866327]",
-  success: "text-[#407765]",
+  danger: "text-[#974535]",
+  warning: "text-[#7e5e25]",
+  success: "text-[#396a5a]",
 };
 export const FIXED_LEVEL_SOFT_BG_CLASS: Record<Level, string> = {
-  danger: "bg-[#a14b36]/10",
-  warning: "bg-[#866327]/10",
-  success: "bg-[#407765]/10",
+  danger: "bg-[#974535]/10",
+  warning: "bg-[#7e5e25]/10",
+  success: "bg-[#396a5a]/10",
 };
 
 // Knowledge Map
 export const KNOWLEDGE_MAP = [
-  { topic: "Álgebra", score: 0.92 },
-  { topic: "Funciones", score: 0.68 },
-  { topic: "Factorización", score: 0.44 },
-  { topic: "Ecuaciones", score: 0.81 },
+  { topic: "Álgebra", score: 0.87 },
+  { topic: "Funciones", score: 0.62 },
+  { topic: "Factorización", score: 0.41 },
+  { topic: "Ecuaciones", score: 0.79 },
 ];
 
 // AI Diagnostic
@@ -43,7 +43,7 @@ export const DIAGNOSTIC_EXAMPLE = {
   question: "Encuentra las raíces de f(x) = x² − 5x + 6",
   studentAnswer: "x = 2 y x = 4",
   concept: "Factorización",
-  domain: 43,
+  domain: 38,
   pattern: "Confusión entre factor común y diferencia de cuadrados.",
   recommendation: "Repasar factorización antes de continuar con funciones.",
 };
@@ -52,14 +52,14 @@ export const DIAGNOSTIC_EXAMPLE = {
 export const EXAM_PREP = {
   name: "Examen de Cálculo",
   date: "28 de agosto",
-  readiness: 78,
-  potential: 12,
+  readiness: 74,
+  potential: 9,
   focus: "Integrales y Aplicaciones",
   topics: [
-    { topic: "Funciones", score: 0.91 },
-    { topic: "Derivadas", score: 0.74 },
-    { topic: "Integrales", score: 0.53 },
-    { topic: "Aplicaciones", score: 0.61 },
+    { topic: "Funciones", score: 0.88 },
+    { topic: "Derivadas", score: 0.71 },
+    { topic: "Integrales", score: 0.49 },
+    { topic: "Aplicaciones", score: 0.64 },
   ],
 };
 

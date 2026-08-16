@@ -69,20 +69,24 @@ export default async function DashboardHomePage() {
         <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card>
-          <CardDescription>Materias</CardDescription>
-          <p className="mt-1 text-3xl font-semibold text-foreground">{subjects.length}</p>
-        </Card>
-        <Card>
-          <CardDescription>Tareas pendientes</CardDescription>
-          <p className="mt-1 text-3xl font-semibold text-foreground">{assignments.length}</p>
-        </Card>
-        <Card>
-          <CardDescription>Exámenes próximos</CardDescription>
-          <p className="mt-1 text-3xl font-semibold text-foreground">{exams.length}</p>
-        </Card>
-      </div>
+      {/* Una línea de contexto en vez de tres tarjetas iguales con un número
+          gigante: ese layout es plantilla de panel de administración y aquí
+          ni siquiera aporta, porque los mismos datos salen desglosados
+          justo abajo. */}
+      <dl className="flex flex-wrap gap-x-10 gap-y-3 border-y border-border py-4">
+        <div className="flex items-baseline gap-2">
+          <dt className="text-sm text-muted">Materias</dt>
+          <dd className="text-sm font-semibold text-foreground tabular-nums">{subjects.length}</dd>
+        </div>
+        <div className="flex items-baseline gap-2">
+          <dt className="text-sm text-muted">Tareas pendientes</dt>
+          <dd className="text-sm font-semibold text-foreground tabular-nums">{assignments.length}</dd>
+        </div>
+        <div className="flex items-baseline gap-2">
+          <dt className="text-sm text-muted">Exámenes próximos</dt>
+          <dd className="text-sm font-semibold text-foreground tabular-nums">{exams.length}</dd>
+        </div>
+      </dl>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Qué tan preparado estás</h2>

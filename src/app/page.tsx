@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import {
   ArrowRight,
   ArrowDown,
-  Sparkles,
+  Lightbulb,
+  Shuffle,
   Network,
   Target,
   ListChecks,
@@ -25,7 +26,6 @@ import { SiteHeader } from "@/components/marketing/SiteHeader";
 import { Pricing } from "@/components/marketing/Pricing";
 import { Faq } from "@/components/marketing/Faq";
 import { Reveal } from "@/components/marketing/Reveal";
-import { Blob, Sparkle } from "@/components/marketing/Decor";
 import {
   KNOWLEDGE_MAP,
   DIAGNOSTIC_EXAMPLE,
@@ -116,7 +116,7 @@ const JOURNEY_STEPS = [
   {
     eyebrow: "01",
     title: "Conecta tu realidad académica",
-    description: "Materias, tareas y exámenes reales — los tuyos, no un temario genérico.",
+    description: "Materias, tareas y exámenes reales, no un temario genérico.",
     items: [
       { icon: BookOpen, label: "Materias" },
       { icon: ListChecks, label: "Tareas" },
@@ -128,7 +128,7 @@ const JOURNEY_STEPS = [
     title: "Descubre lo que realmente sabes",
     description: "Preguntas adaptativas que revelan tu dominio real, no solo si acertaste.",
     items: [
-      { icon: Sparkles, label: "Preguntas adaptativas" },
+      { icon: Shuffle, label: "Preguntas adaptativas" },
       { icon: Network, label: "Dominio por concepto" },
       { icon: Target, label: "Patrones de error" },
     ],
@@ -163,11 +163,11 @@ function BentoCard({
   return (
     <div
       className={cn(
-        "flex h-full flex-col rounded-3xl border border-border bg-surface p-6 shadow-sm transition-shadow hover:shadow-md sm:p-7",
+        "flex h-full flex-col rounded-xl border border-border bg-surface p-6 sm:p-7",
         className,
       )}
     >
-      <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">{eyebrow}</p>
+      <p className="text-xs font-medium tracking-wide text-subtle uppercase">{eyebrow}</p>
       <h3 className="mt-2 font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{title}</h3>
       {children}
     </div>
@@ -268,38 +268,20 @@ export default async function Home() {
         <HeroScene />
 
         {/* Franja de confianza — copy honesto, sin logos ni cifras inventadas */}
-        <section className="border-y border-border bg-surface px-6 py-8 sm:px-8">
-          <Reveal className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-5 text-center sm:flex-row sm:justify-between sm:text-left">
-            <p className="max-w-sm text-sm font-medium text-foreground">
+        <section className="border-y border-border bg-surface px-6 py-7 sm:px-8">
+          <Reveal className="mx-auto flex w-full max-w-[1280px] flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
+            <p className="text-sm font-medium text-foreground">
               Diseñado para estudiantes que quieren dejar de estudiar a ciegas.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted">
-              <span className="inline-flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-accent-hover" strokeWidth={1.75} />
-                Sin tarjeta
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <ListOrdered className="h-4 w-4 text-accent-hover" strokeWidth={1.75} />
-                Listo en minutos
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-accent-hover" strokeWidth={1.75} />
-                Tus datos son tuyos
-              </span>
-            </div>
+            <p className="text-sm text-muted">Sin tarjeta · Listo en minutos · Tus datos son tuyos</p>
           </Reveal>
         </section>
 
         {/* Problema */}
         <section className="relative overflow-hidden px-6 py-20 sm:px-8 sm:py-24">
-          <Blob tone="accent" className="top-0 left-1/2 h-96 w-96 -translate-x-[85%]" />
           <div className="relative mx-auto w-full max-w-3xl">
             <Reveal className="relative">
-              <Sparkle tone="premium" className="absolute -top-2 left-1/2 hidden h-4 w-4 -translate-x-24 sm:block" />
-              <p className="text-center text-xs font-semibold tracking-wide text-accent-hover uppercase">
-                El problema
-              </p>
-              <h2 className="mt-3 text-center font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+              <h2 className="max-w-2xl font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
                 Estudiar más no siempre significa aprender más.
               </h2>
             </Reveal>
@@ -335,11 +317,9 @@ export default async function Home() {
           id="como-funciona"
           className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-24"
         >
-          <Blob tone="premium" className="top-1/2 -right-24 h-80 w-80 -translate-y-1/2" />
           <div className="relative mx-auto w-full max-w-[1280px]">
-            <Reveal className="relative mx-auto max-w-2xl text-center">
-              <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Así funciona</p>
-              <h2 className="mt-3 font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+            <Reveal className="relative max-w-2xl">
+              <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
                 De no saber por dónde empezar, a saber qué hacer hoy.
               </h2>
             </Reveal>
@@ -366,13 +346,9 @@ export default async function Home() {
 
         {/* Producto — un solo bento en vez de tres secciones separadas */}
         <section id="producto" className="relative scroll-mt-20 overflow-hidden px-6 py-20 sm:px-8 sm:py-24">
-          <Blob tone="accent" className="top-1/3 -left-24 h-96 w-96" />
-          <Blob tone="premium" className="right-0 bottom-0 h-80 w-80" />
           <div className="relative mx-auto w-full max-w-[1280px]">
-            <Reveal className="relative mx-auto max-w-2xl text-center">
-              <Sparkle tone="accent" className="absolute -top-2 right-1/2 hidden h-4 w-4 translate-x-28 sm:block" />
-              <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">El producto</p>
-              <h2 className="mt-3 font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+            <Reveal className="relative max-w-2xl">
+              <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
                 Todo lo que HeyStudy entiende de ti.
               </h2>
             </Reveal>
@@ -409,9 +385,9 @@ export default async function Home() {
                     })}
                   </div>
                   <div className="mt-6 flex items-start gap-2.5 rounded-xl bg-premium-soft px-4 py-3.5">
-                    <Sparkles aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-premium" strokeWidth={1.75} />
+                    <Lightbulb aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-premium" strokeWidth={1.75} />
                     <p className="text-sm text-foreground">
-                      <strong>Factorización</strong> es tu punto más débil — por eso lidera tu plan de hoy.
+                      <strong>Factorización</strong> es tu punto más débil, así que lidera tu plan de hoy.
                     </p>
                   </div>
                 </BentoCard>
@@ -453,7 +429,7 @@ export default async function Home() {
                   </dl>
 
                   <div className="mt-4 flex items-start gap-2.5 rounded-xl bg-premium-soft px-4 py-3.5">
-                    <Sparkles aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-premium" strokeWidth={1.75} />
+                    <Lightbulb aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-premium" strokeWidth={1.75} />
                     <p className="text-sm text-foreground">{DIAGNOSTIC_EXAMPLE.recommendation}</p>
                   </div>
                 </BentoCard>
@@ -510,12 +486,12 @@ export default async function Home() {
               {/* Tres tarjetas chicas cierran el bento */}
               {BENTO_EXTRAS.map(({ icon: Icon, eyebrow, title, description, Visual }, i) => (
                 <Reveal key={eyebrow} delay={0.05 * i}>
-                  <div className="flex h-full flex-col rounded-3xl border border-border bg-surface p-6 shadow-sm transition-shadow hover:shadow-md">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent-hover">
-                      <Icon aria-hidden className="h-5 w-5" strokeWidth={1.75} />
-                    </span>
-                    <p className="mt-4 text-xs font-semibold tracking-wide text-accent-hover uppercase">{eyebrow}</p>
-                    <h3 className="mt-1.5 text-base font-semibold text-foreground">{title}</h3>
+                  <div className="flex h-full flex-col rounded-xl border border-border bg-background p-6">
+                    <div className="flex items-center gap-2.5">
+                      <Icon aria-hidden className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.75} />
+                      <p className="text-xs font-medium tracking-wide text-subtle uppercase">{eyebrow}</p>
+                    </div>
+                    <h3 className="mt-3 text-base font-semibold text-foreground">{title}</h3>
                     <p className="mt-1.5 text-sm text-muted">{description}</p>
                     <Visual />
                   </div>
@@ -530,10 +506,8 @@ export default async function Home() {
           id="demo"
           className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-24"
         >
-          <Blob tone="premium" className="bottom-0 left-1/2 h-80 w-80 -translate-x-[15%]" />
           <Reveal className="relative mx-auto max-w-2xl text-center">
-            <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Pruébalo</p>
-            <h2 className="mt-3 font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
               Mira tu plan antes de registrarte.
             </h2>
             <p className="mt-4 text-muted">Elige una materia y verás cómo se arma un día de estudio real.</p>
@@ -545,7 +519,6 @@ export default async function Home() {
 
         {/* Precios */}
         <section id="precios" className="relative scroll-mt-20 overflow-hidden px-6 py-20 sm:px-8 sm:py-24">
-          <Blob tone="premium" className="top-1/2 right-[10%] h-72 w-72 -translate-y-1/2" />
           <Reveal className="relative mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
               Empieza gratis, escala cuando lo necesites
@@ -560,7 +533,6 @@ export default async function Home() {
         {/* Preguntas frecuentes */}
         <section className="border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-24">
           <Reveal className="relative mx-auto max-w-2xl text-center">
-            <Sparkle tone="accent" className="absolute -top-2 left-1/2 hidden h-3.5 w-3.5 -translate-x-28 sm:block" />
             <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
               Preguntas frecuentes
             </h2>
@@ -573,8 +545,6 @@ export default async function Home() {
         {/* CTA final */}
         <section className="relative overflow-hidden bg-accent px-6 py-24 text-center sm:px-8 sm:py-28">
           <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-[0.12]" />
-          <Sparkle className="absolute top-[20%] left-[16%] hidden h-5 w-5 text-white/50 sm:block" />
-          <Sparkle className="absolute right-[14%] bottom-[22%] hidden h-4 w-4 text-white/40 md:block" />
           <Reveal className="relative mx-auto max-w-xl">
             <h2 className="font-display text-3xl leading-[1.1] font-semibold tracking-tight text-white sm:text-5xl">
               Deja de adivinar qué estudiar.

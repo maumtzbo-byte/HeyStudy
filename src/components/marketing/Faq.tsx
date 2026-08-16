@@ -75,7 +75,7 @@ function FaqRow({ question, answer }: { question: string; answer: string }) {
 
 export function Faq() {
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-3xl border border-border bg-surface px-6 shadow-sm sm:px-8">
+    <div className="mx-auto w-full max-w-2xl rounded-xl border border-border bg-surface px-6 sm:px-8">
       {FAQ_ITEMS.map((faqItem) => (
         <FaqRow key={faqItem.question} {...faqItem} />
       ))}

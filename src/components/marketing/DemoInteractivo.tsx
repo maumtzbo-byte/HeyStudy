@@ -31,7 +31,7 @@ export function DemoInteractivo() {
 
   return (
     <div
-      className="mx-auto max-w-lg rounded-3xl border border-border bg-surface-elevated p-7 shadow-lg sm:p-9"
+      className="mx-auto max-w-lg rounded-xl border border-border bg-surface p-7 sm:p-9"
       aria-live="polite"
     >
       {step === "elegir" && (

@@ -3,9 +3,8 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, PlayCircle, Sparkles, CalendarCheck, Gift, TrendingUp } from "lucide-react";
+import { ArrowRight, PlayCircle, TrendingUp } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
-import { Sparkle } from "@/components/marketing/Decor";
 
 // Hero compacto (≈1 pantalla): sin scroll-jacking. La sensación "premium"
 // viene de la composición y de una entrada escalonada, no de secuestrar el
@@ -58,10 +57,10 @@ function Floating({
   );
 }
 
-const HERO_PILLS = [
-  { icon: Sparkles, top: "Diagnóstico", bottom: "con IA" },
-  { icon: CalendarCheck, top: "Plan nuevo", bottom: "cada día" },
-  { icon: Gift, top: "Gratis para", bottom: "empezar" },
+const HERO_FACTS = [
+  { top: "Diagnóstico", bottom: "con IA" },
+  { top: "Plan nuevo", bottom: "cada día" },
+  { top: "Gratis para", bottom: "empezar" },
 ];
 
 export function HeroScene() {
@@ -80,29 +79,24 @@ export function HeroScene() {
           WebkitMaskImage: "radial-gradient(ellipse 80% 70% at 50% 0%, black 25%, transparent 78%)",
         }}
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 -left-24 h-[26rem] w-[26rem] rounded-full bg-accent/[0.13] blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-24 bottom-0 h-[24rem] w-[24rem] rounded-full bg-premium/[0.14] blur-3xl"
-      />
 
       <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-6 pt-16 pb-20 sm:px-8 sm:pt-20 sm:pb-24 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
         {/* Columna izquierda — mensaje */}
         <motion.div variants={container} initial="hidden" animate="show" className="max-w-xl">
-          <motion.span
+          {/* Etiqueta discreta con filete, no una píldora con destello: la
+              píldora con ✨ es la firma visual de landing generada, y esta
+              página la repetía en cada sección. */}
+          <motion.p
             variants={item}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase"
+            className="flex items-center gap-3 text-xs font-semibold tracking-[0.14em] text-muted uppercase"
           >
-            <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+            <span aria-hidden className="h-px w-8 bg-border-strong" />
             Tu estudio, con dirección
-          </motion.span>
+          </motion.p>
 
           <motion.h1
             variants={item}
-            className="mt-7 font-display text-5xl leading-[1.02] font-semibold tracking-tight text-foreground sm:text-6xl lg:text-[4.25rem]"
+            className="mt-6 font-display text-5xl leading-[1.02] font-semibold tracking-tight text-foreground sm:text-6xl lg:text-[4.25rem]"
           >
             ¿Qué deberías
             <br />
@@ -127,34 +121,23 @@ export function HeroScene() {
             </a>
           </motion.div>
 
-          <motion.div
-            variants={item}
-            className="mt-10 flex flex-col divide-y divide-border rounded-2xl border border-border bg-surface p-1.5 shadow-sm sm:flex-row sm:divide-x sm:divide-y-0"
-          >
-            {HERO_PILLS.map(({ icon: Icon, top, bottom }) => (
-              <div key={top} className="flex flex-1 items-center gap-3 px-4 py-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent-hover">
-                  <Icon className="h-4 w-4" strokeWidth={1.75} />
-                </span>
-                <p className="text-sm leading-tight text-muted">
-                  {top}
-                  <br />
-                  <span className="font-semibold text-foreground">{bottom}</span>
-                </p>
-              </div>
+          {/* Sin tarjeta ni chips de ícono: una regla superior y tres datos.
+              El "ícono Lucide en cuadrito pastel" era el patrón más copiado
+              de la página. */}
+          <motion.div variants={item} className="mt-12 flex gap-8 border-t border-border pt-6 sm:gap-12">
+            {HERO_FACTS.map(({ top, bottom }) => (
+              <p key={top} className="text-sm leading-tight text-muted">
+                {top}
+                <br />
+                <span className="font-semibold text-foreground">{bottom}</span>
+              </p>
             ))}
           </motion.div>
         </motion.div>
 
         {/* Columna derecha — escena con mascota y tarjetas de producto */}
         <div className="relative flex min-h-[340px] items-center justify-center sm:min-h-[440px] lg:min-h-[520px]">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute h-[20rem] w-[20rem] rounded-full bg-accent/[0.16] blur-3xl sm:h-[26rem] sm:w-[26rem]"
-          />
 
-          <Sparkle tone="premium" className="absolute top-[12%] left-[8%] hidden h-5 w-5 sm:block" />
-          <Sparkle tone="accent" className="absolute right-[10%] bottom-[16%] hidden h-4 w-4 sm:block" />
 
           <motion.div
             initial={{ opacity: 0, scale: 0.94, y: 14 }}
@@ -229,7 +212,7 @@ export function HeroScene() {
           >
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-2 shadow-lg">
               <TrendingUp className="h-3.5 w-3.5 shrink-0 text-premium" strokeWidth={2} />
-              <span className="text-xs font-medium text-foreground">Factorización · 44%</span>
+              <span className="text-xs font-medium text-foreground">Factorización · 41%</span>
             </div>
           </Floating>
         </div>
