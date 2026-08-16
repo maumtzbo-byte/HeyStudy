@@ -1,249 +1,101 @@
 "use client";
 
-import type { ReactNode } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, PlayCircle, TrendingUp } from "lucide-react";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { ArrowRight } from "lucide-react";
+import { ButtonLink } from "@/components/ui/Button";
 
-// Hero compacto (≈1 pantalla): sin scroll-jacking. La sensación "premium"
-// viene de la composición y de una entrada escalonada, no de secuestrar el
-// scroll — que es justo lo que hacen Linear/Khanmigo y el resto de
-// referencias de presupuesto alto.
+/* ----------------------------------------------------------------------- */
+/* Hero conducido por el personaje.                                         */
+/*                                                                          */
+/* El orden está invertido a propósito: mascota → acción → etiqueta →        */
+/* titular. Funciona porque el personaje carga la primera pantalla solo y    */
+/* el producto ya se explica a fondo en los frames de abajo, así que el      */
+/* hero no tiene que probar nada — sólo tiene que detenerte.                 */
+/*                                                                          */
+/* Todo centrado y sin tarjetas flotantes ni textura de fondo: cualquier     */
+/* elemento extra aquí le quita escala a la mascota, que es el punto.        */
+/* ----------------------------------------------------------------------- */
 
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.09, delayChildren: 0.04 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.08 } },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } },
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
 };
-
-// Tarjeta flotante: entra con fade+scale y después respira con un loop
-// vertical suave. Se apaga por completo con prefers-reduced-motion.
-function Floating({
-  children,
-  className,
-  delay = 0,
-  distance = 10,
-  duration = 5,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-  distance?: number;
-  duration?: number;
-}) {
-  const reduceMotion = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, scale: 0.92 }}
-      animate={reduceMotion ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1, y: [0, -distance, 0] }}
-      transition={
-        reduceMotion
-          ? { duration: 0.35, delay }
-          : {
-              opacity: { duration: 0.5, delay },
-              scale: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] },
-              y: { duration, repeat: Infinity, ease: "easeInOut", delay: delay + 0.5 },
-            }
-      }
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-const HERO_FACTS = [
-  { top: "Diagnóstico", bottom: "con IA" },
-  { top: "Plan nuevo", bottom: "cada día" },
-  { top: "Gratis para", bottom: "empezar" },
-];
 
 export function HeroScene() {
   const reduceMotion = useReducedMotion();
 
   return (
     <section className="relative overflow-hidden bg-background">
-      {/* Textura de fondo + resplandores suaves */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          backgroundImage: "radial-gradient(var(--border) 1px, transparent 1px)",
-          backgroundSize: "30px 30px",
-          maskImage: "radial-gradient(ellipse 80% 70% at 50% 0%, black 25%, transparent 78%)",
-          WebkitMaskImage: "radial-gradient(ellipse 80% 70% at 50% 0%, black 25%, transparent 78%)",
-        }}
-      />
-
-      {/* En móvil el orden es mensaje → escena → datos, para que la mascota
-          entre en la primera pantalla en vez de quedar debajo del pliegue.
-          En lg el mensaje y los datos vuelven a la columna izquierda y la
-          escena ocupa la derecha completa. */}
-      <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-y-8 px-6 pt-10 pb-14 sm:px-8 sm:pt-20 sm:pb-24 lg:grid-cols-[1.05fr_1fr] lg:gap-x-10 lg:gap-y-10">
-        {/* Mensaje */}
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="max-w-xl lg:col-start-1 lg:row-start-1"
-        >
-          {/* Etiqueta discreta con filete, no una píldora con destello: la
-              píldora con ✨ es la firma visual de landing generada, y esta
-              página la repetía en cada sección. */}
-          <motion.p
-            variants={item}
-            className="flex items-center gap-3 text-xs font-semibold tracking-[0.14em] text-muted uppercase"
-          >
-            <span aria-hidden className="h-px w-8 bg-border-strong" />
-            Tu estudio, con dirección
-          </motion.p>
-
-          <motion.h1
-            variants={item}
-            className="mt-4 font-display text-[2.85rem] leading-[0.98] font-semibold tracking-[-0.03em] text-foreground sm:mt-6 sm:text-6xl sm:leading-[1.02] sm:tracking-tight lg:text-[4.25rem]"
-          >
-            ¿Qué deberías
-            <br />
-            <span className="text-accent">estudiar hoy?</span>
-          </motion.h1>
-
-          <motion.p variants={item} className="mt-5 text-base leading-relaxed text-muted sm:mt-6 sm:text-lg">
-            HeyStudy detecta lo que <strong className="font-semibold text-foreground">todavía no dominas</strong> y
-            convierte tu próximo examen en un plan claro para hoy.
-          </motion.p>
-
-          {/* Una sola acción primaria en móvil: dos botones apilados del mismo
-              peso reparten la atención y es el error más común en heroes
-              móviles. El secundario baja a enlace y sólo recupera forma de
-              botón cuando caben en fila. */}
-          <motion.div variants={item} className="mt-7 flex flex-col items-start gap-4 sm:mt-9 sm:flex-row sm:items-center">
-            <ButtonLink href="/registro" size="lg" className="w-full sm:w-auto">
-              Empezar gratis
-              <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
-            </ButtonLink>
-            <a
-              href="#como-funciona"
-              className="inline-flex items-center gap-2 text-sm font-medium text-muted underline-offset-4 hover:text-foreground hover:underline sm:hidden"
-            >
-              <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
-              Ver cómo funciona
-            </a>
-            <a href="#como-funciona" className="hidden sm:inline-flex">
-              <Button size="lg" variant="secondary">
-                <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
-                Ver cómo funciona
-              </Button>
-            </a>
-          </motion.div>
-        </motion.div>
-
-        {/* Escena con mascota y tarjetas de producto. En móvil va justo
-            después del mensaje; en lg ocupa la columna derecha completa. */}
-        <div className="relative flex min-h-[290px] items-center justify-center sm:min-h-[440px] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:min-h-[520px]">
-
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 14 }}
-            animate={reduceMotion ? { opacity: 1, scale: 1, y: 0 } : { opacity: 1, scale: 1, y: [0, -12, 0] }}
-            transition={
-              reduceMotion
-                ? { duration: 0.4 }
-                : {
-                    opacity: { duration: 0.6, delay: 0.15 },
-                    scale: { duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] },
-                    y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.7 },
-                  }
-            }
-            className="relative"
-          >
-            <Image
-              src="/mascot/mascota-lectura.png"
-              alt=""
-              aria-hidden
-              width={338}
-              height={270}
-              priority
-              className="pointer-events-none w-[15rem] sm:w-[19rem] lg:w-[21rem]"
-            />
-          </motion.div>
-
-          {/* Burbuja: la pregunta que resuelve el producto */}
-          <Floating
-            delay={0.45}
-            duration={5.6}
-            className="absolute -top-2 -right-2 sm:top-[4%] sm:right-0 lg:-right-2"
-          >
-            <div className="max-w-[13rem] rounded-2xl rounded-br-md border border-border bg-surface px-4 py-3 shadow-lg">
-              <p className="text-sm leading-snug font-medium text-foreground">
-                ¿Qué debería <span className="text-accent">estudiar</span> hoy?
-              </p>
-            </div>
-          </Floating>
-
-          {/* Tarjeta: preparación de examen */}
-          <Floating
-            delay={0.6}
-            duration={6.4}
-            distance={12}
-            className="absolute bottom-0 -left-2 sm:bottom-[8%] sm:left-0 lg:-left-6"
-          >
-            <div className="w-[11.5rem] rounded-2xl border border-border bg-surface p-4 shadow-lg">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-[10px] font-semibold tracking-wide text-subtle uppercase">Preparación</p>
-                <span className="font-display text-lg leading-none font-semibold text-foreground tabular-nums">
-                  72%
-                </span>
-              </div>
-              <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-border">
-                <motion.div
-                  className="h-full rounded-full bg-accent"
-                  initial={{ width: 0 }}
-                  animate={{ width: "72%" }}
-                  transition={{ duration: reduceMotion ? 0 : 1.1, delay: 1, ease: [0.22, 1, 0.36, 1] }}
-                />
-              </div>
-              <p className="mt-2 text-[11px] text-muted">Matemáticas · en 6 días</p>
-            </div>
-          </Floating>
-
-          {/* Chip: tema débil detectado */}
-          <Floating
-            delay={0.75}
-            duration={5.2}
-            distance={8}
-            className="absolute right-[4%] bottom-[34%] hidden sm:block lg:right-0"
-          >
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-2 shadow-lg">
-              <TrendingUp className="h-3.5 w-3.5 shrink-0 text-premium" strokeWidth={2} />
-              <span className="text-xs font-medium text-foreground">Factorización · 41%</span>
-            </div>
-          </Floating>
-        </div>
-
-        {/* Sin tarjeta ni chips de ícono: una regla superior y tres datos.
-            El "ícono Lucide en cuadrito pastel" era el patrón más copiado
-            de la página. */}
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="mx-auto flex w-full max-w-[1280px] flex-col items-center px-6 pt-6 pb-16 text-center sm:px-8 sm:pt-8 sm:pb-20"
+      >
+        {/* La mascota entra primero y ocupa casi todo el ancho: es la única
+            pieza de marca que el visitante reconoce antes de leer nada. */}
         <motion.div
           variants={item}
-          initial="hidden"
-          animate="show"
-          transition={{ delay: 0.5 }}
-          className="flex max-w-xl gap-6 border-t border-border pt-5 sm:gap-12 sm:pt-6 lg:col-start-1 lg:row-start-2 lg:self-start"
+          animate={reduceMotion ? undefined : { y: [0, -14, 0] }}
+          transition={
+            reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.9 }
+          }
         >
-          {HERO_FACTS.map(({ top, bottom }) => (
-            <p key={top} className="text-sm leading-tight text-muted">
-              {top}
-              <br />
-              <span className="font-semibold text-foreground">{bottom}</span>
-            </p>
-          ))}
+          <Image
+            src="/mascot/mascota-feliz.png"
+            alt=""
+            aria-hidden
+            width={351}
+            height={263}
+            priority
+            className="pointer-events-none w-[min(21rem,88vw)] sm:w-[26rem] lg:w-[33rem]"
+          />
         </motion.div>
-      </div>
+
+        {/* Acción antes que titular, como en la referencia. */}
+        <motion.div variants={item} className="mt-8 sm:mt-10">
+          <ButtonLink href="/registro" size="lg" className="rounded-full px-8">
+            Empezar gratis
+            <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+          </ButtonLink>
+        </motion.div>
+
+        <motion.p
+          variants={item}
+          className="mt-7 rounded-full border border-border-strong/50 px-4 py-1.5 text-sm font-medium text-accent sm:mt-8"
+        >
+          Estudio dirigido con IA
+        </motion.p>
+
+        <motion.h1
+          variants={item}
+          className="mt-7 max-w-[16ch] font-display text-[2.9rem] leading-[0.98] font-semibold tracking-[-0.035em] text-foreground sm:mt-8 sm:max-w-[18ch] sm:text-6xl sm:leading-[1] lg:text-[4.5rem]"
+        >
+          ¿Qué deberías <span className="text-accent">estudiar hoy?</span>
+        </motion.h1>
+
+        <motion.p
+          variants={item}
+          className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:mt-6 sm:text-lg"
+        >
+          HeyStudy detecta lo que <strong className="font-semibold text-foreground">todavía no dominas</strong> y
+          convierte tu próximo examen en un plan claro para hoy.
+        </motion.p>
+
+        <motion.a
+          variants={item}
+          href="#como-funciona"
+          className="mt-7 text-sm font-medium text-muted underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Ver cómo funciona
+        </motion.a>
+      </motion.div>
     </section>
   );
 }
