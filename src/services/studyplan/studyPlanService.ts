@@ -1,11 +1,17 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { createStudyPlan } from "@/services/ai/AIProvider";
+import { todayInTimezone } from "@/lib/utils/dates";
 import type { AITier } from "@/services/ai/models";
 
-function todayDateOnly() {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+// El día del plan se resuelve en la zona horaria del estudiante, no en la del
+// servidor (ver todayInTimezone).
+async function planDateFor(studentProfileId: string): Promise<Date> {
+  const profile = await prisma.studentProfile.findUnique({
+    where: { id: studentProfileId },
+    select: { timezone: true },
+  });
+  return todayInTimezone(profile?.timezone);
 }
 
 // Junta las debilidades más urgentes del estudiante: mastery bajo, ponderado
@@ -53,8 +59,9 @@ async function buildWeakTopicsSummary(studentProfileId: string): Promise<string 
 }
 
 export async function getTodayPlan(studentProfileId: string) {
+  const forDate = await planDateFor(studentProfileId);
   return prisma.studyPlan.findUnique({
-    where: { studentProfileId_forDate: { studentProfileId, forDate: todayDateOnly() } },
+    where: { studentProfileId_forDate: { studentProfileId, forDate } },
     include: {
       items: { orderBy: { orderIndex: "asc" }, include: { knowledgeTopic: { select: { name: true, subjectId: true } } } },
     },
@@ -81,7 +88,7 @@ export async function generateTodayPlan(params: {
   const topics = await prisma.knowledgeTopic.findMany({ where: { subject: { studentProfileId } } });
   const topicIdByName = new Map(topics.map((t) => [t.name.trim().toLowerCase(), t.id]));
 
-  const forDate = todayDateOnly();
+  const forDate = await planDateFor(studentProfileId);
   const plan = await prisma.studyPlan.upsert({
     where: { studentProfileId_forDate: { studentProfileId, forDate } },
     create: { studentProfileId, forDate },

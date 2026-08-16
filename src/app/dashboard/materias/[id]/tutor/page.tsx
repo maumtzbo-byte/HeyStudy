@@ -5,6 +5,7 @@ import { MessageCircle } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getSubject } from "@/services/subjects/subjectService";
 import { listConversations } from "@/services/tutor/tutorService";
+import { listTutorsForSubject } from "@/services/tutor/customTutorService";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { StartTutorForm } from "@/components/tutor/StartTutorForm";
 
@@ -22,7 +23,10 @@ export default async function TutorIndexPage({ params }: PageProps<"/dashboard/m
   const subject = await getSubject(studentProfile.id, id);
   if (!subject) notFound();
 
-  const conversations = await listConversations(studentProfile.id, id);
+  const [conversations, tutors] = await Promise.all([
+    listConversations(studentProfile.id, id),
+    listTutorsForSubject(studentProfile.id, id),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -33,7 +37,7 @@ export default async function TutorIndexPage({ params }: PageProps<"/dashboard/m
 
       <Card className="flex flex-col gap-4">
         <CardTitle>Nueva conversación</CardTitle>
-        <StartTutorForm subjectId={subject.id} />
+        <StartTutorForm subjectId={subject.id} tutors={tutors} />
       </Card>
 
       {conversations.length > 0 && (
@@ -47,10 +51,17 @@ export default async function TutorIndexPage({ params }: PageProps<"/dashboard/m
                 className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-border/20"
               >
                 <div className="flex items-center gap-3">
-                  <MessageCircle className="h-4 w-4 shrink-0 text-muted" />
+                  {c.tutorEmoji ? (
+                    <span aria-hidden className="w-4 shrink-0 text-center text-sm">
+                      {c.tutorEmoji}
+                    </span>
+                  ) : (
+                    <MessageCircle className="h-4 w-4 shrink-0 text-muted" />
+                  )}
                   <div>
                     <p className="text-sm font-medium text-foreground">{c.title ?? "Conversación sin título"}</p>
                     <p className="text-xs text-muted">
+                      {c.tutorName ? `${c.tutorName} · ` : ""}
                       {c.messageCount} mensaje{c.messageCount === 1 ? "" : "s"} · {formatDate(c.updatedAt)}
                     </p>
                   </div>

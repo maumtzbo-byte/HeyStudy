@@ -1,30 +1,17 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
+import { UserFacingError } from "@/lib/actions/result";
 import { tutorResponse } from "@/services/ai/AIProvider";
+import { MODE_TO_DB, MODE_FROM_DB } from "@/services/tutor/customTutorService";
 import type { AITier } from "@/services/ai/models";
 import type { TutorMode } from "@/services/ai/types";
-import type { TutorConversationMode as DbTutorMode } from "@/generated/prisma/client";
-
-const MODE_TO_DB: Record<TutorMode, DbTutorMode> = {
-  socratico: "SOCRATICO",
-  explicar: "EXPLICAR",
-  pista: "PISTA",
-  practica: "PRACTICA",
-};
-
-const MODE_FROM_DB: Record<DbTutorMode, TutorMode> = {
-  SOCRATICO: "socratico",
-  EXPLICAR: "explicar",
-  PISTA: "pista",
-  PRACTICA: "practica",
-};
 
 async function assertConversationOwnership(studentProfileId: string, conversationId: string) {
   const conversation = await prisma.tutorConversation.findFirst({
     where: { id: conversationId, studentProfileId },
-    include: { subject: true },
+    include: { subject: true, customTutor: true },
   });
-  if (!conversation) throw new Error("Conversación no encontrada");
+  if (!conversation) throw new UserFacingError("Conversación no encontrada");
   return conversation;
 }
 
@@ -48,7 +35,10 @@ export async function listConversations(studentProfileId: string, subjectId: str
   const conversations = await prisma.tutorConversation.findMany({
     where: { studentProfileId, subjectId },
     orderBy: { updatedAt: "desc" },
-    include: { _count: { select: { messages: true } } },
+    include: {
+      _count: { select: { messages: true } },
+      customTutor: { select: { name: true, emoji: true } },
+    },
   });
 
   return conversations.map((c) => ({
@@ -57,6 +47,8 @@ export async function listConversations(studentProfileId: string, subjectId: str
     title: c.title,
     messageCount: c._count.messages,
     updatedAt: c.updatedAt,
+    tutorName: c.customTutor?.name ?? null,
+    tutorEmoji: c.customTutor?.emoji ?? null,
   }));
 }
 
@@ -65,6 +57,7 @@ export async function getConversation(studentProfileId: string, conversationId: 
     where: { id: conversationId, studentProfileId },
     include: {
       subject: true,
+      customTutor: { select: { name: true, emoji: true } },
       messages: { orderBy: { createdAt: "asc" } },
     },
   });
@@ -75,6 +68,8 @@ export async function getConversation(studentProfileId: string, conversationId: 
     mode: MODE_FROM_DB[conversation.mode],
     subjectId: conversation.subjectId,
     subjectName: conversation.subject.name,
+    tutorName: conversation.customTutor?.name ?? null,
+    tutorEmoji: conversation.customTutor?.emoji ?? null,
     messages: conversation.messages.map((m) => ({
       id: m.id,
       role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
@@ -87,14 +82,33 @@ export async function startConversation(params: {
   studentProfileId: string;
   subjectId: string;
   mode: TutorMode;
+  customTutorId?: string | null;
 }) {
-  const { studentProfileId, subjectId, mode } = params;
+  const { studentProfileId, subjectId, mode, customTutorId } = params;
 
   const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new Error("Materia no encontrada");
+  if (!subject) throw new UserFacingError("Materia no encontrada");
+
+  // El tutor tiene que ser del estudiante y aplicar a esta materia (general o
+  // atado justo a ella).
+  let resolvedTutorId: string | null = null;
+  let resolvedMode = mode;
+  if (customTutorId) {
+    const tutor = await prisma.customTutor.findFirst({
+      where: { id: customTutorId, studentProfileId, OR: [{ subjectId: null }, { subjectId }] },
+    });
+    if (!tutor) throw new UserFacingError("Tutor no encontrado");
+    resolvedTutorId = tutor.id;
+    resolvedMode = MODE_FROM_DB[tutor.baseMode];
+  }
 
   const conversation = await prisma.tutorConversation.create({
-    data: { studentProfileId, subjectId, mode: MODE_TO_DB[mode] },
+    data: {
+      studentProfileId,
+      subjectId,
+      mode: MODE_TO_DB[resolvedMode],
+      customTutorId: resolvedTutorId,
+    },
   });
 
   return conversation.id;
@@ -127,6 +141,9 @@ export async function sendMessage(params: {
       mode: MODE_FROM_DB[conversation.mode],
       subjectContext: conversation.subject.name,
       masterySummary,
+      persona: conversation.customTutor
+        ? { name: conversation.customTutor.name, instructions: conversation.customTutor.instructions }
+        : null,
       history: [
         ...priorMessages.map((m) => ({
           role: m.role === "USER" ? ("user" as const) : ("assistant" as const),

@@ -56,8 +56,74 @@ model StudentProfile {
   studyPlans         StudyPlan[]
   grades             Grade[]
   tutorConversations TutorConversation[]
+  customTutors       CustomTutor[]
+
+  ownedStudyGroups  StudyGroup[]       @relation("StudyGroupOwner")
+  studyGroupMembers StudyGroupMember[]
+  sharedStudyPlans  SharedStudyPlan[]
 
   @@map("student_profiles")
+}
+
+// ---------------------------------------------------------------------------
+// Grupos de estudio — estudiar acompañado
+// ---------------------------------------------------------------------------
+
+// Se entra por código, no buscando personas: buscar por correo o nombre
+// permitiría averiguar quién tiene cuenta en HeyStudy.
+model StudyGroup {
+  id        String         @id @default(uuid()) @db.Uuid
+  name      String
+  joinCode  String         @unique
+  ownerId   String         @db.Uuid
+  owner     StudentProfile @relation("StudyGroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  members     StudyGroupMember[]
+  sharedPlans SharedStudyPlan[]
+
+  @@index([ownerId])
+  @@map("study_groups")
+}
+
+enum StudyGroupRole {
+  OWNER
+  MIEMBRO
+}
+
+model StudyGroupMember {
+  id               String         @id @default(uuid()) @db.Uuid
+  studyGroupId     String         @db.Uuid
+  studyGroup       StudyGroup     @relation(fields: [studyGroupId], references: [id], onDelete: Cascade)
+  studentProfileId String         @db.Uuid
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  role             StudyGroupRole @default(MIEMBRO)
+  joinedAt         DateTime       @default(now())
+
+  @@unique([studyGroupId, studentProfileId])
+  @@index([studyGroupId])
+  @@index([studentProfileId])
+  @@map("study_group_members")
+}
+
+// Compartir es opt-in y por plan: nadie publica sus planes al grupo por el
+// simple hecho de ser miembro. Aun así, esto solo expone los ítems del plan
+// (qué estudiar y cuántos minutos). El diagnóstico, el mastery por tema, los
+// patrones de error y las calificaciones nunca salen del dueño.
+model SharedStudyPlan {
+  id           String         @id @default(uuid()) @db.Uuid
+  studyPlanId  String         @db.Uuid
+  studyPlan    StudyPlan      @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  studyGroupId String         @db.Uuid
+  studyGroup   StudyGroup     @relation(fields: [studyGroupId], references: [id], onDelete: Cascade)
+  sharedById   String         @db.Uuid
+  sharedBy     StudentProfile @relation(fields: [sharedById], references: [id], onDelete: Cascade)
+  sharedAt     DateTime       @default(now())
+
+  @@unique([studyPlanId, studyGroupId])
+  @@index([studyGroupId])
+  @@map("shared_study_plans")
 }
 
 // ---------------------------------------------------------------------------
@@ -79,6 +145,7 @@ model Subject {
   knowledgeTopics    KnowledgeTopic[]
   grades             Grade[]
   tutorConversations TutorConversation[]
+  customTutors       CustomTutor[]
 
   @@index([studentProfileId])
   @@map("subjects")
@@ -314,7 +381,8 @@ model StudyPlan {
   forDate          DateTime       @db.Date
   generatedAt      DateTime       @default(now())
 
-  items StudyPlanItem[]
+  items      StudyPlanItem[]
+  sharedWith SharedStudyPlan[]
 
   @@unique([studentProfileId, forDate])
   @@map("study_plans")
@@ -359,6 +427,10 @@ model TutorConversation {
   subjectId        String                @db.Uuid
   subject          Subject               @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   mode             TutorConversationMode @default(EXPLICAR)
+  // Tutor personalizado del estudiante. Si es null, se usa el tutor por
+  // defecto de HeyStudy con el comportamiento del `mode`.
+  customTutorId    String?               @db.Uuid
+  customTutor      CustomTutor?          @relation(fields: [customTutorId], references: [id], onDelete: SetNull)
   title            String?
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
@@ -368,6 +440,33 @@ model TutorConversation {
   @@index([studentProfileId])
   @@index([subjectId])
   @@map("tutor_conversations")
+}
+
+// Tutor que el estudiante define a su gusto: nombre, personalidad y estilo
+// de explicación.
+model CustomTutor {
+  id               String                @id @default(uuid()) @db.Uuid
+  studentProfileId String                @db.Uuid
+  studentProfile   StudentProfile        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  name             String
+  emoji            String                @default("🎓")
+  // Texto libre escrito por el estudiante. Se trata como entrada NO confiable:
+  // viaja en una sección delimitada del system prompt y nunca puede
+  // sobreescribir las reglas de HeyStudy (ver AIProvider.tutorResponse).
+  instructions     String
+  // Modo base sobre el que se apoya la personalidad.
+  baseMode         TutorConversationMode @default(EXPLICAR)
+  // Opcional: si se fija, el tutor solo aparece en esa materia.
+  subjectId        String?               @db.Uuid
+  subject          Subject?              @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  conversations TutorConversation[]
+
+  @@index([studentProfileId])
+  @@index([subjectId])
+  @@map("custom_tutors")
 }
 
 model TutorChatMessage {

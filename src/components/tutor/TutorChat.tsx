@@ -49,11 +49,11 @@ export function TutorChat({
     setInput("");
     startTransition(async () => {
       const result = await sendMessageAction(conversationId, content);
-      if ("error" in result) {
+      if (!result.ok) {
         setError(result.error);
         return;
       }
-      setMessages((prev) => [...prev, { role: "assistant", content: result.reply }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: result.data }]);
     });
   }
 

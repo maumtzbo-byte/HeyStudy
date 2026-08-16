@@ -14,12 +14,18 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             <Link href="/dashboard">
               <Logo />
             </Link>
-            <nav className="flex items-center gap-6 text-sm font-medium text-muted">
+            <nav className="flex items-center gap-4 text-sm font-medium text-muted sm:gap-6">
               <Link href="/dashboard" className="hover:text-foreground">
                 Hoy
               </Link>
               <Link href="/dashboard/materias" className="hover:text-foreground">
                 Materias
+              </Link>
+              <Link href="/dashboard/tutores" className="hover:text-foreground">
+                Tutores
+              </Link>
+              <Link href="/dashboard/grupos" className="hover:text-foreground">
+                Grupos
               </Link>
             </nav>
           </div>
