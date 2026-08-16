@@ -1,286 +1,237 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { ArrowRight, PlayCircle } from "lucide-react";
+import type { ReactNode } from "react";
+import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, PlayCircle, Sparkles, CalendarCheck, Gift, TrendingUp } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
-import { PhoneMockup } from "@/components/marketing/PhoneMockup";
-import { NotebookObject, PencilObject, ExamObject } from "@/components/marketing/StudyObjects";
+import { Sparkle } from "@/components/marketing/Decor";
 
-/* ---------------------------------------------------------------------- */
-/* Motor de scroll cinemático                                              */
-/*                                                                          */
-/* Adaptado de un patrón de "stage" fijo (position: sticky) + un loop de   */
-/* rAF que suaviza scroll y mouse con lerp, y escribe el resultado como    */
-/* CSS custom properties directamente en el DOM (sin pasar por React) —    */
-/* así la animación corre a 60fps sin re-renders. Cada capa (texto,        */
-/* teléfono, objetos flotantes) lee su propia variable con su propio       */
-/* multiplicador de profundidad, así que se mueven a velocidades distintas */
-/* con el mouse y desaparecen en momentos distintos del scroll.            */
-/* ---------------------------------------------------------------------- */
+// Hero compacto (≈1 pantalla): sin scroll-jacking. La sensación "premium"
+// viene de la composición y de una entrada escalonada, no de secuestrar el
+// scroll — que es justo lo que hacen Linear/Khanmigo y el resto de
+// referencias de presupuesto alto.
 
-const SCROLL_DISTANCE = 1150;
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.04 } },
+};
 
-function clamp(v: number, min = 0, max = 1) {
-  return Math.min(max, Math.max(min, v));
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } },
+};
+
+// Tarjeta flotante: entra con fade+scale y después respira con un loop
+// vertical suave. Se apaga por completo con prefers-reduced-motion.
+function Floating({
+  children,
+  className,
+  delay = 0,
+  distance = 10,
+  duration = 5,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  distance?: number;
+  duration?: number;
+}) {
+  const reduceMotion = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={reduceMotion ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1, y: [0, -distance, 0] }}
+      transition={
+        reduceMotion
+          ? { duration: 0.35, delay }
+          : {
+              opacity: { duration: 0.5, delay },
+              scale: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] },
+              y: { duration, repeat: Infinity, ease: "easeInOut", delay: delay + 0.5 },
+            }
+      }
+    >
+      {children}
+    </motion.div>
+  );
 }
-function smoothstep(e0: number, e1: number, v: number) {
-  const x = clamp((v - e0) / (e1 - e0));
-  return x * x * (3 - 2 * x);
-}
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
+
+const HERO_PILLS = [
+  { icon: Sparkles, top: "Diagnóstico", bottom: "con IA" },
+  { icon: CalendarCheck, top: "Plan nuevo", bottom: "cada día" },
+  { icon: Gift, top: "Gratis para", bottom: "empezar" },
+];
 
 export function HeroScene() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const stage = stageRef.current;
-    if (!section || !stage) return;
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-    let targetMouseX = 0;
-    let targetMouseY = 0;
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetScroll = 0;
-    let smoothScroll = 0;
-    let initialized = false;
-    let rafPending = false;
-
-    function getScrollDistance() {
-      const rect = section!.getBoundingClientRect();
-      return clamp(-rect.top, 0, section!.offsetHeight - window.innerHeight);
-    }
-
-    function update() {
-      rafPending = false;
-      targetScroll = getScrollDistance();
-      if (!initialized || reduceMotion.matches) {
-        smoothScroll = targetScroll;
-        initialized = true;
-      } else {
-        smoothScroll = lerp(smoothScroll, targetScroll, 0.14);
-      }
-      if (Math.abs(smoothScroll - targetScroll) < 0.08) smoothScroll = targetScroll;
-
-      mouseX = lerp(mouseX, targetMouseX, 0.12);
-      mouseY = lerp(mouseY, targetMouseY, 0.12);
-
-      const mx = reduceMotion.matches ? 0 : mouseX;
-      const my = reduceMotion.matches ? 0 : mouseY;
-
-      const titleExit = smoothstep(0, 640, smoothScroll);
-      const phoneExit = smoothstep(120, 1020, smoothScroll);
-      const floatExit = smoothstep(60, 900, smoothScroll);
-      const bgDrift = smoothstep(0, SCROLL_DISTANCE, smoothScroll);
-
-      const s = stage!.style;
-      s.setProperty("--title-y", `${titleExit * -130}px`);
-      s.setProperty("--title-opacity", `${1 - titleExit}`);
-      s.setProperty("--title-scale", `${1 - titleExit * 0.05}`);
-
-      s.setProperty("--phone-x", `${mx * 20}px`);
-      s.setProperty("--phone-y", `${my * 12 + phoneExit * 70}px`);
-      s.setProperty("--phone-rotate", `${mx * 8}deg`);
-      s.setProperty("--phone-scale", `${1 + (1 - phoneExit) * 0 + phoneExit * -0.04}`);
-      s.setProperty("--phone-opacity", `${1 - phoneExit}`);
-
-      s.setProperty("--float-notebook-x", `${mx * 34 - floatExit * 26}px`);
-      s.setProperty("--float-notebook-y", `${my * 20 - floatExit * 90}px`);
-      s.setProperty("--float-notebook-rotate", `${-10 - floatExit * 12 + mx * 6}deg`);
-      s.setProperty("--float-notebook-opacity", `${1 - floatExit}`);
-
-      s.setProperty("--float-pencil-x", `${mx * -26 + floatExit * 22}px`);
-      s.setProperty("--float-pencil-y", `${my * 24 - floatExit * 110}px`);
-      s.setProperty("--float-pencil-rotate", `${20 + floatExit * 16 + mx * 6}deg`);
-      s.setProperty("--float-pencil-opacity", `${1 - floatExit}`);
-
-      s.setProperty("--float-exam-x", `${mx * 18 - floatExit * 18}px`);
-      s.setProperty("--float-exam-y", `${my * 16 - floatExit * 70}px`);
-      s.setProperty("--float-exam-rotate", `${6 - floatExit * 10 + mx * -5}deg`);
-      s.setProperty("--float-exam-opacity", `${1 - floatExit}`);
-
-      s.setProperty("--bg-x", `${mx * -10}px`);
-      s.setProperty("--bg-y", `${my * -6 - bgDrift * 20}px`);
-      s.setProperty("--bg-scale", `${1 + bgDrift * 0.06}`);
-
-      const stillMoving =
-        Math.abs(smoothScroll - targetScroll) > 0.08 ||
-        Math.abs(mouseX - targetMouseX) > 0.001 ||
-        Math.abs(mouseY - targetMouseY) > 0.001;
-      if (stillMoving) requestTick();
-    }
-
-    function requestTick() {
-      if (rafPending) return;
-      rafPending = true;
-      requestAnimationFrame(update);
-    }
-
-    function onScroll() {
-      requestTick();
-    }
-    function onResize() {
-      requestTick();
-    }
-    function onPointerMove(e: PointerEvent) {
-      targetMouseX = e.clientX / window.innerWidth - 0.5;
-      targetMouseY = e.clientY / window.innerHeight - 0.5;
-      requestTick();
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    requestTick();
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("pointermove", onPointerMove);
-    };
-  }, []);
+  const reduceMotion = useReducedMotion();
 
   return (
-    <section ref={sectionRef} className="relative" style={{ height: `calc(100vh + ${SCROLL_DISTANCE}px)` }}>
+    <section className="relative overflow-hidden bg-background">
+      {/* Textura de fondo + resplandores suaves */}
       <div
-        ref={stageRef}
-        className="sticky top-0 h-screen min-h-[620px] overflow-hidden bg-background"
-        style={
-          {
-            "--title-y": "0px",
-            "--title-opacity": 1,
-            "--title-scale": 1,
-            "--phone-x": "0px",
-            "--phone-y": "0px",
-            "--phone-rotate": "0deg",
-            "--phone-scale": 1,
-            "--phone-opacity": 1,
-            "--float-notebook-x": "0px",
-            "--float-notebook-y": "0px",
-            "--float-notebook-rotate": "-10deg",
-            "--float-notebook-opacity": 1,
-            "--float-pencil-x": "0px",
-            "--float-pencil-y": "0px",
-            "--float-pencil-rotate": "20deg",
-            "--float-pencil-opacity": 1,
-            "--float-exam-x": "0px",
-            "--float-exam-y": "0px",
-            "--float-exam-rotate": "6deg",
-            "--float-exam-opacity": 1,
-            "--bg-x": "0px",
-            "--bg-y": "0px",
-            "--bg-scale": 1,
-            perspective: "1500px",
-          } as React.CSSProperties
-        }
-      >
-        {/* Fondo: puntos casi invisibles con su propio drift de profundidad */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.5]"
-          style={{
-            backgroundImage: "radial-gradient(var(--border) 1px, transparent 1px)",
-            backgroundSize: "28px 28px",
-            transform: "translate3d(var(--bg-x), var(--bg-y), 0) scale(var(--bg-scale))",
-            maskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black 30%, transparent 75%)",
-            WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black 30%, transparent 75%)",
-          }}
-        />
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          backgroundImage: "radial-gradient(var(--border) 1px, transparent 1px)",
+          backgroundSize: "30px 30px",
+          maskImage: "radial-gradient(ellipse 80% 70% at 50% 0%, black 25%, transparent 78%)",
+          WebkitMaskImage: "radial-gradient(ellipse 80% 70% at 50% 0%, black 25%, transparent 78%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 -left-24 h-[26rem] w-[26rem] rounded-full bg-accent/[0.13] blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-24 bottom-0 h-[24rem] w-[24rem] rounded-full bg-premium/[0.14] blur-3xl"
+      />
 
-        <div className="relative mx-auto flex h-full w-full max-w-3xl flex-col items-center px-6 pt-24 text-center sm:px-8 sm:pt-28">
-          <div
-            style={{
-              transform: "translate3d(0, var(--title-y), 0) scale(var(--title-scale))",
-              opacity: "var(--title-opacity)",
-              willChange: "transform, opacity",
-            }}
+      <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-6 pt-16 pb-20 sm:px-8 sm:pt-20 sm:pb-24 lg:grid-cols-[1.05fr_1fr] lg:gap-10">
+        {/* Columna izquierda — mensaje */}
+        <motion.div variants={container} initial="hidden" animate="show" className="max-w-xl">
+          <motion.span
+            variants={item}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase"
           >
-            <span className="inline-flex items-center rounded-full border border-border bg-surface px-3.5 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase">
-              Tu estudio, con dirección
-            </span>
-            <h1 className="mt-7 font-display text-5xl leading-[1.05] font-semibold tracking-tight text-foreground sm:text-6xl">
-              ¿Qué deberías
-              <br />
-              estudiar hoy?
-            </h1>
-            <p className="mt-6 max-w-xl text-lg text-muted">
-              HeyStudy analiza lo que realmente dominas, detecta tus puntos débiles y convierte tu próximo examen en
-              un plan claro para hoy.
-            </p>
-            <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
-              <ButtonLink href="/registro" size="lg" className="w-full sm:w-auto">
-                Empezar gratis
-                <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
-              </ButtonLink>
-              <a href="#como-funciona" className="w-full sm:w-auto">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto">
-                  <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
-                  Ver cómo funciona
-                </Button>
-              </a>
-            </div>
-          </div>
+            <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+            Tu estudio, con dirección
+          </motion.span>
 
-          {/* Escena 3D: teléfono + objetos de estudio flotando alrededor,
-              cada uno a su propia profundidad (mouse-parallax + salida en scroll) */}
-          <div
-            className="relative mt-10 flex w-full flex-1 items-start justify-center"
-            style={{ transformStyle: "preserve-3d" }}
+          <motion.h1
+            variants={item}
+            className="mt-7 font-display text-5xl leading-[1.02] font-semibold tracking-tight text-foreground sm:text-6xl lg:text-[4.25rem]"
           >
-            {/* El teléfono va primero en el DOM para quedar detrás de los
-                objetos flotantes en el orden de pintado. */}
-            <div
-              style={{
-                transform:
-                  "translate3d(var(--phone-x), var(--phone-y), 0) scale(var(--phone-scale)) rotateY(var(--phone-rotate))",
-                opacity: "var(--phone-opacity)",
-                transformStyle: "preserve-3d",
-                willChange: "transform, opacity",
-              }}
-            >
-              <PhoneMockup />
-            </div>
+            ¿Qué deberías
+            <br />
+            <span className="text-accent">estudiar hoy?</span>
+          </motion.h1>
 
-            <div
-              className="pointer-events-none absolute top-2 left-[6%] z-10 hidden w-16 sm:block md:top-4 md:left-[14%] md:w-20"
-              style={{
-                transform:
-                  "translate3d(var(--float-notebook-x), var(--float-notebook-y), 0) rotate(var(--float-notebook-rotate))",
-                opacity: "var(--float-notebook-opacity)",
-                willChange: "transform, opacity",
-              }}
-            >
-              <NotebookObject className="w-full drop-shadow-none" />
-            </div>
+          <motion.p variants={item} className="mt-6 text-lg leading-relaxed text-muted">
+            HeyStudy detecta lo que <strong className="font-semibold text-foreground">todavía no dominas</strong> y
+            convierte tu próximo examen en un plan claro para hoy.
+          </motion.p>
 
-            <div
-              className="pointer-events-none absolute top-16 right-[4%] z-10 hidden w-24 sm:block md:top-20 md:right-[12%] md:w-28"
-              style={{
-                transform:
-                  "translate3d(var(--float-pencil-x), var(--float-pencil-y), 0) rotate(var(--float-pencil-rotate))",
-                opacity: "var(--float-pencil-opacity)",
-                willChange: "transform, opacity",
-              }}
-            >
-              <PencilObject className="w-full" />
-            </div>
+          <motion.div variants={item} className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <ButtonLink href="/registro" size="lg" className="w-full sm:w-auto">
+              Empezar gratis
+              <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+            </ButtonLink>
+            <a href="#como-funciona" className="w-full sm:w-auto">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+                <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
+                Ver cómo funciona
+              </Button>
+            </a>
+          </motion.div>
 
-            <div
-              className="pointer-events-none absolute top-[19rem] left-[1%] z-10 hidden w-16 md:block md:left-[7%] md:w-[4.75rem]"
-              style={{
-                transform: "translate3d(var(--float-exam-x), var(--float-exam-y), 0) rotate(var(--float-exam-rotate))",
-                opacity: "var(--float-exam-opacity)",
-                willChange: "transform, opacity",
-              }}
-            >
-              <ExamObject className="w-full" />
+          <motion.div
+            variants={item}
+            className="mt-10 flex flex-col divide-y divide-border rounded-2xl border border-border bg-surface p-1.5 shadow-sm sm:flex-row sm:divide-x sm:divide-y-0"
+          >
+            {HERO_PILLS.map(({ icon: Icon, top, bottom }) => (
+              <div key={top} className="flex flex-1 items-center gap-3 px-4 py-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent-hover">
+                  <Icon className="h-4 w-4" strokeWidth={1.75} />
+                </span>
+                <p className="text-sm leading-tight text-muted">
+                  {top}
+                  <br />
+                  <span className="font-semibold text-foreground">{bottom}</span>
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Columna derecha — escena con mascota y tarjetas de producto */}
+        <div className="relative flex min-h-[340px] items-center justify-center sm:min-h-[440px] lg:min-h-[520px]">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute h-[20rem] w-[20rem] rounded-full bg-accent/[0.16] blur-3xl sm:h-[26rem] sm:w-[26rem]"
+          />
+
+          <Sparkle tone="premium" className="absolute top-[12%] left-[8%] hidden h-5 w-5 sm:block" />
+          <Sparkle tone="accent" className="absolute right-[10%] bottom-[16%] hidden h-4 w-4 sm:block" />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 14 }}
+            animate={reduceMotion ? { opacity: 1, scale: 1, y: 0 } : { opacity: 1, scale: 1, y: [0, -12, 0] }}
+            transition={
+              reduceMotion
+                ? { duration: 0.4 }
+                : {
+                    opacity: { duration: 0.6, delay: 0.15 },
+                    scale: { duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] },
+                    y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.7 },
+                  }
+            }
+            className="relative"
+          >
+            <Image
+              src="/mascot/mascota-lectura.png"
+              alt=""
+              aria-hidden
+              width={338}
+              height={270}
+              priority
+              className="pointer-events-none w-[15rem] sm:w-[19rem] lg:w-[21rem]"
+            />
+          </motion.div>
+
+          {/* Burbuja: la pregunta que resuelve el producto */}
+          <Floating
+            delay={0.45}
+            duration={5.6}
+            className="absolute top-[2%] right-[2%] sm:top-[4%] sm:right-0 lg:-right-2"
+          >
+            <div className="max-w-[13rem] rounded-2xl rounded-br-md border border-border bg-surface px-4 py-3 shadow-lg">
+              <p className="text-sm leading-snug font-medium text-foreground">
+                ¿Qué debería <span className="text-accent">estudiar</span> hoy?
+              </p>
             </div>
-          </div>
+          </Floating>
+
+          {/* Tarjeta: preparación de examen */}
+          <Floating
+            delay={0.6}
+            duration={6.4}
+            distance={12}
+            className="absolute bottom-[6%] left-0 sm:bottom-[8%] lg:-left-6"
+          >
+            <div className="w-[11.5rem] rounded-2xl border border-border bg-surface p-4 shadow-lg">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] font-semibold tracking-wide text-subtle uppercase">Preparación</p>
+                <span className="font-display text-lg leading-none font-semibold text-foreground tabular-nums">
+                  72%
+                </span>
+              </div>
+              <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-border">
+                <motion.div
+                  className="h-full rounded-full bg-accent"
+                  initial={{ width: 0 }}
+                  animate={{ width: "72%" }}
+                  transition={{ duration: reduceMotion ? 0 : 1.1, delay: 1, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </div>
+              <p className="mt-2 text-[11px] text-muted">Matemáticas · en 6 días</p>
+            </div>
+          </Floating>
+
+          {/* Chip: tema débil detectado */}
+          <Floating
+            delay={0.75}
+            duration={5.2}
+            distance={8}
+            className="absolute right-[4%] bottom-[34%] hidden sm:block lg:right-0"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-2 shadow-lg">
+              <TrendingUp className="h-3.5 w-3.5 shrink-0 text-premium" strokeWidth={2} />
+              <span className="text-xs font-medium text-foreground">Factorización · 44%</span>
+            </div>
+          </Floating>
         </div>
       </div>
     </section>

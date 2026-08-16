@@ -30,40 +30,6 @@ export const FIXED_LEVEL_SOFT_BG_CLASS: Record<Level, string> = {
   success: "bg-[#407765]/10",
 };
 
-// Hero + Daily Plan — el plan de hoy de Alex.
-export const DAILY_PLAN = [
-  {
-    subject: "Matemáticas",
-    topic: "Funciones cuadráticas",
-    minutes: 20,
-    priority: "Prioridad alta" as const,
-    level: "danger" as Level,
-    reason: "Tu dominio bajó 18% esta semana",
-  },
-  {
-    subject: "Matemáticas",
-    topic: "Factorización",
-    minutes: 15,
-    priority: "Prioridad alta" as const,
-    level: "warning" as Level,
-    reason: "4 errores del mismo tipo detectados",
-  },
-  {
-    subject: "Historia",
-    topic: "Revolución Francesa",
-    minutes: 10,
-    priority: "Prioridad media" as const,
-    level: "success" as Level,
-    reason: "Repaso corto para mantener el nivel",
-  },
-];
-
-export const EXAM_CONTEXT = {
-  subject: "Matemáticas",
-  daysLeft: 6,
-  readiness: 72,
-};
-
 // Knowledge Map
 export const KNOWLEDGE_MAP = [
   { topic: "Álgebra", score: 0.92 },
