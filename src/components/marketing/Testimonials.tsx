@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 // Testimonios ilustrativos del tipo de resultado que HeyStudy busca dar —
 // no son citas de usuarios reales todavía (producto en etapa MVP).
@@ -39,15 +39,17 @@ function initials(name: string) {
 const OFFSET_CLASS = ["sm:mt-0", "sm:mt-8", "sm:mt-2"];
 
 export function Testimonials() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-4 sm:grid-cols-3">
       {TESTIMONIALS.map((testimonial, i) => (
         <motion.div
           key={testimonial.name}
-          initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, filter: "blur(4px)" }}
+          whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, filter: "blur(0px)" }}
           viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.6, delay: 0.1 * i, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: reduceMotion ? 0.15 : 0.6, delay: reduceMotion ? 0 : 0.1 * i, ease: [0.22, 1, 0.36, 1] }}
           className={`flex flex-col rounded-2xl border border-border bg-surface p-6 shadow-soft ${OFFSET_CLASS[i % OFFSET_CLASS.length]}`}
         >
           <p className="flex-1 text-sm text-foreground">&ldquo;{testimonial.quote}&rdquo;</p>

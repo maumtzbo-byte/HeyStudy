@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Loader2, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 
 type Step = "elegir" | "analizando" | "listo";
 
@@ -52,7 +51,7 @@ export function DemoInteractivo() {
   const totalMinutes = plan?.reduce((sum, item) => sum + item.minutes, 0) ?? 0;
 
   return (
-    <div className="mx-auto max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-soft sm:p-8">
+    <div className="mx-auto max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-soft sm:p-8" aria-live="polite">
       {step === "elegir" && (
         <div className="flex flex-col items-center gap-5 text-center">
           <p className="text-sm font-medium text-muted">Elige una materia para ver un ejemplo</p>
@@ -62,7 +61,7 @@ export function DemoInteractivo() {
                 key={s}
                 type="button"
                 onClick={() => handlePick(s)}
-                className="rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-accent-soft"
+                className="rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
               >
                 {s}
               </button>
@@ -74,7 +73,7 @@ export function DemoInteractivo() {
       {step === "analizando" && (
         <div className="flex flex-col items-center gap-4 py-8 text-center">
           <Loader2 className="h-6 w-6 animate-spin text-accent-hover" />
-          <p className="text-sm font-medium text-muted">Analizando tu nivel en {subject}...</p>
+          <p className="text-sm font-medium text-muted">Analizando tu nivel en {subject}…</p>
         </div>
       )}
 
@@ -99,13 +98,15 @@ export function DemoInteractivo() {
             ))}
           </div>
           <div className="flex flex-col items-center gap-2 pt-2 text-center">
-            <Link href="/registro" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto">
-                Empezar gratis
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <button type="button" onClick={handleReset} className="text-xs font-medium text-muted hover:text-foreground">
+            <ButtonLink href="/registro" className="w-full sm:w-auto">
+              Empezar gratis
+              <ArrowRight className="h-4 w-4" />
+            </ButtonLink>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="rounded-sm text-xs font-medium text-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+            >
               Probar con otra materia
             </button>
           </div>

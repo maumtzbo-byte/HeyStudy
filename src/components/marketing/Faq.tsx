@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const FAQ_ITEMS = [
   {
@@ -35,6 +35,7 @@ const FAQ_ITEMS = [
 function FaqRow({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   const panelId = useId();
+  const reduceMotion = useReducedMotion();
 
   return (
     <div className="border-b border-border last:border-b-0">
@@ -48,7 +49,7 @@ function FaqRow({ question, answer }: { question: string; answer: string }) {
         <span className="text-base font-medium text-foreground">{question}</span>
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
-          transition={{ type: "spring", stiffness: 500, damping: 40 }}
+          transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }}
           className="shrink-0 text-muted"
         >
           <ChevronDown className="h-5 w-5" />
@@ -61,7 +62,7 @@ function FaqRow({ question, answer }: { question: string; answer: string }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: reduceMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
             <p className="pb-5 pr-8 text-sm text-muted">{answer}</p>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 
 const NAV_LINKS = [
   { href: "#como-funciona", label: "Cómo funciona" },
@@ -32,9 +32,9 @@ export function SiteHeader() {
           <Link href="/login" className="text-sm font-medium text-muted hover:text-foreground">
             Iniciar sesión
           </Link>
-          <Link href="/registro">
-            <Button size="sm">Crear cuenta</Button>
-          </Link>
+          <ButtonLink href="/registro" size="sm">
+            Crear cuenta
+          </ButtonLink>
         </div>
       </div>
     </header>

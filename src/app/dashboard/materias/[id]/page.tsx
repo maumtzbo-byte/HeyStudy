@@ -6,7 +6,7 @@ import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getSubject } from "@/services/subjects/subjectService";
 import { toggleAssignmentAction, deleteAssignmentAction, deleteExamAction } from "@/app/dashboard/materias/actions";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { CreateAssignmentForm } from "@/components/subjects/CreateAssignmentForm";
 import { CreateExamForm } from "@/components/subjects/CreateExamForm";
 import { MaterialUploadForm } from "@/components/subjects/MaterialUploadForm";
@@ -51,11 +51,9 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
             <CardDescription>Diagnostica qué tanto dominas cada tema de {subject.name}.</CardDescription>
           </div>
         </div>
-        <Link href={`/dashboard/materias/${subject.id}/diagnostico`}>
-          <Button variant="secondary" size="sm">
-            Ver mapa
-          </Button>
-        </Link>
+        <ButtonLink href={`/dashboard/materias/${subject.id}/diagnostico`} variant="secondary" size="sm">
+          Ver mapa
+        </ButtonLink>
       </Card>
 
       <Card className="flex items-center justify-between gap-4 bg-accent/5 border-accent/20">
@@ -66,11 +64,9 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
             <CardDescription>Pregunta lo que no entiendas de {subject.name}, en el modo que prefieras.</CardDescription>
           </div>
         </div>
-        <Link href={`/dashboard/materias/${subject.id}/tutor`}>
-          <Button variant="secondary" size="sm">
-            Abrir tutor
-          </Button>
-        </Link>
+        <ButtonLink href={`/dashboard/materias/${subject.id}/tutor`} variant="secondary" size="sm">
+          Abrir tutor
+        </ButtonLink>
       </Card>
 
       <Card className="flex flex-col gap-4">

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Sparkles, Lightbulb, ArrowRight, CheckCircle2, XCircle, Target, ListChecks, LayoutGrid, FileText } from "lucide-react";
 import { getAuthUser } from "@/lib/auth/getCurrentUser";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { DemoInteractivo } from "@/components/marketing/DemoInteractivo";
 import { Constellation } from "@/components/marketing/Constellation";
@@ -76,7 +76,7 @@ function KnowledgeMapVisual() {
         })}
       </div>
       <div className="mt-6 flex items-start gap-2 rounded-lg bg-white px-4 py-3">
-        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#565ec2]" />
+        <Sparkles aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#565ec2]" />
         <p className="text-sm text-[#111111]">
           Ejemplo: HeyStudy encontró que <strong>Funciones</strong> es tu punto más débil, por eso es lo primero en
           tu plan de hoy.
@@ -94,9 +94,9 @@ function DiagnosticVisual() {
         {DIAGNOSTIC_ITEMS.map((item) => (
           <div key={item.question} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
             {item.correct ? (
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#3f7d52]" />
+              <CheckCircle2 aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#3f7d52]" />
             ) : (
-              <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#b3341c]" />
+              <XCircle aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#b3341c]" />
             )}
             <div>
               <p className="text-sm font-medium text-[#111111]">{item.question}</p>
@@ -160,11 +160,18 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col bg-background">
+      <a
+        href="#main-content"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[60] focus-visible:rounded-lg focus-visible:bg-accent focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm focus-visible:font-medium focus-visible:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+      >
+        Saltar al contenido
+      </a>
       <SiteHeader />
-      <HeroScene />
+      <main id="main-content" className="flex flex-1 flex-col">
+        <HeroScene />
 
       {/* Cómo funciona — historia en tarjetas */}
-      <section id="como-funciona" className="relative overflow-hidden bg-surface px-4 py-20 sm:py-28">
+      <section id="como-funciona" className="relative scroll-mt-20 overflow-hidden bg-surface px-4 py-20 sm:py-28">
         <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-accent opacity-10" />
 
         <Reveal className="relative mx-auto max-w-2xl text-center">
@@ -173,7 +180,7 @@ export default async function Home() {
             <br />
             Empieza a{" "}
             <span className="mx-1 inline-flex h-9 w-9 -translate-y-1 items-center justify-center rounded-lg bg-white align-middle shadow-soft">
-              <Lightbulb className="h-5 w-5 text-accent-hover" />
+              <Lightbulb aria-hidden className="h-5 w-5 text-accent-hover" />
             </span>{" "}
             saber qué toca hoy.
           </h2>
@@ -228,7 +235,7 @@ export default async function Home() {
                       i === 0 || i === 3 ? "bg-accent text-accent-foreground" : "bg-accent-soft text-accent-hover",
                     )}
                   >
-                    <feature.icon className="h-5 w-5" />
+                    <feature.icon aria-hidden className="h-5 w-5" />
                   </span>
                   <h3 className="mt-4 text-base font-semibold text-foreground">{feature.title}</h3>
                   <p className="mt-2 text-sm text-muted">{feature.description}</p>
@@ -240,7 +247,7 @@ export default async function Home() {
       </section>
 
       {/* Demo interactiva */}
-      <section id="demo" className="px-4 py-20">
+      <section id="demo" className="scroll-mt-20 px-4 py-20">
         <Reveal className="mx-auto max-w-3xl text-center">
           <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             ¿Quieres ver cómo funciona?
@@ -265,7 +272,7 @@ export default async function Home() {
       </section>
 
       {/* Precios */}
-      <section id="precios" className="px-4 py-20">
+      <section id="precios" className="scroll-mt-20 px-4 py-20">
         <Reveal className="mx-auto max-w-2xl text-center">
           <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             Empieza gratis, escala cuando lo necesites
@@ -296,15 +303,18 @@ export default async function Home() {
             <br />
             Sabe qué repasar antes de tu próximo examen.
           </h2>
-          <Link href="/registro" className="mt-8 inline-block">
-            <Button size="lg" className="bg-white text-accent-hover shadow-none hover:bg-white/90">
-              Empezar gratis
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+          <ButtonLink
+            href="/registro"
+            size="lg"
+            className="mt-8 bg-white text-accent-hover shadow-none hover:bg-white/90"
+          >
+            Empezar gratis
+            <ArrowRight className="h-4 w-4" />
+          </ButtonLink>
           <p className="mt-4 text-sm text-white/80">Gratis para empezar · Sin tarjeta</p>
         </Reveal>
       </section>
+      </main>
 
       <footer className="border-t border-border px-4 py-12">
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 text-center sm:flex-row sm:items-start sm:justify-between sm:text-left">

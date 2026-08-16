@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Check } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/utils/cn";
 
 // Refleja el modelo real de Subscription (PlanTier: FREE | PAID) — el
@@ -65,11 +64,13 @@ export function Pricing() {
             ))}
           </ul>
 
-          <Link href="/registro" className="mt-8 block">
-            <Button variant={plan.highlighted ? "primary" : "secondary"} className="w-full">
-              {plan.cta}
-            </Button>
-          </Link>
+          <ButtonLink
+            href="/registro"
+            variant={plan.highlighted ? "primary" : "secondary"}
+            className="mt-8 w-full"
+          >
+            {plan.cta}
+          </ButtonLink>
         </div>
       ))}
     </div>

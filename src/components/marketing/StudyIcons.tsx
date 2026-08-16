@@ -1,14 +1,16 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { CSSProperties } from "react";
 
 // Ilustraciones "clay" (formas planas + degradado + sombra suave) en vez de
 // renders 3D fotorrealistas — más rápido de iterar y sin depender de un
 // servicio externo de generación de imágenes. Cada una flota con un loop
 // sutil para dar sensación de profundidad sin parallax de mouse.
-
-function float(duration: number, delay = 0) {
+// El loop se apaga por completo con prefers-reduced-motion.
+function useFloat(duration: number, delay = 0) {
+  const reduceMotion = useReducedMotion();
+  if (reduceMotion) return {};
   return {
     animate: { y: [0, -10, 0], rotate: [0, 1.5, 0] },
     transition: { duration, delay, repeat: Infinity, ease: "easeInOut" as const },
@@ -16,12 +18,13 @@ function float(duration: number, delay = 0) {
 }
 
 export function BookStack({ className, style }: { className?: string; style?: CSSProperties }) {
+  const floatProps = useFloat(5);
   return (
     <motion.svg
       viewBox="0 0 160 130"
       className={className}
       style={style}
-      {...float(5)}
+      {...floatProps}
       aria-hidden
     >
       <defs>
@@ -61,12 +64,13 @@ export function BookStack({ className, style }: { className?: string; style?: CS
 }
 
 export function Pencil({ className, style }: { className?: string; style?: CSSProperties }) {
+  const floatProps = useFloat(4.2, 0.4);
   return (
     <motion.svg
       viewBox="0 0 160 60"
       className={className}
       style={style}
-      {...float(4.2, 0.4)}
+      {...floatProps}
       aria-hidden
     >
       <defs>
@@ -90,12 +94,13 @@ export function Pencil({ className, style }: { className?: string; style?: CSSPr
 }
 
 export function ExamCard({ className, style }: { className?: string; style?: CSSProperties }) {
+  const floatProps = useFloat(4.8, 0.8);
   return (
     <motion.svg
       viewBox="0 0 140 110"
       className={className}
       style={style}
-      {...float(4.8, 0.8)}
+      {...floatProps}
       aria-hidden
     >
       <defs>

@@ -1,10 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { ParallaxField, ParallaxLayer } from "@/components/marketing/Parallax";
 import { BookStack, Pencil, ExamCard } from "@/components/marketing/StudyIcons";
 import { PLAN_PREVIEW, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
@@ -56,12 +55,10 @@ function DashboardPreview() {
         </div>
       </div>
 
-      <Link href="/registro" className="mt-6 block">
-        <Button className="w-full">
-          Empezar sesión
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-      </Link>
+      <ButtonLink href="/registro" className="mt-6 w-full">
+        Empezar sesión
+        <ArrowRight className="h-4 w-4" />
+      </ButtonLink>
     </div>
   );
 }
@@ -125,12 +122,10 @@ export function HeroScene() {
               Respondes un diagnóstico corto, HeyStudy detecta lo que no dominas y arma tu plan de estudio del día.
             </motion.p>
             <motion.div variants={item} className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
-              <Link href="/registro" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full sm:w-auto">
-                  Empezar gratis
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
+              <ButtonLink href="/registro" size="lg" className="w-full sm:w-auto">
+                Empezar gratis
+                <ArrowRight className="h-4 w-4" />
+              </ButtonLink>
               <a href="#como-funciona" className="w-full sm:w-auto">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
                   Ver cómo funciona
