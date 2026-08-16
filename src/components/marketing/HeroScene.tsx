@@ -1,11 +1,31 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { ArrowRight, PlayCircle } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { ParallaxField, ParallaxLayer } from "@/components/marketing/Parallax";
 import { DAILY_PLAN, EXAM_CONTEXT, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
+
+function HeroMascot() {
+  const reduceMotion = useReducedMotion();
+  return (
+    <motion.div
+      aria-hidden
+      className="pointer-events-none absolute top-6 right-[6%] hidden w-20 sm:block lg:right-[12%] lg:w-24"
+      initial={{ opacity: 0, y: 10 }}
+      animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: [0, -10, 0] }}
+      transition={
+        reduceMotion
+          ? { duration: 0.6, delay: 0.4 }
+          : { opacity: { duration: 0.6, delay: 0.4 }, y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }
+      }
+    >
+      <Image src="/mascot/mascota-saludo.png" alt="" width={193} height={144} className="w-full" />
+    </motion.div>
+  );
+}
 
 const container = {
   hidden: {},
@@ -103,6 +123,7 @@ export function HeroScene() {
       />
 
       <section className="relative px-6 pt-16 pb-20 sm:px-8 sm:pt-24 sm:pb-28">
+        <HeroMascot />
         <motion.div
           style={{ opacity: contentOpacity, y: contentY }}
           className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center"

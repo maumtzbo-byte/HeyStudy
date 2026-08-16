@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { requireAuthUser } from "@/lib/auth/getCurrentUser";
 import { prisma } from "@/lib/prisma/client";
@@ -20,7 +21,16 @@ export default async function OnboardingPage() {
         aria-hidden
       />
       <div className="relative w-full max-w-md">
-        <div className="mb-8 flex justify-center">
+        <Image
+          src="/mascot/mascota-lectura.png"
+          alt=""
+          aria-hidden
+          width={278}
+          height={222}
+          priority
+          className="pointer-events-none relative mx-auto h-20 w-auto"
+        />
+        <div className="mt-2 mb-8 flex justify-center">
           <Logo />
         </div>
         <div className="rounded-2xl border border-border bg-surface p-8 shadow-soft">

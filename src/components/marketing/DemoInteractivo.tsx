@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, ArrowRight, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { Loader2, ArrowRight } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { PLAN_BY_SUBJECT, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
 import { cn } from "@/lib/utils/cn";
@@ -34,10 +35,15 @@ export function DemoInteractivo() {
       aria-live="polite"
     >
       {step === "elegir" && (
-        <div className="flex flex-col items-center gap-4 py-4 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent-hover">
-            <Sparkles className="h-5 w-5" strokeWidth={1.75} />
-          </span>
+        <div className="flex flex-col items-center gap-2 text-center">
+          <Image
+            src="/mascot/mascota-saludo.png"
+            alt=""
+            aria-hidden
+            width={193}
+            height={144}
+            className="pointer-events-none h-16 w-auto"
+          />
           <p className="text-sm font-medium text-foreground">Elige una materia para ver un ejemplo</p>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {SUBJECTS.map((s) => (

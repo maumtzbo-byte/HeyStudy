@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 
@@ -10,7 +11,16 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         aria-hidden
       />
       <div className="relative w-full max-w-sm">
-        <div className="mb-8 flex justify-center">
+        <Image
+          src="/mascot/mascota-saludo.png"
+          alt=""
+          aria-hidden
+          width={288}
+          height={216}
+          priority
+          className="pointer-events-none relative mx-auto h-20 w-auto"
+        />
+        <div className="mt-2 mb-8 flex justify-center">
           <Link href="/">
             <Logo />
           </Link>
