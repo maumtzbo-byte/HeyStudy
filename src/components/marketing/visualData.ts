@@ -1,39 +1,120 @@
-export const PLAN_PREVIEW = [
-  { title: "Funciones cuadráticas", reason: "Tu tema más débil ahora mismo", minutes: 20, level: "danger" as const },
-  { title: "Factorización", reason: "4 errores detectados esta semana", minutes: 15, level: "warning" as const },
-  { title: "Ecuaciones lineales", reason: "Repaso rápido para mantener el nivel", minutes: 10, level: "success" as const },
-];
+// Datos ficticios pero coherentes entre secciones — mismo estudiante
+// ("Alex"), mismas materias, mismos números — para que la landing cuente
+// una sola historia de producto en vez de ejemplos sueltos por sección.
+// Ninguno de estos datos toca funcionalidad real: son solo para las
+// visualizaciones de producto de la landing.
 
-export const KNOWLEDGE_MAP = [
-  { topic: "Funciones", score: 0.42 },
-  { topic: "Factorización", score: 0.67 },
-  { topic: "Ecuaciones", score: 0.91 },
-  { topic: "Polinomios", score: 0.73 },
-  { topic: "Geometría", score: 0.88 },
-];
+export type Level = "success" | "warning" | "danger";
 
-export const DIAGNOSTIC_ITEMS = [
-  { question: "¿Cuál es el vértice de f(x) = x² − 4x + 3?", correct: true, detail: "Dominas este concepto" },
-  { question: "Factoriza x² − 5x + 6", correct: false, detail: "Confundes el signo del término medio" },
-  { question: "Resuelve 2x + 3 = 11", correct: true, detail: "Dominas este concepto" },
-];
-
-export const TUTOR_CHAT = [
-  { role: "user" as const, text: "¿Por qué la derivada de x² es 2x?" },
-  { role: "assistant" as const, text: "Buena pregunta — ¿qué pasa si primero desarrollas (x+h)² y ves qué tan rápido crece?" },
-];
-
-export function levelFromScore(score: number): "danger" | "warning" | "success" {
+export function levelFromScore(score: number): Level {
   if (score >= 0.7) return "success";
   if (score >= 0.4) return "warning";
   return "danger";
 }
 
-// Estos mockups son "capturas de producto": deben verse siempre igual
-// (claros), sin adaptarse al modo oscuro del sistema — por eso usan
-// colores fijos en vez de los tokens de tema.
-export const FIXED_LEVEL_BAR_CLASS: Record<"danger" | "warning" | "success", string> = {
+// Clases fijas: estos mockups son "capturas de producto" y deben verse
+// siempre iguales (claros), sin adaptarse al modo oscuro del sistema.
+export const FIXED_LEVEL_BAR_CLASS: Record<Level, string> = {
   danger: "bg-[#a14b36]",
   warning: "bg-[#866327]",
   success: "bg-[#407765]",
+};
+export const FIXED_LEVEL_TEXT_CLASS: Record<Level, string> = {
+  danger: "text-[#a14b36]",
+  warning: "text-[#866327]",
+  success: "text-[#407765]",
+};
+export const FIXED_LEVEL_SOFT_BG_CLASS: Record<Level, string> = {
+  danger: "bg-[#a14b36]/10",
+  warning: "bg-[#866327]/10",
+  success: "bg-[#407765]/10",
+};
+
+// Hero + Daily Plan — el plan de hoy de Alex.
+export const DAILY_PLAN = [
+  {
+    subject: "Matemáticas",
+    topic: "Funciones cuadráticas",
+    minutes: 20,
+    priority: "Prioridad alta" as const,
+    level: "danger" as Level,
+    reason: "Tu dominio bajó 18% esta semana",
+  },
+  {
+    subject: "Matemáticas",
+    topic: "Factorización",
+    minutes: 15,
+    priority: "Prioridad alta" as const,
+    level: "warning" as Level,
+    reason: "4 errores del mismo tipo detectados",
+  },
+  {
+    subject: "Historia",
+    topic: "Revolución Francesa",
+    minutes: 10,
+    priority: "Prioridad media" as const,
+    level: "success" as Level,
+    reason: "Repaso corto para mantener el nivel",
+  },
+];
+
+export const EXAM_CONTEXT = {
+  subject: "Matemáticas",
+  daysLeft: 6,
+  readiness: 72,
+};
+
+// Knowledge Map
+export const KNOWLEDGE_MAP = [
+  { topic: "Álgebra", score: 0.92 },
+  { topic: "Funciones", score: 0.68 },
+  { topic: "Factorización", score: 0.44 },
+  { topic: "Ecuaciones", score: 0.81 },
+];
+
+// AI Diagnostic
+export const DIAGNOSTIC_EXAMPLE = {
+  question: "Encuentra las raíces de f(x) = x² − 5x + 6",
+  studentAnswer: "x = 2 y x = 4",
+  concept: "Factorización",
+  domain: 43,
+  pattern: "Confusión entre factor común y diferencia de cuadrados.",
+  recommendation: "Repasar factorización antes de continuar con funciones.",
+};
+
+// Exam Preparation
+export const EXAM_PREP = {
+  name: "Examen de Cálculo",
+  date: "28 de agosto",
+  readiness: 78,
+  potential: 12,
+  focus: "Integrales y Aplicaciones",
+  topics: [
+    { topic: "Funciones", score: 0.91 },
+    { topic: "Derivadas", score: 0.74 },
+    { topic: "Integrales", score: 0.53 },
+    { topic: "Aplicaciones", score: 0.61 },
+  ],
+};
+
+// Demo interactiva (elige materia)
+export const PLAN_BY_SUBJECT: Record<
+  string,
+  { title: string; reason: string; minutes: number; level: Level }[]
+> = {
+  Matemáticas: [
+    { title: "Funciones cuadráticas", reason: "Es tu tema más débil ahora mismo", minutes: 20, level: "danger" },
+    { title: "Factorización", reason: "4 errores detectados esta semana", minutes: 15, level: "warning" },
+    { title: "Ecuaciones lineales", reason: "Repaso rápido para mantener el nivel", minutes: 10, level: "success" },
+  ],
+  Historia: [
+    { title: "Revolución Francesa", reason: "Es tu tema más débil ahora mismo", minutes: 20, level: "danger" },
+    { title: "Causas de la Primera Guerra Mundial", reason: "3 errores detectados esta semana", minutes: 15, level: "warning" },
+    { title: "Línea de tiempo del siglo XIX", reason: "Repaso rápido para mantener el nivel", minutes: 10, level: "success" },
+  ],
+  Biología: [
+    { title: "Respiración celular", reason: "Es tu tema más débil ahora mismo", minutes: 20, level: "danger" },
+    { title: "Mitosis y meiosis", reason: "5 errores detectados esta semana", minutes: 15, level: "warning" },
+    { title: "Clasificación de los seres vivos", reason: "Repaso rápido para mantener el nivel", minutes: 10, level: "success" },
+  ],
 };

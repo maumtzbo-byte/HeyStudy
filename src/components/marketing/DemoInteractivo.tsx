@@ -1,37 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
-import { Chispa } from "@/components/marketing/StudyIcons";
+import { PLAN_BY_SUBJECT, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
+import { cn } from "@/lib/utils/cn";
 
 type Step = "elegir" | "analizando" | "listo";
 
 const SUBJECTS = ["Matemáticas", "Historia", "Biología"];
-
-const PLAN_BY_SUBJECT: Record<string, { title: string; reason: string; minutes: number; level: "danger" | "warning" | "success" }[]> = {
-  Matemáticas: [
-    { title: "Funciones cuadráticas", reason: "Es tu tema más débil ahora mismo", minutes: 20, level: "danger" },
-    { title: "Factorización", reason: "4 errores detectados esta semana", minutes: 15, level: "warning" },
-    { title: "Ecuaciones lineales", reason: "Repaso rápido para mantener el nivel", minutes: 10, level: "success" },
-  ],
-  Historia: [
-    { title: "Revolución Francesa", reason: "Es tu tema más débil ahora mismo", minutes: 20, level: "danger" },
-    { title: "Causas de la Primera Guerra Mundial", reason: "3 errores detectados esta semana", minutes: 15, level: "warning" },
-    { title: "Línea de tiempo del siglo XIX", reason: "Repaso rápido para mantener el nivel", minutes: 10, level: "success" },
-  ],
-  Biología: [
-    { title: "Respiración celular", reason: "Es tu tema más débil ahora mismo", minutes: 20, level: "danger" },
-    { title: "Mitosis y meiosis", reason: "5 errores detectados esta semana", minutes: 15, level: "warning" },
-    { title: "Clasificación de los seres vivos", reason: "Repaso rápido para mantener el nivel", minutes: 10, level: "success" },
-  ],
-};
-
-const DOT_CLASS: Record<"danger" | "warning" | "success", string> = {
-  danger: "bg-danger",
-  warning: "bg-warning",
-  success: "bg-success",
-};
 
 export function DemoInteractivo() {
   const [step, setStep] = useState<Step>("elegir");
@@ -40,7 +17,7 @@ export function DemoInteractivo() {
   function handlePick(s: string) {
     setSubject(s);
     setStep("analizando");
-    setTimeout(() => setStep("listo"), 1200);
+    setTimeout(() => setStep("listo"), 1000);
   }
 
   function handleReset() {
@@ -52,11 +29,16 @@ export function DemoInteractivo() {
   const totalMinutes = plan?.reduce((sum, item) => sum + item.minutes, 0) ?? 0;
 
   return (
-    <div className="mx-auto max-w-lg rounded-2xl border border-border bg-surface p-6 shadow-soft sm:p-8" aria-live="polite">
+    <div
+      className="mx-auto max-w-lg rounded-3xl border border-border bg-surface-elevated p-7 shadow-lg sm:p-9"
+      aria-live="polite"
+    >
       {step === "elegir" && (
-        <div className="flex flex-col items-center gap-3 text-center">
-          <Chispa className="w-20" />
-          <p className="text-sm font-medium text-muted">Elige una materia para ver un ejemplo</p>
+        <div className="flex flex-col items-center gap-4 py-4 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent-hover">
+            <Sparkles className="h-5 w-5" strokeWidth={1.75} />
+          </span>
+          <p className="text-sm font-medium text-foreground">Elige una materia para ver un ejemplo</p>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {SUBJECTS.map((s) => (
               <button
@@ -73,8 +55,8 @@ export function DemoInteractivo() {
       )}
 
       {step === "analizando" && (
-        <div className="flex flex-col items-center gap-4 py-8 text-center">
-          <Loader2 className="h-6 w-6 animate-spin text-accent-hover" />
+        <div className="flex flex-col items-center gap-4 py-10 text-center">
+          <Loader2 className="h-6 w-6 animate-spin text-accent-hover" strokeWidth={1.75} />
           <p className="text-sm font-medium text-muted">Analizando tu nivel en {subject}…</p>
         </div>
       )}
@@ -82,27 +64,27 @@ export function DemoInteractivo() {
       {step === "listo" && plan && (
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-medium tracking-wide text-muted uppercase">
-              Tu plan de hoy · {subject}
-            </p>
-            <span className="text-xs font-medium text-muted">{totalMinutes} min</span>
+            <p className="text-xs font-semibold tracking-wide text-subtle uppercase">Tu plan de hoy · {subject}</p>
+            <span className="text-xs font-medium text-muted tabular-nums">{totalMinutes} min</span>
           </div>
-          <div className="flex flex-col divide-y divide-border rounded-xl border border-border">
+          <div className="flex flex-col gap-2.5">
             {plan.map((item) => (
-              <div key={item.title} className="flex items-start gap-3 px-4 py-3">
-                <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${DOT_CLASS[item.level]}`} />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{item.title}</p>
-                  <p className="text-xs text-muted">{item.reason}</p>
+              <div key={item.title} className="rounded-xl border border-border bg-background p-3.5">
+                <div className="flex items-start gap-3">
+                  <span className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", FIXED_LEVEL_BAR_CLASS[item.level])} />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{item.title}</p>
+                    <p className="text-xs text-muted">{item.reason}</p>
+                  </div>
+                  <span className="shrink-0 text-xs font-medium text-muted tabular-nums">{item.minutes} min</span>
                 </div>
-                <span className="shrink-0 text-xs font-medium text-muted">{item.minutes} min</span>
               </div>
             ))}
           </div>
           <div className="flex flex-col items-center gap-2 pt-2 text-center">
             <ButtonLink href="/registro" className="w-full sm:w-auto">
               Empezar gratis
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
             </ButtonLink>
             <button
               type="button"

@@ -52,7 +52,7 @@ function FaqRow({ question, answer }: { question: string; answer: string }) {
           transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }}
           className="shrink-0 text-muted"
         >
-          <ChevronDown className="h-5 w-5" />
+          <ChevronDown className="h-5 w-5" strokeWidth={1.75} />
         </motion.span>
       </button>
       <AnimatePresence initial={false}>
@@ -75,7 +75,7 @@ function FaqRow({ question, answer }: { question: string; answer: string }) {
 
 export function Faq() {
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border bg-surface px-6 shadow-soft sm:px-8">
+    <div className="mx-auto w-full max-w-2xl rounded-3xl border border-border bg-surface px-6 shadow-sm sm:px-8">
       {FAQ_ITEMS.map((faqItem) => (
         <FaqRow key={faqItem.question} {...faqItem} />
       ))}

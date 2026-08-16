@@ -2,63 +2,78 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight, PlayCircle } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { ParallaxField, ParallaxLayer } from "@/components/marketing/Parallax";
-import { BookStack, Pencil, ExamCard } from "@/components/marketing/StudyIcons";
-import { PLAN_PREVIEW, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
+import { DAILY_PLAN, EXAM_CONTEXT, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
 
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.18, delayChildren: 0.1 } },
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const } },
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 function DashboardPreview() {
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border bg-surface p-6 shadow-soft sm:p-8">
-      <p className="text-sm text-muted">Buenas tardes, Alex 👋</p>
-
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs font-medium tracking-wide text-muted uppercase">Tu preparación</p>
-          <p className="mt-1 text-sm font-medium text-foreground">Matemáticas · Examen en 6 días</p>
+    <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
+      {/* Barra de "ventana" — vende que esto es una captura de producto,
+          no una ilustración. Puntos neutros, no semáforo mac genérico. */}
+      <div className="flex items-center gap-4 border-b border-border bg-surface-elevated px-5 py-3">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-border-strong/50" />
+          <span className="h-2 w-2 rounded-full bg-border-strong/50" />
+          <span className="h-2 w-2 rounded-full bg-border-strong/50" />
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-3xl font-semibold text-foreground">72%</span>
-          <span className="rounded-full bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning">
-            Bien preparado
-          </span>
+        <div className="flex-1 rounded-md bg-background px-3 py-1 text-center text-[11px] text-subtle">
+          app.heystudy.com/hoy
         </div>
       </div>
-      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-border">
-        <div className="h-full rounded-full bg-warning" style={{ width: "72%" }} />
-      </div>
 
-      <div className="mt-6 border-t border-border pt-6">
-        <p className="text-xs font-medium tracking-wide text-muted uppercase">Tu plan de hoy</p>
-        <div className="mt-3 flex flex-col divide-y divide-border">
-          {PLAN_PREVIEW.map((item) => (
-            <div key={item.title} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
-              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${FIXED_LEVEL_BAR_CLASS[item.level]}`} />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-foreground">{item.title}</p>
-                <p className="text-xs text-muted">{item.reason}</p>
+      <div className="p-6 sm:p-7">
+        <p className="text-sm text-muted">
+          Buenos días, <span className="font-medium text-foreground">Alex</span>
+        </p>
+        <p className="text-xs text-subtle">Esto es lo que necesitas hoy.</p>
+
+        <div className="mt-5 rounded-xl border border-border bg-background p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold tracking-wide text-subtle uppercase">
+                Preparación · {EXAM_CONTEXT.subject}
+              </p>
+              <p className="mt-0.5 text-xs text-muted">Examen en {EXAM_CONTEXT.daysLeft} días</p>
+            </div>
+            <span className="font-display text-2xl font-semibold text-foreground tabular-nums">
+              {EXAM_CONTEXT.readiness}%
+            </span>
+          </div>
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-border">
+            <div className="h-full rounded-full bg-accent" style={{ width: `${EXAM_CONTEXT.readiness}%` }} />
+          </div>
+        </div>
+
+        <p className="mt-6 text-[11px] font-semibold tracking-wide text-subtle uppercase">Hoy</p>
+        <div className="mt-3 flex flex-col gap-3">
+          {DAILY_PLAN.map((task) => (
+            <div key={task.topic} className="rounded-xl border border-border bg-background p-3.5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-medium tracking-wide text-subtle uppercase">{task.subject}</p>
+                  <p className="mt-0.5 text-sm font-medium text-foreground">{task.topic}</p>
+                </div>
+                <span className="shrink-0 text-xs font-medium text-muted tabular-nums">{task.minutes} min</span>
               </div>
-              <span className="shrink-0 text-xs font-medium text-muted">{item.minutes} min</span>
+              <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-border">
+                <div className={`h-full rounded-full ${FIXED_LEVEL_BAR_CLASS[task.level]}`} style={{ width: "58%" }} />
+              </div>
             </div>
           ))}
         </div>
       </div>
-
-      <ButtonLink href="/registro" className="mt-6 w-full">
-        Empezar sesión
-        <ArrowRight className="h-4 w-4" />
-      </ButtonLink>
     </div>
   );
 }
@@ -67,37 +82,27 @@ export function HeroScene() {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
 
-  // Al hacer scroll: el texto se va primero, la tarjeta un poco después
-  // (con un ligero acercamiento, no solo fade) — fondo blanco fijo, ya no
-  // hay foto que fundir a color sólido.
   const contentOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
-  const contentY = useTransform(scrollYProgress, [0, 0.45], [0, -40]);
+  const contentY = useTransform(scrollYProgress, [0, 0.45], [0, -30]);
   const mockupOpacity = useTransform(scrollYProgress, [0.15, 0.7], [1, 0]);
-  const mockupY = useTransform(scrollYProgress, [0.15, 0.7], [0, -30]);
-  const mockupScale = useTransform(scrollYProgress, [0, 0.7], [1, 1.06]);
+  const mockupY = useTransform(scrollYProgress, [0.15, 0.7], [0, -24]);
 
   return (
     <ParallaxField ref={heroRef} className="relative overflow-hidden bg-background">
-      <section className="relative px-4 pt-24 pb-20">
-        <ParallaxLayer
-          depth={0.6}
-          className="pointer-events-none absolute top-24 left-[6%] hidden w-28 sm:block lg:left-[12%] lg:w-36"
-        >
-          <BookStack className="w-full drop-shadow-none" />
-        </ParallaxLayer>
-        <ParallaxLayer
-          depth={0.9}
-          className="pointer-events-none absolute top-20 right-[8%] hidden w-24 sm:block lg:right-[14%] lg:w-32"
-        >
-          <Pencil className="w-full" />
-        </ParallaxLayer>
-        <ParallaxLayer
-          depth={0.75}
-          className="pointer-events-none absolute top-56 right-[4%] hidden w-24 sm:block lg:right-[8%] lg:w-28"
-        >
-          <ExamCard className="w-full" />
-        </ParallaxLayer>
+      {/* Textura sutil: puntos casi invisibles + un resplandor tenue detrás
+          del producto — profundidad sin gradient genérico de startup. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.5]"
+        style={{
+          backgroundImage: "radial-gradient(var(--border) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black 30%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 0%, black 30%, transparent 75%)",
+        }}
+      />
 
+      <section className="relative px-6 pt-16 pb-20 sm:px-8 sm:pt-24 sm:pb-28">
         <motion.div
           style={{ opacity: contentOpacity, y: contentY }}
           className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center"
@@ -105,29 +110,30 @@ export function HeroScene() {
           <motion.div variants={container} initial="hidden" animate="show" className="contents">
             <motion.span
               variants={item}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/40 px-3 py-1 text-xs font-medium text-accent-hover shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-md"
+              className="inline-flex items-center rounded-full border border-border bg-surface px-3.5 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase"
             >
-              <Sparkles className="h-3.5 w-3.5" />
-              Tu copiloto de estudio con IA
+              Tu estudio, con dirección
             </motion.span>
             <motion.h1
               variants={item}
-              className="mt-6 text-4xl leading-[1.1] font-semibold tracking-tight text-foreground sm:text-5xl"
+              className="mt-7 font-display text-5xl leading-[1.05] font-semibold tracking-tight text-foreground sm:text-6xl"
             >
-              Sabe qué estudiar
+              ¿Qué deberías
               <br />
-              antes de tu próximo examen.
+              estudiar hoy?
             </motion.h1>
             <motion.p variants={item} className="mt-6 max-w-xl text-lg text-muted">
-              Respondes un diagnóstico corto, HeyStudy detecta lo que no dominas y arma tu plan de estudio del día.
+              HeyStudy analiza lo que realmente dominas, detecta tus puntos débiles y convierte tu próximo examen en
+              un plan claro para hoy.
             </motion.p>
-            <motion.div variants={item} className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+            <motion.div variants={item} className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
               <ButtonLink href="/registro" size="lg" className="w-full sm:w-auto">
                 Empezar gratis
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
               </ButtonLink>
               <a href="#como-funciona" className="w-full sm:w-auto">
                 <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+                  <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
                   Ver cómo funciona
                 </Button>
               </a>
@@ -135,12 +141,12 @@ export function HeroScene() {
           </motion.div>
         </motion.div>
 
-        <ParallaxLayer depth={1.1} className="relative mx-auto mt-16 w-full max-w-5xl">
-          <motion.div style={{ opacity: mockupOpacity, y: mockupY, scale: mockupScale }}>
+        <ParallaxLayer depth={0.3} className="relative mx-auto mt-16 w-full max-w-5xl sm:mt-20">
+          <motion.div style={{ opacity: mockupOpacity, y: mockupY }}>
             <motion.div
-              initial={{ opacity: 0, y: 32, scale: 0.97 }}
+              initial={{ opacity: 0, y: 28, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
             >
               <DashboardPreview />
             </motion.div>

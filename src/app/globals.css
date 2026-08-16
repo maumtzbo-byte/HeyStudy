@@ -13,14 +13,20 @@
      que "esto se te da mal" se lea como información, no como amenaza. El
      periwinkle de acento no se toca: ya cae en el rango calma/confianza. */
   --background: #fbfaf9;
-  --surface: #f6f6f9;
+  --surface: #ffffff;
+  --surface-elevated: #fcfcfd;
   --foreground: #17172b;
-  --muted: #6c6d7a;
+  --muted: #5c5a6b;
+  --subtle: #8c8e9b;
   --border: #ece9e4;
+  --border-strong: #a19887;
   --accent: #6c74d6;
   --accent-hover: #565ec2;
   --accent-foreground: #ffffff;
   --accent-soft: #ecebfa;
+  --premium: #a87d3e;
+  --premium-hover: #916b30;
+  --premium-soft: #f5ecdc;
   --success: #407765;
   --warning: #866327;
   --danger: #a14b36;
@@ -31,20 +37,26 @@
   --deep: #f2f1fb;
   --deep-surface: #fbfaf9;
   --deep-foreground: #17172b;
-  --deep-muted: #6c6d7a;
+  --deep-muted: #5c5a6b;
   --deep-border: #e3e0f5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-soft: var(--accent-soft);
+  --color-premium: var(--premium);
+  --color-premium-hover: var(--premium-hover);
+  --color-premium-soft: var(--premium-soft);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
@@ -53,20 +65,46 @@
   --color-deep-foreground: var(--deep-foreground);
   --color-deep-muted: var(--deep-muted);
   --color-deep-border: var(--deep-border);
-  --font-sans: var(--font-fredoka);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
+
+  /* Escala de radios propia — cards y paneles se sienten "tallados", no
+     genéricos. Sobrescribe la escala default de Tailwind para que
+     rounded-sm/md/lg/xl/2xl reflejen el mismo sistema en todo el sitio. */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+  --radius-3xl: 2rem;
+
+  /* Sombras casi imperceptibles, tintadas con el color de marca en vez de
+     negro puro — así una card "flota" sin verse como un recorte de PDF. */
+  --shadow-xs: 0 1px 1px hsl(var(--shadow-color) / 0.03), 0 1px 2px hsl(var(--shadow-color) / 0.04);
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 2px 6px -2px hsl(var(--shadow-color) / 0.08);
+  --shadow-md: 0 4px 12px -4px hsl(var(--shadow-color) / 0.12), 0 2px 6px -3px hsl(var(--shadow-color) / 0.08);
+  --shadow-lg: 0 16px 40px -12px hsl(var(--shadow-color) / 0.18), 0 6px 16px -6px hsl(var(--shadow-color) / 0.1);
+  --shadow-xl: 0 24px 60px -16px hsl(var(--shadow-color) / 0.22), 0 8px 20px -8px hsl(var(--shadow-color) / 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #18173a;
     --surface: #211f47;
+    --surface-elevated: #2d2b50;
     --foreground: #eae9f2;
     --muted: #aca8d6;
+    --subtle: #8481a7;
     --border: #34325f;
+    --border-strong: #4a487a;
     --accent: #8b92e8;
     --accent-hover: #a3a9f0;
     --accent-foreground: #1b1a3d;
     --accent-soft: #2b2a57;
+    --premium: #d5ae6d;
+    --premium-hover: #e2c087;
+    --premium-soft: #3a3252;
     --success: #72b69d;
     --warning: #c9a25e;
     --danger: #ca8172;
@@ -84,14 +122,24 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
 }
 
+/* Alias retrocompatible — algunos componentes ya usan esta clase. Ahora es
+   equivalente a shadow-md de la escala nueva. */
 .shadow-soft {
-  box-shadow:
-    0 1px 2px hsl(var(--shadow-color) / 0.06),
-    0 10px 30px -12px hsl(var(--shadow-color) / 0.18);
+  box-shadow: var(--shadow-md);
 }
 
 .bg-atmosphere {
   background-color: var(--deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
