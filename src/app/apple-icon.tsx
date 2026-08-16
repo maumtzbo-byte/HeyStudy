@@ -17,17 +17,9 @@ export default function AppleIcon() {
         }}
       >
         <svg width="100" height="100" viewBox="0 0 32 32" fill="none">
-          <path
-            d="M8.5 22.5L15 16l3.5 3.5L25 12"
-            stroke="#ffffff"
-            strokeWidth="2.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.55"
-          />
-          <circle cx="8.5" cy="22.5" r="2.75" fill="#ffffff" opacity="0.55" />
-          <circle cx="18.5" cy="19.5" r="3" fill="#ffffff" opacity="0.8" />
-          <circle cx="25" cy="12" r="3.5" fill="#ffffff" />
+          <rect x="7" y="6" width="6" height="20" rx="3" fill="#ffffff" />
+          <rect x="19" y="6" width="6" height="20" rx="3" fill="#ffffff" />
+          <rect x="7" y="13" width="18" height="6" rx="3" fill="#ffffff" />
         </svg>
       </div>
     ),
