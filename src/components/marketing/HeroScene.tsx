@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import { ArrowRight, PlayCircle } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { ParallaxField, ParallaxLayer } from "@/components/marketing/Parallax";
+import { Blob, Sparkle } from "@/components/marketing/Decor";
 import { DAILY_PLAN, EXAM_CONTEXT, FIXED_LEVEL_BAR_CLASS } from "@/components/marketing/visualData";
 
 function HeroMascot() {
@@ -123,6 +124,10 @@ export function HeroScene() {
       />
 
       <section className="relative px-6 pt-16 pb-20 sm:px-8 sm:pt-24 sm:pb-28">
+        <Blob tone="accent" className="-top-24 -left-16 h-80 w-80 sm:-left-24" />
+        <Blob tone="premium" className="top-32 -right-20 h-72 w-72 sm:-right-28" />
+        <Sparkle tone="premium" className="absolute top-[18%] left-[12%] hidden h-4 w-4 sm:block" />
+        <Sparkle tone="accent" className="absolute bottom-[8%] left-[20%] hidden h-3 w-3 md:block" />
         <HeroMascot />
         <motion.div
           style={{ opacity: contentOpacity, y: contentY }}

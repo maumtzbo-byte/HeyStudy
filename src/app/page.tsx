@@ -26,6 +26,7 @@ import { SiteHeader } from "@/components/marketing/SiteHeader";
 import { Pricing } from "@/components/marketing/Pricing";
 import { Faq } from "@/components/marketing/Faq";
 import { Reveal } from "@/components/marketing/Reveal";
+import { Blob, Sparkle } from "@/components/marketing/Decor";
 import {
   KNOWLEDGE_MAP,
   DIAGNOSTIC_EXAMPLE,
@@ -327,9 +328,11 @@ export default async function Home() {
         </section>
 
         {/* Problema */}
-        <section className="px-6 py-20 sm:px-8 sm:py-28">
-          <div className="mx-auto w-full max-w-3xl">
-            <Reveal>
+        <section className="relative overflow-hidden px-6 py-20 sm:px-8 sm:py-28">
+          <Blob tone="accent" className="top-0 left-1/2 h-96 w-96 -translate-x-[85%]" />
+          <div className="relative mx-auto w-full max-w-3xl">
+            <Reveal className="relative">
+              <Sparkle tone="premium" className="absolute -top-2 left-1/2 hidden h-4 w-4 -translate-x-24 sm:block" />
               <p className="text-center text-xs font-semibold tracking-wide text-accent-hover uppercase">
                 El problema
               </p>
@@ -365,9 +368,14 @@ export default async function Home() {
         </section>
 
         {/* Cómo funciona */}
-        <section id="como-funciona" className="scroll-mt-20 border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-28">
-          <div className="mx-auto w-full max-w-[1280px]">
-            <Reveal className="mx-auto max-w-2xl text-center">
+        <section
+          id="como-funciona"
+          className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-28"
+        >
+          <Blob tone="premium" className="top-1/2 -right-24 h-80 w-80 -translate-y-1/2" />
+          <div className="relative mx-auto w-full max-w-[1280px]">
+            <Reveal className="relative mx-auto max-w-2xl text-center">
+              <Sparkle tone="accent" className="absolute top-0 right-1/2 hidden h-3.5 w-3.5 translate-x-28 md:block" />
               <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Así funciona</p>
               <h2 className="mt-3 font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
                 De no saber por dónde empezar, a saber qué hacer hoy.
@@ -399,8 +407,9 @@ export default async function Home() {
         <div id="producto" />
 
         {/* Mapa de conocimiento */}
-        <section className="px-6 py-20 sm:px-8 sm:py-28">
-          <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
+        <section className="relative overflow-hidden px-6 py-20 sm:px-8 sm:py-28">
+          <Blob tone="accent" className="top-1/2 right-[8%] h-96 w-96 -translate-y-1/2" />
+          <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <Reveal>
               <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Mapa de conocimiento</p>
               <h2 className="mt-3 font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -451,8 +460,9 @@ export default async function Home() {
         </section>
 
         {/* Diagnóstico con IA */}
-        <section className="border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-28">
-          <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
+        <section className="relative overflow-hidden border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-28">
+          <Blob tone="premium" className="top-1/2 -left-20 h-96 w-96 -translate-y-1/2 sm:-left-16" />
+          <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <Reveal delay={0.15} className="order-2 lg:order-1">
               <div className="rounded-3xl border border-border bg-surface-elevated p-7 shadow-lg sm:p-9">
                 <p className="text-xs font-semibold tracking-wide text-subtle uppercase">Pregunta</p>
@@ -506,8 +516,9 @@ export default async function Home() {
         </section>
 
         {/* Preparación para examen */}
-        <section className="px-6 py-20 sm:px-8 sm:py-28">
-          <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
+        <section className="relative overflow-hidden px-6 py-20 sm:px-8 sm:py-28">
+          <Blob tone="accent" className="top-1/2 right-[6%] h-96 w-96 -translate-y-1/2" />
+          <div className="relative mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <Reveal>
               <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Preparación para examen</p>
               <h2 className="mt-3 font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -570,8 +581,13 @@ export default async function Home() {
         </section>
 
         {/* Plan diario — demo interactiva */}
-        <section id="demo" className="scroll-mt-20 border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-28">
-          <Reveal className="mx-auto max-w-2xl text-center">
+        <section
+          id="demo"
+          className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-28"
+        >
+          <Blob tone="premium" className="bottom-0 left-1/2 h-80 w-80 -translate-x-[15%]" />
+          <Reveal className="relative mx-auto max-w-2xl text-center">
+            <Sparkle tone="accent" className="absolute -top-1 left-1/2 hidden h-3.5 w-3.5 translate-x-20 sm:block" />
             <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Plan diario</p>
             <h2 className="mt-3 font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
               Hoy sabes exactamente qué hacer.
@@ -584,9 +600,11 @@ export default async function Home() {
         </section>
 
         {/* Qué más incluye */}
-        <section className="px-6 py-20 sm:px-8 sm:py-28">
-          <div className="mx-auto w-full max-w-[1280px]">
-            <Reveal className="mx-auto max-w-2xl text-center">
+        <section className="relative overflow-hidden px-6 py-20 sm:px-8 sm:py-28">
+          <Blob tone="accent" className="top-10 -left-24 h-80 w-80" />
+          <div className="relative mx-auto w-full max-w-[1280px]">
+            <Reveal className="relative mx-auto max-w-2xl text-center">
+              <Sparkle tone="premium" className="absolute -top-2 right-1/2 hidden h-4 w-4 translate-x-24 sm:block" />
               <p className="text-xs font-semibold tracking-wide text-accent-hover uppercase">Qué más incluye</p>
               <h2 className="mt-3 font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
                 Todo lo que necesitas, nada de lo que sobra.
@@ -611,6 +629,7 @@ export default async function Home() {
 
         {/* Precios */}
         <section id="precios" className="relative scroll-mt-20 overflow-hidden border-t border-border bg-surface px-6 py-20 sm:px-8 sm:py-28">
+          <Blob tone="premium" className="top-1/2 right-[10%] h-72 w-72 -translate-y-1/2" />
           <Reveal className="relative mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
               Empieza gratis, escala cuando lo necesites
@@ -624,7 +643,8 @@ export default async function Home() {
 
         {/* Preguntas frecuentes */}
         <section className="px-6 py-20 sm:px-8 sm:py-28">
-          <Reveal className="mx-auto max-w-2xl text-center">
+          <Reveal className="relative mx-auto max-w-2xl text-center">
+            <Sparkle tone="accent" className="absolute -top-2 left-1/2 hidden h-3.5 w-3.5 -translate-x-28 sm:block" />
             <h2 className="font-display text-3xl leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl">
               Preguntas frecuentes
             </h2>
@@ -637,6 +657,8 @@ export default async function Home() {
         {/* CTA final */}
         <section className="relative overflow-hidden bg-accent px-6 py-24 text-center sm:px-8 sm:py-32">
           <Constellation className="pointer-events-none absolute inset-0 h-full w-full text-white opacity-[0.12]" />
+          <Sparkle className="absolute top-[20%] left-[16%] hidden h-5 w-5 text-white/50 sm:block" />
+          <Sparkle className="absolute right-[14%] bottom-[22%] hidden h-4 w-4 text-white/40 md:block" />
           <Reveal className="relative mx-auto max-w-xl">
             <h2 className="font-display text-3xl leading-[1.1] font-semibold tracking-tight text-white sm:text-5xl">
               Deja de adivinar qué estudiar.
