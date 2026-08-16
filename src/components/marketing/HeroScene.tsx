@@ -105,7 +105,7 @@ export function HeroScene() {
           <motion.div variants={container} initial="hidden" animate="show" className="contents">
             <motion.span
               variants={item}
-              className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-medium text-accent-hover"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/40 px-3 py-1 text-xs font-medium text-accent-hover shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-md"
             >
               <Sparkles className="h-3.5 w-3.5" />
               Tu copiloto de estudio con IA

@@ -344,7 +344,9 @@ export default async function Home() {
             Empezar gratis
             <ArrowRight className="h-4 w-4" />
           </ButtonLink>
-          <p className="mt-4 text-sm text-white/80">Gratis para empezar · Sin tarjeta</p>
+          <p className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-sm text-white/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md">
+            Gratis para empezar · Sin tarjeta
+          </p>
         </Reveal>
       </section>
       </main>
