@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown, PlayCircle } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
+import { Mascot3D } from "@/components/marketing/Mascot3D";
 
 /* ----------------------------------------------------------------------- */
 /* Hero conducido por el personaje.                                         */
@@ -38,8 +39,6 @@ const POSES = [
 ];
 
 export function HeroScene() {
-  const reduceMotion = useReducedMotion();
-
   return (
     <section className="relative overflow-hidden bg-background">
       <motion.div
@@ -50,37 +49,8 @@ export function HeroScene() {
       >
         {/* La mascota entra primero y ocupa casi todo el ancho: es la única
             pieza de marca que el visitante reconoce antes de leer nada. */}
-        <motion.div
-          variants={item}
-          animate={reduceMotion ? undefined : { y: [0, -14, 0] }}
-          transition={
-            reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.9 }
-          }
-        >
-          {/* El PNG mide 351x263, pero el cuerpo sólo ocupa 300x238: la chispa
-              es un componente suelto arriba a la derecha que estira el marco.
-              Encuadrar contra el archivo dejaba al personaje descentrado y un
-              15% más chico de lo que aparenta.
-
-              La chispa (x300-338, filas 12-56) se traslapa con el cuerpo, que
-              llega a x=311 en las filas 152-214, así que ningún rectángulo
-              contiene el cuerpo entero y excluye la chispa. Se recortan 12px
-              de cada brazo — simétrico, para que lea como encuadre cerrado y
-              no como un lado cortado. El archivo no se toca: todo es CSS. */}
-          <div
-            className="relative w-[94vw] max-w-[31rem] overflow-hidden sm:w-[26rem] sm:max-w-none lg:w-[32rem]"
-            style={{ aspectRatio: "276 / 238" }}
-          >
-            <Image
-              src="/mascot/mascota-feliz.png"
-              alt=""
-              aria-hidden
-              width={351}
-              height={263}
-              priority
-              className="pointer-events-none absolute top-[-5.46%] left-[-8.7%] w-[127.2%] max-w-none"
-            />
-          </div>
+        <motion.div variants={item}>
+          <Mascot3D className="w-[100vw] max-w-[32rem] sm:w-[30rem] sm:max-w-none lg:w-[37rem]" />
         </motion.div>
 
         {/* Acciones antes que titular, como en la referencia. */}
