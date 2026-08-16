@@ -23,10 +23,8 @@ export function Logo({
   inverted?: boolean;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.6rem] bg-accent text-accent-foreground">
-        <LogoMark className="h-[18px] w-[18px]" />
-      </span>
+    <span className={cn("inline-flex items-center gap-2", className)}>
+      <LogoMark className={cn("h-7 w-7 shrink-0", inverted ? "text-white" : "text-accent")} />
       {!iconOnly && (
         <span
           className={cn(
