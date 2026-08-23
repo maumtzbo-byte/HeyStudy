@@ -100,6 +100,18 @@ export async function calculateExamReadiness(studentProfileId: string, examId: s
   else if (score >= 45 || daysUntilExam > 7) status = "en_progreso";
   else status = "en_riesgo";
 
+  // "La predicción" para la sección 4.5: se congela en cuanto pasa la fecha
+  // del examen, para no comparar la calificación real contra un mastery que
+  // ya se movió por estudio posterior. Antes de esa fecha se refresca en
+  // cada lectura — no cuesta una llamada a IA, es sólo un upsert.
+  if (daysUntilExam >= 0) {
+    await prisma.readinessSnapshot.upsert({
+      where: { examId: exam.id },
+      create: { examId: exam.id, score },
+      update: { score, capturedAt: new Date() },
+    });
+  }
+
   return {
     examId: exam.id,
     examTitle: exam.title,

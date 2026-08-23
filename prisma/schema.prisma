@@ -180,12 +180,31 @@ model Exam {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  topics        ExamTopic[]
-  grades        Grade[]
-  studySessions StudySession[]
+  topics            ExamTopic[]
+  grades            Grade[]
+  studySessions     StudySession[]
+  readinessSnapshot ReadinessSnapshot?
 
   @@index([subjectId])
   @@map("exams")
+}
+
+// La "predicción" congelada del Exam Readiness Score, para poder comparar
+// contra la calificación real después (sección 4.5: "comparar contra el
+// Exam Readiness Score que la app había calculado antes del examen").
+// calculateExamReadiness() no guarda nada por sí solo — se recalcula en
+// vivo cada vez que se pide — así que sin esto no habría ningún registro
+// de "qué predijo la app" una vez que el mastery del estudiante se mueve
+// después del examen. Se actualiza en cada lectura mientras el examen no
+// haya pasado, y se congela en cuanto pasa la fecha.
+model ReadinessSnapshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  examId     String   @unique @db.Uuid
+  exam       Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  score      Int
+  capturedAt DateTime @default(now())
+
+  @@map("readiness_snapshots")
 }
 
 // Relación N:M entre Exam y KnowledgeTopic, con un peso para el cálculo

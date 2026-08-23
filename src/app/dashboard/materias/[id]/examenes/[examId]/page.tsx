@@ -5,6 +5,7 @@ import { getExamTopicSetup, calculateExamReadiness } from "@/services/exams/read
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import { ReadinessBadge } from "@/components/exams/ReadinessBadge";
 import { ExamTopicSetupForm } from "@/components/exams/ExamTopicSetupForm";
+import { RecordGradeForm } from "@/components/exams/RecordGradeForm";
 
 export const metadata: Metadata = { title: "Preparación del examen — HeyStudy" };
 
@@ -92,6 +93,14 @@ export default async function ExamReadinessPage({
               </Link>
             </Card>
           )}
+
+          <Card className="flex flex-col gap-4">
+            <div>
+              <CardTitle>¿Ya presentaste el examen?</CardTitle>
+              <CardDescription>Registra tu calificación real para ver qué tan bien predijo HeyStudy.</CardDescription>
+            </div>
+            <RecordGradeForm subjectId={subjectId} examId={examId} />
+          </Card>
         </>
       )}
     </div>

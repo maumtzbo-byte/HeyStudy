@@ -1,0 +1,12 @@
+-- El REVOKE de la migración anterior (20260823120500) sólo quitó el
+-- permiso de anon/authenticated directamente, pero PUBLIC seguía con
+-- EXECUTE y ambos lo heredan de ahí (todo rol es miembro implícito de
+-- PUBLIC en Postgres) — verificado con information_schema.routine_privileges,
+-- el advisor lo seguía marcando después de esa migración.
+--
+-- Revocar de PUBLIC no rompe el trigger: una función de trigger se invoca
+-- por el mecanismo de disparo de Postgres, no por una llamada SQL directa
+-- de la sesión que hace el INSERT en auth.users, así que no pasa por el
+-- chequeo de EXECUTE de esa sesión. postgres y service_role conservan el
+-- acceso (grants directos, no heredados de PUBLIC).
+REVOKE EXECUTE ON FUNCTION public.handle_new_auth_user() FROM PUBLIC;

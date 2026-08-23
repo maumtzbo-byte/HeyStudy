@@ -27,6 +27,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
               <Link href="/dashboard/grupos" className="hover:text-foreground">
                 Grupos
               </Link>
+              <Link href="/dashboard/resumen" className="hover:text-foreground">
+                Resumen
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
