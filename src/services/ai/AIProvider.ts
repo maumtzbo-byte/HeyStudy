@@ -3,6 +3,7 @@ import { jsonSchemaOutputFormat } from "@anthropic-ai/sdk/helpers/json-schema";
 import { anthropic } from "@/services/ai/anthropicClient";
 import { MODEL_BY_TIER } from "@/services/ai/models";
 import { logAIUsage } from "@/services/usage/logAIUsage";
+import { checkRateLimit } from "@/services/security/rateLimit";
 import type {
   AICallContext,
   AnswerDiagnosis,
@@ -22,10 +23,19 @@ async function logUsage(ctx: AICallContext, model: string, inputTokens: number, 
   await logAIUsage({ userId: ctx.userId, model, feature: ctx.feature, inputTokens, outputTokens });
 }
 
+// Límite técnico independiente del plan (sección 8.5): máximo 10 llamadas a
+// IA por minuto por usuario, sin importar free/pagado. Vive aquí porque es
+// el único lugar por el que pasa cualquier llamada a Anthropic — no hay que
+// recordar agregarlo en cada service nuevo que use el provider.
+async function checkAIRateLimit(ctx: AICallContext) {
+  await checkRateLimit(`ai:${ctx.userId}`, 10, 60);
+}
+
 export async function generateText(
   ctx: AICallContext,
   params: { prompt: string; system?: string; maxTokens?: number },
 ): Promise<string> {
+  await checkAIRateLimit(ctx);
   const model = MODEL_BY_TIER[ctx.tier];
   const response = await anthropic.messages.create({
     model,
@@ -57,6 +67,7 @@ export async function generateQuestions(
   ctx: AICallContext,
   params: { topicName: string; subjectContext: string; difficulty: "FACIL" | "MEDIO" | "DIFICIL"; count: number },
 ): Promise<GeneratedQuestion[]> {
+  await checkAIRateLimit(ctx);
   const model = MODEL_BY_TIER[ctx.tier];
   const response = await anthropic.messages.parse({
     model,
@@ -106,6 +117,7 @@ export async function diagnoseKnowledge(
   ctx: AICallContext,
   params: { question: string; correctAnswer: string; studentResponse: string },
 ): Promise<AnswerDiagnosis> {
+  await checkAIRateLimit(ctx);
   const model = MODEL_BY_TIER[ctx.tier];
   const response = await anthropic.messages.parse({
     model,
@@ -153,6 +165,7 @@ export async function createStudyPlan(
   ctx: AICallContext,
   params: { weakTopicsSummary: string; minutesAvailable: number },
 ): Promise<StudyPlanItemDraft[]> {
+  await checkAIRateLimit(ctx);
   const model = MODEL_BY_TIER[ctx.tier];
   const response = await anthropic.messages.parse({
     model,
@@ -253,6 +266,7 @@ export async function tutorResponse(
     persona?: { name: string; instructions: string } | null;
   },
 ): Promise<string> {
+  await checkAIRateLimit(ctx);
   const model = MODEL_BY_TIER[ctx.tier];
   const response = await anthropic.messages.create({
     model,

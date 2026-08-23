@@ -507,6 +507,20 @@ model Subscription {
   @@map("subscriptions")
 }
 
+// Límite técnico de solicitudes por minuto, independiente del plan (sección
+// 8.5). Un registro por intento permitido; se cuenta cuántos hay en la
+// ventana antes de dejar pasar uno nuevo. `key` combina el propósito y el
+// identificador (ej. "ai:<userId>") para poder reusar la misma tabla con
+// distintos límites sin necesitar una tabla por caso de uso.
+model RateLimitEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@map("rate_limit_events")
+}
+
 // Un registro por llamada a la API de Anthropic. Crítico para validar costo
 // real por usuario activo (sección 8).
 model AIUsageLog {

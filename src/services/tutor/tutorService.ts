@@ -6,6 +6,11 @@ import { MODE_TO_DB, MODE_FROM_DB } from "@/services/tutor/customTutorService";
 import type { AITier } from "@/services/ai/models";
 import type { TutorMode } from "@/services/ai/types";
 
+// Sin esto, un solo mensaje gigante o mal formado dispara un costo de
+// tokens desproporcionado — la salida ya tiene max_tokens en AIProvider,
+// pero nada topaba la entrada (sección 8.5).
+const MAX_MESSAGE_LENGTH = 4000;
+
 async function assertConversationOwnership(studentProfileId: string, conversationId: string) {
   const conversation = await prisma.tutorConversation.findFirst({
     where: { id: conversationId, studentProfileId },
@@ -122,6 +127,11 @@ export async function sendMessage(params: {
   content: string;
 }) {
   const { studentProfileId, userId, tier, conversationId, content } = params;
+
+  if (content.length > MAX_MESSAGE_LENGTH) {
+    throw new UserFacingError(`Tu mensaje no puede pasar de ${MAX_MESSAGE_LENGTH} caracteres.`);
+  }
+
   const conversation = await assertConversationOwnership(studentProfileId, conversationId);
 
   const priorMessages = await prisma.tutorChatMessage.findMany({

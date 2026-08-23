@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { generateQuestions, diagnoseKnowledge } from "@/services/ai/AIProvider";
 import { applyDiagnosisToMastery } from "@/services/knowledge/masteryService";
+import { assertDiagnosticAvailable } from "@/services/usage/planLimits";
 import type { AITier } from "@/services/ai/models";
 
 // Free (Haiku) hace un diagnóstico más corto y menos profundo que paid (Sonnet),
@@ -23,6 +24,8 @@ export async function startDiagnosticSession(params: {
   tier: AITier;
 }) {
   const { studentProfileId, userId, subjectId, topicId, tier } = params;
+
+  await assertDiagnosticAvailable(userId);
 
   const topic = await prisma.knowledgeTopic.findFirst({
     where: { id: topicId, subjectId, subject: { studentProfileId } },
