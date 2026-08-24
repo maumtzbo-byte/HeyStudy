@@ -36,9 +36,50 @@ export default function PrivacidadPage() {
               </p>
             </section>
             <section>
-              <h2 className="text-base font-semibold text-foreground">Tu control sobre tus datos</h2>
+              <h2 className="text-base font-semibold text-foreground">El tutor usa inteligencia artificial</h2>
               <p className="mt-2 text-sm leading-relaxed">
-                Puedes eliminar tus materiales, tareas o tu cuenta completa desde tu perfil en cualquier momento.
+                Cuando chateas con el tutor, generas un diagnóstico o pides retroalimentación, tu mensaje se envía
+                a Anthropic (el proveedor del modelo de IA Claude) para generar la respuesta. Antes de eso, un
+                filtro automático revisa el mensaje buscando señales de riesgo (autolesión, contenido fuera de lo
+                académico) — ver{" "}
+                <a href="/terminos" className="font-medium text-accent hover:underline">
+                  Términos de uso
+                </a>
+                . Ese filtro es una capa de seguridad, no reemplaza ayuda humana real.
+              </p>
+            </section>
+            <section>
+              <h2 className="text-base font-semibold text-foreground">Menores de edad</h2>
+              <p className="mt-2 text-sm leading-relaxed">
+                HeyStudy es para estudiantes de al menos 13 años y no recopila a sabiendas información de niños
+                menores de esa edad. Si tienes entre 13 y 17 años, te pedimos usarlo con conocimiento de tu padre,
+                madre o tutor. Si un padre, madre o tutor cree que un menor de 13 años creó una cuenta, puede
+                escribirnos para que la eliminemos.
+              </p>
+            </section>
+            <section>
+              <h2 className="text-base font-semibold text-foreground">Con quién compartimos información</h2>
+              <p className="mt-2 text-sm leading-relaxed">
+                No vendemos tu información ni la compartimos con fines publicitarios. Sí la procesan dos
+                proveedores que operan el servicio: Anthropic (genera las respuestas del tutor y diagnósticos) y
+                Supabase (aloja la base de datos, el inicio de sesión y los archivos que subes). Ambos procesan
+                tus datos únicamente para darte el servicio, no para sus propios fines.
+              </p>
+            </section>
+            <section>
+              <h2 className="text-base font-semibold text-foreground">Cuánto tiempo guardamos tus datos</h2>
+              <p className="mt-2 text-sm leading-relaxed">
+                Mientras tu cuenta exista. Si borras un material o una tarea, desaparece de inmediato. Si eliminas
+                tu cuenta completa desde tu perfil, se borra de forma permanente — materias, materiales,
+                diagnósticos, planes de estudio y conversaciones con el tutor — y no se puede deshacer.
+              </p>
+            </section>
+            <section>
+              <h2 className="text-base font-semibold text-foreground">Tus derechos (ARCO)</h2>
+              <p className="mt-2 text-sm leading-relaxed">
+                Como usuario en México tienes derecho a acceder, rectificar, cancelar y oponerte al uso de tus
+                datos personales. Puedes ejercer la cancelación tú mismo eliminando tu cuenta desde tu perfil; para
+                acceso, rectificación u oposición, escríbenos desde tu cuenta.
               </p>
             </section>
             <section>
