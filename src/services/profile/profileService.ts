@@ -11,3 +11,10 @@ export async function updatePreferredStudyMethod(
     data: { preferredStudyMethod },
   });
 }
+
+export async function updateReviewRemindersEnabled(userId: string, enabled: boolean) {
+  await prisma.studentProfile.update({
+    where: { userId },
+    data: { reviewRemindersEnabled: enabled },
+  });
+}

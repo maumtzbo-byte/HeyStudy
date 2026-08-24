@@ -46,20 +46,26 @@ enum StudyMethod {
 }
 
 model StudentProfile {
-  id                   String         @id @default(uuid()) @db.Uuid
-  userId               String         @unique @db.Uuid
-  user                 User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName          String
-  educationLevel       EducationLevel
+  id                       String         @id @default(uuid()) @db.Uuid
+  userId                   String         @unique @db.Uuid
+  user                     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName              String
+  educationLevel           EducationLevel
   // Cómo prefiere estudiar (personalización): si incluye video (VIDEOS o
   // MIXTO), el plan de estudio le sugiere videos de YouTube para sus temas
   // más débiles del día (ver videoService.ts). MIXTO por default para no
   // requerir backfill en perfiles creados antes de este campo.
-  preferredStudyMethod StudyMethod    @default(MIXTO)
-  timezone             String         @default("America/Mexico_City")
-  onboardedAt          DateTime?
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
+  preferredStudyMethod     StudyMethod    @default(MIXTO)
+  timezone                 String         @default("America/Mexico_City")
+  // Recordatorio diario por correo de repasos vencidos (ver
+  // reviewReminderService.ts). Encendido por default: es lo que hace que la
+  // repetición espaciada sirva de algo — sin un empujón, sólo funciona si el
+  // estudiante abre la app justo el día que le toca repasar.
+  reviewRemindersEnabled   Boolean        @default(true)
+  lastReviewReminderSentAt DateTime?
+  onboardedAt              DateTime?
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
 
   subjects           Subject[]
   knowledgeMastery   KnowledgeMastery[]

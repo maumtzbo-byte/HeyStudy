@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAuthUser } from "@/lib/auth/getCurrentUser";
 import { createClient } from "@/lib/supabase/server";
 import { deleteAccount } from "@/services/account/deleteAccountService";
-import { updatePreferredStudyMethod } from "@/services/profile/profileService";
+import { updatePreferredStudyMethod, updateReviewRemindersEnabled } from "@/services/profile/profileService";
 import { studyMethods } from "@/lib/validation/onboardingSchemas";
 import { runAction, type ActionResult, UserFacingError } from "@/lib/actions/result";
 
@@ -24,6 +24,18 @@ export async function updatePreferredStudyMethodAction(
     await updatePreferredStudyMethod(user.id, value as (typeof studyMethods)[number]);
     revalidatePath("/dashboard/perfil");
     revalidatePath("/dashboard");
+  });
+}
+
+export async function updateReviewRemindersEnabledAction(
+  _prev: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    const user = await requireAuthUser();
+    const enabled = formData.get("reviewRemindersEnabled") === "on";
+    await updateReviewRemindersEnabled(user.id, enabled);
+    revalidatePath("/dashboard/perfil");
   });
 }
 

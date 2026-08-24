@@ -3,6 +3,7 @@ import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import { DeleteAccountForm } from "@/components/account/DeleteAccountForm";
 import { StudyMethodForm } from "@/components/account/StudyMethodForm";
+import { ReviewRemindersToggle } from "@/components/account/ReviewRemindersToggle";
 
 export const metadata: Metadata = { title: "Tu cuenta — HeyStudy" };
 
@@ -23,6 +24,15 @@ export default async function PerfilPage() {
           vas más flojo.
         </CardDescription>
         <StudyMethodForm current={studentProfile.preferredStudyMethod} />
+      </Card>
+
+      <Card className="flex flex-col gap-3">
+        <CardTitle>Recordatorios de repaso</CardTitle>
+        <CardDescription>
+          Un correo al día cuando tengas temas listos para repasar — es lo que hace que la repetición
+          espaciada sirva de algo, en vez de depender de que te acuerdes de abrir la app.
+        </CardDescription>
+        <ReviewRemindersToggle enabled={studentProfile.reviewRemindersEnabled} />
       </Card>
 
       <Card className="flex flex-col gap-3 border-danger/30">
