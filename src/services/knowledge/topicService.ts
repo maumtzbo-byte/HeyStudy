@@ -52,6 +52,8 @@ export async function ensureTopicsForSubject(params: {
 }
 
 export async function listTopicsWithMastery(studentProfileId: string, subjectId: string) {
+  await assertSubjectOwnership(studentProfileId, subjectId);
+
   const topics = await prisma.knowledgeTopic.findMany({
     where: { subjectId },
     orderBy: { createdAt: "asc" },
