@@ -1,10 +1,11 @@
 import "server-only";
+import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import type { AssignmentInput } from "@/lib/validation/subjectSchemas";
 
 async function assertSubjectOwnership(studentProfileId: string, subjectId: string) {
   const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new Error("Materia no encontrada");
+  if (!subject) throw new UserFacingError("Materia no encontrada");
 }
 
 export async function createAssignment(studentProfileId: string, input: AssignmentInput) {
@@ -37,7 +38,7 @@ export async function toggleAssignmentStatus(studentProfileId: string, assignmen
   const assignment = await prisma.assignment.findFirst({
     where: { id: assignmentId, subject: { studentProfileId } },
   });
-  if (!assignment) throw new Error("Tarea no encontrada");
+  if (!assignment) throw new UserFacingError("Tarea no encontrada");
   return prisma.assignment.update({
     where: { id: assignmentId },
     data: { status: assignment.status === "PENDIENTE" ? "COMPLETADA" : "PENDIENTE" },

@@ -33,7 +33,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden text-sm text-muted sm:inline">Hola, {studentProfile.displayName}</span>
+            <Link href="/dashboard/perfil" className="hidden text-sm text-muted hover:text-foreground sm:inline">
+              Hola, {studentProfile.displayName}
+            </Link>
             <form action="/auth/logout" method="post">
               <button type="submit" className="text-sm font-medium text-muted hover:text-foreground">
                 Salir

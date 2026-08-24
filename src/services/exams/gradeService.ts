@@ -69,9 +69,12 @@ export async function recordGrade(params: {
   const { studentProfileId, userId, subjectId, examId, label, score, maxScore } = params;
 
   await assertSubjectOwnership(studentProfileId, subjectId);
+  // gradeSchema (capa de acción) ya valida formato y rangos individuales;
+  // lo que falta aquí es lo que un schema de un solo campo no puede ver:
+  // espacios en blanco disfrazando un label vacío, y que score no rebase
+  // maxScore (son dos campos independientes para zod).
   if (!label.trim()) throw new UserFacingError("Ponle un nombre a la calificación.");
-  if (maxScore <= 0) throw new UserFacingError("El puntaje máximo debe ser mayor que cero.");
-  if (score < 0 || score > maxScore) throw new UserFacingError("La calificación debe estar entre 0 y el máximo.");
+  if (score > maxScore) throw new UserFacingError("La calificación no puede ser mayor que el máximo.");
 
   let exam: { id: string; title: string; readinessSnapshot: { score: number } | null } | null = null;
   if (examId) {

@@ -22,6 +22,7 @@ export async function submitOnboardingAction(
     displayName: formData.get("displayName"),
     educationLevel: formData.get("educationLevel"),
     subjectNames,
+    ageConfirmed: formData.get("ageConfirmed"),
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };

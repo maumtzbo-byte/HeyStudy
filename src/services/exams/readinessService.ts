@@ -1,4 +1,5 @@
 import "server-only";
+import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 
 async function getExamOrThrow(studentProfileId: string, examId: string) {
@@ -6,7 +7,7 @@ async function getExamOrThrow(studentProfileId: string, examId: string) {
     where: { id: examId, subject: { studentProfileId } },
     include: { subject: true, topics: { include: { knowledgeTopic: true } } },
   });
-  if (!exam) throw new Error("Examen no encontrado");
+  if (!exam) throw new UserFacingError("Examen no encontrado");
   return exam;
 }
 

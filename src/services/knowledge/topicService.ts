@@ -1,11 +1,12 @@
 import "server-only";
+import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import { generateText } from "@/services/ai/AIProvider";
 import type { AITier } from "@/services/ai/models";
 
 async function assertSubjectOwnership(studentProfileId: string, subjectId: string) {
   const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new Error("Materia no encontrada");
+  if (!subject) throw new UserFacingError("Materia no encontrada");
   return subject;
 }
 

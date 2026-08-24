@@ -1,4 +1,5 @@
 import "server-only";
+import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import { createStudyPlan } from "@/services/ai/AIProvider";
 import { todayInTimezone } from "@/lib/utils/dates";
@@ -168,6 +169,6 @@ export async function toggleStudyPlanItem(studentProfileId: string, itemId: stri
   const item = await prisma.studyPlanItem.findFirst({
     where: { id: itemId, studyPlan: { studentProfileId } },
   });
-  if (!item) throw new Error("Item no encontrado");
+  if (!item) throw new UserFacingError("Item no encontrado");
   return prisma.studyPlanItem.update({ where: { id: itemId }, data: { completed: !item.completed } });
 }

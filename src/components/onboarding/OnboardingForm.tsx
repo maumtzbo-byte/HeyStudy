@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import { Plus, X } from "lucide-react";
 import { submitOnboardingAction } from "@/app/onboarding/actions";
 import { Button } from "@/components/ui/Button";
@@ -8,9 +9,9 @@ import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Select } from "@/components/ui/Select";
 
+// Solo lo que HeyStudy realmente sirve — ver la sección "educationLevels"
+// en lib/validation/onboardingSchemas.ts.
 const EDUCATION_LEVEL_LABELS: Record<string, string> = {
-  PRIMARIA: "Primaria",
-  SECUNDARIA: "Secundaria",
   PREPARATORIA: "Preparatoria",
   UNIVERSIDAD: "Universidad",
   OTRO: "Otro",
@@ -82,6 +83,26 @@ export function OnboardingForm() {
           <Plus className="h-4 w-4" /> Agregar materia
         </button>
       </div>
+
+      <label className="flex items-start gap-2.5 text-sm text-muted">
+        <input
+          type="checkbox"
+          name="ageConfirmed"
+          required
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-border-strong/60 text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        />
+        <span>
+          Confirmo que tengo al menos 13 años y acepto los{" "}
+          <Link href="/terminos" target="_blank" className="font-medium text-accent hover:underline">
+            Términos de uso
+          </Link>{" "}
+          y la{" "}
+          <Link href="/privacidad" target="_blank" className="font-medium text-accent hover:underline">
+            Política de privacidad
+          </Link>
+          .
+        </span>
+      </label>
 
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
 

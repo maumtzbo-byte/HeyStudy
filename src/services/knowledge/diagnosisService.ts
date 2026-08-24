@@ -1,4 +1,5 @@
 import "server-only";
+import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import { generateQuestions, diagnoseKnowledge } from "@/services/ai/AIProvider";
 import { applyDiagnosisToMastery } from "@/services/knowledge/masteryService";
@@ -31,7 +32,7 @@ export async function startDiagnosticSession(params: {
     where: { id: topicId, subjectId, subject: { studentProfileId } },
     include: { subject: true },
   });
-  if (!topic) throw new Error("Tema no encontrado");
+  if (!topic) throw new UserFacingError("Tema no encontrado");
 
   const session = await prisma.studySession.create({
     data: { studentProfileId, mode: "DIAGNOSTICO" },
@@ -97,8 +98,8 @@ export async function submitAnswer(params: {
     where: { id: questionId, studySession: { studentProfileId } },
     include: { answer: true },
   });
-  if (!question) throw new Error("Pregunta no encontrada");
-  if (question.answer) throw new Error("Esta pregunta ya fue respondida");
+  if (!question) throw new UserFacingError("Pregunta no encontrada");
+  if (question.answer) throw new UserFacingError("Esta pregunta ya fue respondida");
 
   const diagnosis = await diagnoseKnowledge(
     { userId, tier, feature: "diagnose_answer" },

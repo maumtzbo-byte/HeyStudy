@@ -4,8 +4,22 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema, registroSchema } from "@/lib/validation/authSchemas";
+import { checkRateLimit } from "@/services/security/rateLimit";
 
 export type AuthActionState = { error?: string } | undefined;
+
+// Sin esto, login y registro no tenían ningún límite técnico — nada impedía
+// probar contraseñas en loop contra una cuenta, o crear cuentas en loop
+// desde una sola IP (sección 8.5: rate limiting en CADA endpoint, no sólo
+// en los que llaman a IA). Se limita por IP y, en login, también por el
+// correo que se está probando — así un atacante no puede esquivar el
+// límite repartiendo intentos entre varias IPs contra la misma cuenta.
+async function clientIp(): Promise<string> {
+  const h = await headers();
+  return h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? h.get("x-real-ip") ?? "unknown";
+}
+
+const RATE_LIMIT_ERROR = "Demasiados intentos. Espera un minuto e intenta de nuevo.";
 
 export async function loginAction(_prevState: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const parsed = loginSchema.safeParse({
@@ -14,6 +28,14 @@ export async function loginAction(_prevState: AuthActionState, formData: FormDat
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const ip = await clientIp();
+  try {
+    await checkRateLimit(`login-ip:${ip}`, 10, 60);
+    await checkRateLimit(`login-email:${parsed.data.email.toLowerCase()}`, 5, 60);
+  } catch {
+    return { error: RATE_LIMIT_ERROR };
   }
 
   const supabase = await createClient();
@@ -33,6 +55,13 @@ export async function registroAction(_prevState: AuthActionState, formData: Form
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const ip = await clientIp();
+  try {
+    await checkRateLimit(`registro-ip:${ip}`, 5, 60);
+  } catch {
+    return { error: RATE_LIMIT_ERROR };
   }
 
   const supabase = await createClient();

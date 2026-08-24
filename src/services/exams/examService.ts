@@ -1,10 +1,11 @@
 import "server-only";
+import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import type { ExamInput } from "@/lib/validation/subjectSchemas";
 
 async function assertSubjectOwnership(studentProfileId: string, subjectId: string) {
   const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new Error("Materia no encontrada");
+  if (!subject) throw new UserFacingError("Materia no encontrada");
 }
 
 export async function createExam(studentProfileId: string, input: ExamInput) {
