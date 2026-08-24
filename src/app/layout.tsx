@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
         <Toaster position="top-center" richColors />
+        <Analytics />
       </body>
     </html>
   );
