@@ -3,7 +3,7 @@ import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import { generateQuestions, diagnoseKnowledge } from "@/services/ai/AIProvider";
 import { applyDiagnosisToMastery } from "@/services/knowledge/masteryService";
-import { assertDiagnosticAvailable } from "@/services/usage/planLimits";
+import { claimDiagnostic } from "@/services/usage/planLimits";
 import type { AITier } from "@/services/ai/models";
 
 // Free (Haiku) hace un diagnóstico más corto y menos profundo que paid (Sonnet),
@@ -26,7 +26,9 @@ export async function startDiagnosticSession(params: {
 }) {
   const { studentProfileId, userId, subjectId, topicId, tier } = params;
 
-  await assertDiagnosticAvailable(userId);
+  // Chequeo e incremento atómicos (ver claimDiagnostic) — pasa antes de
+  // gastar la llamada a IA, no después.
+  await claimDiagnostic(userId);
 
   const topic = await prisma.knowledgeTopic.findFirst({
     where: { id: topicId, subjectId, subject: { studentProfileId } },
@@ -63,11 +65,6 @@ export async function startDiagnosticSession(params: {
       });
     }
   }
-
-  await prisma.subscription.updateMany({
-    where: { userId },
-    data: { diagnosticsUsed: { increment: 1 } },
-  });
 
   return session.id;
 }

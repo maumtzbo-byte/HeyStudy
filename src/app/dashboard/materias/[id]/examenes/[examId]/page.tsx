@@ -6,12 +6,9 @@ import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import { ReadinessBadge } from "@/components/exams/ReadinessBadge";
 import { ExamTopicSetupForm } from "@/components/exams/ExamTopicSetupForm";
 import { RecordGradeForm } from "@/components/exams/RecordGradeForm";
+import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Preparación del examen — HeyStudy" };
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", year: "numeric" }).format(date);
-}
 
 export default async function ExamReadinessPage({
   params,

@@ -1,14 +1,8 @@
 import "server-only";
-import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import { generateText } from "@/services/ai/AIProvider";
+import { assertSubjectOwnership } from "@/lib/auth/ownership";
 import type { AITier } from "@/services/ai/models";
-
-async function assertSubjectOwnership(studentProfileId: string, subjectId: string) {
-  const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new UserFacingError("Materia no encontrada");
-  return subject;
-}
 
 // Si la materia no tiene temas todavía, le pedimos a la IA una lista base.
 // Se generan una sola vez; el estudiante no tiene que armarlos a mano.

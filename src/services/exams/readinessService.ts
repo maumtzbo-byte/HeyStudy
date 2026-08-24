@@ -1,6 +1,7 @@
 import "server-only";
 import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
+import { todayInTimezone } from "@/lib/utils/dates";
 
 async function getExamOrThrow(studentProfileId: string, examId: string) {
   const exam = await prisma.exam.findFirst({
@@ -55,7 +56,15 @@ export interface ExamReadiness {
 
 export async function calculateExamReadiness(studentProfileId: string, examId: string): Promise<ExamReadiness> {
   const exam = await getExamOrThrow(studentProfileId, examId);
-  const daysUntilExam = Math.ceil((exam.examDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  // examDate es medianoche UTC del día calendario elegido; comparar contra
+  // Date.now() (instante absoluto) desincronizaba daysUntilExam desde media
+  // tarde en México (UTC-6) — el mismo bug que listUpcomingExams.
+  const profile = await prisma.studentProfile.findUnique({
+    where: { id: studentProfileId },
+    select: { timezone: true },
+  });
+  const today = todayInTimezone(profile?.timezone);
+  const daysUntilExam = Math.ceil((exam.examDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
   if (exam.topics.length === 0) {
     return {

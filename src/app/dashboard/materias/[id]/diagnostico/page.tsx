@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
-import { getSubject } from "@/services/subjects/subjectService";
+import { getSubjectSummary } from "@/services/subjects/subjectService";
 import { listTopicsWithMastery } from "@/services/knowledge/topicService";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { MasteryBadge } from "@/components/knowledge/MasteryBadge";
@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Mapa de conocimiento — HeyStudy" }
 export default async function DiagnosticoPage({ params }: PageProps<"/dashboard/materias/[id]/diagnostico">) {
   const { id } = await params;
   const { studentProfile } = await requireStudentProfile();
-  const subject = await getSubject(studentProfile.id, id);
+  const subject = await getSubjectSummary(studentProfile.id, id);
   if (!subject) notFound();
 
   const topics = await listTopicsWithMastery(studentProfile.id, id);

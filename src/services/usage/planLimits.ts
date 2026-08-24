@@ -12,11 +12,23 @@ const FREE_DIAGNOSTICS_PER_MONTH = 6;
 // El contador vive en Subscription y se resetea por ciclo. Antes se
 // incrementaba en cada diagnóstico pero nada lo comparaba contra un
 // límite — un usuario free tenía diagnósticos ilimitados en la práctica.
-export async function assertDiagnosticAvailable(userId: string): Promise<void> {
+//
+// Chequeo e incremento en un solo UPDATE condicional (no leer diagnosticsUsed
+// y luego incrementarlo aparte): dos solicitudes concurrentes del mismo
+// usuario (doble clic, retry) podían leer el mismo valor antes de que
+// cualquiera incrementara, dejando pasar un diagnóstico de más del límite
+// del plan free. Con el WHERE en el propio UPDATE, sólo una de las dos
+// puede ganar la carrera.
+export async function claimDiagnostic(userId: string): Promise<void> {
   const subscription = await getOrRollSubscriptionPeriod(userId);
   if (subscription.plan === "PAID") return;
 
-  if (subscription.diagnosticsUsed >= FREE_DIAGNOSTICS_PER_MONTH) {
+  const { count } = await prisma.subscription.updateMany({
+    where: { userId, diagnosticsUsed: { lt: FREE_DIAGNOSTICS_PER_MONTH } },
+    data: { diagnosticsUsed: { increment: 1 } },
+  });
+
+  if (count === 0) {
     throw new UserFacingError(
       `Ya usaste tus ${FREE_DIAGNOSTICS_PER_MONTH} diagnósticos de este mes en el plan gratuito. ` +
         "Mejora tu plan para seguir diagnosticando sin límite.",

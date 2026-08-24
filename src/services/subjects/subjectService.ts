@@ -23,6 +23,16 @@ export async function getSubject(studentProfileId: string, subjectId: string) {
   });
 }
 
+// Para páginas que sólo necesitan el nombre de la materia (diagnóstico,
+// tutor, generateMetadata) — getSubject trae tareas/exámenes/materiales
+// completos, que ahí nunca se usan y crecen con el tiempo.
+export async function getSubjectSummary(studentProfileId: string, subjectId: string) {
+  return prisma.subject.findFirst({
+    where: { id: subjectId, studentProfileId },
+    select: { id: true, name: true },
+  });
+}
+
 export async function createSubject(studentProfileId: string, input: SubjectInput) {
   return prisma.subject.create({
     data: { studentProfileId, name: input.name, color: input.color },

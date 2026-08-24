@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
 import { tutorResponse, moderateTutorMessage } from "@/services/ai/AIProvider";
 import { MODE_TO_DB, MODE_FROM_DB } from "@/services/tutor/customTutorService";
+import { assertSubjectOwnership } from "@/lib/auth/ownership";
 import type { AITier } from "@/services/ai/models";
 import type { TutorMode } from "@/services/ai/types";
 
@@ -41,9 +42,12 @@ async function assertConversationOwnership(studentProfileId: string, conversatio
 // Resume el dominio del estudiante en los temas de esta materia, para darle
 // al tutor contexto de qué tan fuerte o débil está el estudiante ahí.
 async function buildMasterySummaryForSubject(studentProfileId: string, subjectId: string): Promise<string> {
+  // select en vez de include: esto corre en cada mensaje del chat, y de
+  // KnowledgeTopic sólo se usa el nombre — no hace falta traer description,
+  // parentId, createdAt, etc. en cada turno.
   const masteryRows = await prisma.knowledgeMastery.findMany({
     where: { studentProfileId, knowledgeTopic: { subjectId } },
-    include: { knowledgeTopic: true },
+    select: { score: true, knowledgeTopic: { select: { name: true } } },
   });
 
   if (masteryRows.length === 0) return "Sin datos de dominio todavía para esta materia.";
@@ -109,8 +113,7 @@ export async function startConversation(params: {
 }) {
   const { studentProfileId, subjectId, mode, customTutorId } = params;
 
-  const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new UserFacingError("Materia no encontrada");
+  await assertSubjectOwnership(studentProfileId, subjectId);
 
   // El tutor tiene que ser del estudiante y aplicar a esta materia (general o
   // atado justo a ella).

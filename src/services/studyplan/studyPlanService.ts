@@ -32,9 +32,10 @@ async function getOverdueReviewTopics(studentProfileId: string) {
 async function buildWeakTopicsSummary(
   studentProfileId: string,
   overdueTopicIds: Set<string>,
+  today: Date,
 ): Promise<string | null> {
   const upcomingExams = await prisma.exam.findMany({
-    where: { subject: { studentProfileId }, examDate: { gte: new Date() } },
+    where: { subject: { studentProfileId }, examDate: { gte: today } },
     include: { topics: true },
     orderBy: { examDate: "asc" },
     take: 10,
@@ -42,7 +43,10 @@ async function buildWeakTopicsSummary(
 
   const daysUntilByTopic = new Map<string, number>();
   for (const exam of upcomingExams) {
-    const days = Math.ceil((exam.examDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    // examDate y today son ambos medianoche UTC de un día calendario — comparar
+    // contra Date.now() (instante absoluto) desincronizaba esto desde media
+    // tarde en México (UTC-6), el mismo bug que listUpcomingExams.
+    const days = Math.ceil((exam.examDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     for (const examTopic of exam.topics) {
       const prev = daysUntilByTopic.get(examTopic.knowledgeTopicId);
       if (prev === undefined || days < prev) daysUntilByTopic.set(examTopic.knowledgeTopicId, days);
@@ -122,10 +126,14 @@ export async function generateTodayPlan(params: {
 }) {
   const { studentProfileId, userId, tier, minutesAvailable } = params;
 
+  // Se calcula una sola vez y se reusa abajo para forDate, en vez de volver a
+  // consultar el perfil al final de la función.
+  const today = await planDateFor(studentProfileId);
+
   const overdueTopics = await getOverdueReviewTopics(studentProfileId);
   const overdueTopicIds = new Set(overdueTopics.map((m) => m.knowledgeTopicId));
 
-  const summary = await buildWeakTopicsSummary(studentProfileId, overdueTopicIds);
+  const summary = await buildWeakTopicsSummary(studentProfileId, overdueTopicIds, today);
   if (!summary) return null;
 
   const generated = await createStudyPlan(
@@ -143,24 +151,29 @@ export async function generateTodayPlan(params: {
   }));
   const items = ensureOverdueReviewsInPlan(resolved, overdueTopics);
 
-  const forDate = await planDateFor(studentProfileId);
   const plan = await prisma.studyPlan.upsert({
-    where: { studentProfileId_forDate: { studentProfileId, forDate } },
-    create: { studentProfileId, forDate },
+    where: { studentProfileId_forDate: { studentProfileId, forDate: today } },
+    create: { studentProfileId, forDate: today },
     update: { generatedAt: new Date() },
   });
 
-  await prisma.studyPlanItem.deleteMany({ where: { studyPlanId: plan.id } });
-  await prisma.studyPlanItem.createMany({
-    data: items.map((item, index) => ({
-      studyPlanId: plan.id,
-      knowledgeTopicId: item.knowledgeTopicId,
-      title: item.title,
-      reason: item.reason,
-      minutes: item.minutes,
-      orderIndex: index,
-    })),
-  });
+  // deleteMany + createMany en una sola transacción: si createMany fallara
+  // después de que deleteMany ya se aplicó, el plan quedaría con cero items
+  // el resto del día (la restricción única studentProfileId+forDate impide
+  // regenerarlo limpio hasta mañana).
+  await prisma.$transaction([
+    prisma.studyPlanItem.deleteMany({ where: { studyPlanId: plan.id } }),
+    prisma.studyPlanItem.createMany({
+      data: items.map((item, index) => ({
+        studyPlanId: plan.id,
+        knowledgeTopicId: item.knowledgeTopicId,
+        title: item.title,
+        reason: item.reason,
+        minutes: item.minutes,
+        orderIndex: index,
+      })),
+    }),
+  ]);
 
   return getTodayPlan(studentProfileId);
 }

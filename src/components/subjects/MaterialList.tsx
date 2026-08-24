@@ -17,8 +17,12 @@ export function MaterialList({ subjectId, materials }: { subjectId: string; mate
   async function handleView(materialId: string) {
     setOpeningId(materialId);
     try {
-      const url = await getMaterialUrlAction(materialId);
-      window.open(url, "_blank", "noopener,noreferrer");
+      const result = await getMaterialUrlAction(materialId);
+      if (!result.ok) {
+        window.alert(result.error);
+        return;
+      }
+      window.open(result.data, "_blank", "noopener,noreferrer");
     } finally {
       setOpeningId(null);
     }

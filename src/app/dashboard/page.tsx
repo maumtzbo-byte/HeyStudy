@@ -7,16 +7,13 @@ import { listUpcomingExams } from "@/services/exams/examService";
 import { calculateExamReadiness } from "@/services/exams/readinessService";
 import { getTodayPlan } from "@/services/studyplan/studyPlanService";
 import { getVideoRecommendationsForTopic, type VideoRecommendation } from "@/services/video/videoService";
+import { formatDate } from "@/lib/format";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { ReadinessBadge } from "@/components/exams/ReadinessBadge";
 import { GeneratePlanForm } from "@/components/dashboard/GeneratePlanForm";
 import { StudyPlanList } from "@/components/dashboard/StudyPlanList";
 
 export const metadata: Metadata = { title: "Hoy — HeyStudy" };
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short" }).format(date);
-}
 
 function daysUntilLabel(diff: number) {
   if (diff <= 0) return "hoy";
@@ -194,7 +191,9 @@ export default async function DashboardHomePage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-foreground">{formatDate(item.date)}</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {formatDate(item.date, { day: "numeric", month: "short" })}
+                  </p>
                   <p className="text-xs text-muted">{daysUntil(item.date)}</p>
                 </div>
               </div>

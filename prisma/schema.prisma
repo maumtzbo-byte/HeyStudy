@@ -335,6 +335,9 @@ model KnowledgeMastery {
   updatedAt        DateTime       @updatedAt
 
   @@unique([studentProfileId, knowledgeTopicId])
+  // Soporta getOverdueReviewTopics (studyPlanService), que corre en cada
+  // generación de plan filtrando por studentProfileId + nextReview <= ahora.
+  @@index([studentProfileId, nextReview])
   @@map("knowledge_mastery")
 }
 
@@ -420,6 +423,10 @@ model ErrorPattern {
 
   @@index([studentProfileId])
   @@index([knowledgeTopicId])
+  // Soporta el dedup de errorPattern.findFirst (masteryService) por
+  // studentProfileId + knowledgeTopicId, que corre en cada respuesta
+  // incorrecta de un diagnóstico o práctica.
+  @@index([studentProfileId, knowledgeTopicId])
   @@map("error_patterns")
 }
 

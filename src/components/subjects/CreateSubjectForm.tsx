@@ -13,7 +13,7 @@ export function CreateSubjectForm() {
   const [color] = useState(() => COLOR_OPTIONS[Math.floor(Math.random() * COLOR_OPTIONS.length)]);
 
   useEffect(() => {
-    if (state?.success) formRef.current?.reset();
+    if (state?.ok) formRef.current?.reset();
   }, [state]);
 
   return (
@@ -25,7 +25,7 @@ export function CreateSubjectForm() {
       <Button type="submit" disabled={isPending}>
         {isPending ? "Agregando..." : "Agregar materia"}
       </Button>
-      {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+      {state && !state.ok && <p className="text-sm text-danger">{state.error}</p>}
     </form>
   );
 }

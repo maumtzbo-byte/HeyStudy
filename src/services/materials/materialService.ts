@@ -2,6 +2,7 @@ import "server-only";
 import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import { createClient } from "@/lib/supabase/server";
+import { assertSubjectOwnership } from "@/lib/auth/ownership";
 
 const MATERIALS_BUCKET = "materials";
 const ALLOWED_TYPES: Record<string, "PDF" | "IMAGEN"> = {
@@ -18,11 +19,6 @@ const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
 function sanitizeFileName(name: string): string {
   const safe = name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-150);
   return safe || "archivo";
-}
-
-async function assertSubjectOwnership(studentProfileId: string, subjectId: string) {
-  const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new UserFacingError("Materia no encontrada");
 }
 
 export async function uploadMaterial(params: {

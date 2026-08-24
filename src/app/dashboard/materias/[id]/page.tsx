@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Trash2, Brain, MessageCircle } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
-import { getSubject } from "@/services/subjects/subjectService";
+import { getSubject, getSubjectSummary } from "@/services/subjects/subjectService";
 import { toggleAssignmentAction, deleteAssignmentAction, deleteExamAction } from "@/app/dashboard/materias/actions";
+import { formatDate } from "@/lib/format";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import { ButtonLink } from "@/components/ui/Button";
 import { CreateAssignmentForm } from "@/components/subjects/CreateAssignmentForm";
@@ -16,12 +17,8 @@ import { DeleteSubjectButton } from "@/components/subjects/DeleteSubjectButton";
 export async function generateMetadata({ params }: PageProps<"/dashboard/materias/[id]">): Promise<Metadata> {
   const { id } = await params;
   const { studentProfile } = await requireStudentProfile();
-  const subject = await getSubject(studentProfile.id, id);
+  const subject = await getSubjectSummary(studentProfile.id, id);
   return { title: subject ? `${subject.name} — HeyStudy` : "Materia — HeyStudy" };
-}
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", year: "numeric" }).format(date);
 }
 
 export default async function SubjectDetailPage({ params }: PageProps<"/dashboard/materias/[id]">) {

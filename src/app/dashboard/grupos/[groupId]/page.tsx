@@ -7,6 +7,7 @@ import { getStudyGroupDetail } from "@/services/groups/studyGroupService";
 import { UserFacingError } from "@/lib/actions/result";
 import { ShareTodayPlanButton, UnshareButton, LeaveGroupButton } from "@/components/groups/GroupActions";
 import { cn } from "@/lib/utils/cn";
+import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Grupo de estudio — HeyStudy" };
 
@@ -17,10 +18,6 @@ function formatMinutes(total: number) {
   const hours = Math.floor(total / 60);
   const minutes = total % 60;
   return minutes === 0 ? `${hours} h` : `${hours} h ${minutes} min`;
-}
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "long", timeZone: "UTC" }).format(date);
 }
 
 export default async function GroupDetailPage({ params }: PageProps<"/dashboard/grupos/[groupId]">) {
@@ -146,7 +143,8 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
                       {plan.isMine && <span className="ml-2 text-xs font-normal text-accent-hover">tú</span>}
                     </p>
                     <p className="text-xs text-subtle">
-                      {formatDate(plan.forDate)} · {formatMinutes(plan.totalMinutes)} ·{" "}
+                      {formatDate(plan.forDate, { day: "numeric", month: "long", timeZone: "UTC" })} ·{" "}
+                      {formatMinutes(plan.totalMinutes)} ·{" "}
                       {plan.completedCount}/{plan.items.length} hechos
                     </p>
                   </div>

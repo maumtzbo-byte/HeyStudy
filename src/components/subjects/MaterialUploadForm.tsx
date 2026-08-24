@@ -9,7 +9,7 @@ export function MaterialUploadForm({ subjectId }: { subjectId: string }) {
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (state?.success) formRef.current?.reset();
+    if (state?.ok) formRef.current?.reset();
   }, [state]);
 
   return (
@@ -25,7 +25,7 @@ export function MaterialUploadForm({ subjectId }: { subjectId: string }) {
       <Button type="submit" size="sm" disabled={isPending}>
         {isPending ? "Subiendo..." : "Subir"}
       </Button>
-      {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+      {state && !state.ok && <p className="text-sm text-danger">{state.error}</p>}
     </form>
   );
 }

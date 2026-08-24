@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
+import { assertSubjectOwnershipIfSet } from "@/lib/auth/ownership";
 import { MAX_TUTOR_INSTRUCTIONS } from "@/services/ai/AIProvider";
 import type { TutorMode } from "@/services/ai/types";
 import type { TutorConversationMode as DbTutorMode } from "@/generated/prisma/client";
@@ -50,14 +51,6 @@ function normalize(input: CustomTutorInput) {
   return { name, emoji, instructions, baseMode: MODE_TO_DB[input.baseMode], subjectId: input.subjectId || null };
 }
 
-// Si el tutor está atado a una materia, esa materia tiene que ser del propio
-// estudiante — si no, el subjectId de otra persona se colaría por el form.
-async function assertSubjectOwnership(studentProfileId: string, subjectId: string | null) {
-  if (!subjectId) return;
-  const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId }, select: { id: true } });
-  if (!subject) throw new UserFacingError("Materia no encontrada.");
-}
-
 export async function listCustomTutors(studentProfileId: string) {
   const tutors = await prisma.customTutor.findMany({
     where: { studentProfileId },
@@ -98,7 +91,7 @@ export async function createCustomTutor(studentProfileId: string, input: CustomT
   }
 
   const data = normalize(input);
-  await assertSubjectOwnership(studentProfileId, data.subjectId);
+  await assertSubjectOwnershipIfSet(studentProfileId, data.subjectId);
 
   const tutor = await prisma.customTutor.create({ data: { studentProfileId, ...data } });
   return tutor.id;
@@ -112,7 +105,7 @@ export async function updateCustomTutor(studentProfileId: string, tutorId: strin
   if (!existing) throw new UserFacingError("Tutor no encontrado.");
 
   const data = normalize(input);
-  await assertSubjectOwnership(studentProfileId, data.subjectId);
+  await assertSubjectOwnershipIfSet(studentProfileId, data.subjectId);
 
   await prisma.customTutor.update({ where: { id: tutorId }, data });
 }

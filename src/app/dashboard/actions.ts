@@ -7,10 +7,18 @@ import { generateTodayPlan, toggleStudyPlanItem } from "@/services/studyplan/stu
 
 export type PlanActionState = { error?: string } | undefined;
 
+const MIN_MINUTES_AVAILABLE = 15;
+const MAX_MINUTES_AVAILABLE = 240;
+
 export async function generatePlanAction(_prev: PlanActionState, formData: FormData): Promise<PlanActionState> {
   const { user, studentProfile } = await requireStudentProfile();
   const tier = await getAITier(user.id);
-  const minutesAvailable = Number(formData.get("minutesAvailable")) || 45;
+  const rawMinutes = Number(formData.get("minutesAvailable"));
+  // Sin acotar esto, un valor negativo o absurdamente grande llegaba directo
+  // al prompt de la IA que arma el plan.
+  const minutesAvailable = Number.isFinite(rawMinutes)
+    ? Math.min(Math.max(rawMinutes, MIN_MINUTES_AVAILABLE), MAX_MINUTES_AVAILABLE)
+    : 45;
 
   const plan = await generateTodayPlan({ studentProfileId: studentProfile.id, userId: user.id, tier, minutesAvailable });
   if (!plan) {

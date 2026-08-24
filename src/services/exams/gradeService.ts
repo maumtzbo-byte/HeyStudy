@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { generateText } from "@/services/ai/AIProvider";
 import { UserFacingError } from "@/lib/actions/result";
+import { assertSubjectOwnership } from "@/lib/auth/ownership";
 
 // Sección 4.5: comparar la calificación real contra el Exam Readiness Score
 // que la app había calculado antes del examen (congelado en
@@ -15,11 +16,6 @@ export interface GradeComparison {
   predictedScore: number;
   actualPercent: number;
   message: string;
-}
-
-async function assertSubjectOwnership(studentProfileId: string, subjectId: string) {
-  const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new UserFacingError("Materia no encontrada");
 }
 
 async function buildReinforcementMessage(params: {
@@ -98,11 +94,4 @@ export async function recordGrade(params: {
   }
 
   return { gradeId: grade.id, comparison };
-}
-
-export async function listGradesForExam(studentProfileId: string, examId: string) {
-  return prisma.grade.findMany({
-    where: { studentProfileId, examId },
-    orderBy: { recordedAt: "desc" },
-  });
 }

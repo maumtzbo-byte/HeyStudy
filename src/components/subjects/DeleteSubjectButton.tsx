@@ -11,7 +11,11 @@ export function DeleteSubjectButton({ subjectId, subjectName }: { subjectId: str
     if (!window.confirm(`¿Eliminar "${subjectName}"? Esto borra también sus tareas, exámenes y materiales.`)) {
       return;
     }
-    await deleteSubjectAction(subjectId);
+    const result = await deleteSubjectAction(subjectId);
+    if (!result.ok) {
+      window.alert(result.error);
+      return;
+    }
     router.push("/dashboard/materias");
   }
 

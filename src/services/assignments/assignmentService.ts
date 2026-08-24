@@ -1,31 +1,14 @@
 import "server-only";
 import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
+import { assertSubjectOwnership } from "@/lib/auth/ownership";
 import type { AssignmentInput } from "@/lib/validation/subjectSchemas";
-
-async function assertSubjectOwnership(studentProfileId: string, subjectId: string) {
-  const subject = await prisma.subject.findFirst({ where: { id: subjectId, studentProfileId } });
-  if (!subject) throw new UserFacingError("Materia no encontrada");
-}
 
 export async function createAssignment(studentProfileId: string, input: AssignmentInput) {
   await assertSubjectOwnership(studentProfileId, input.subjectId);
   return prisma.assignment.create({
     data: {
       subjectId: input.subjectId,
-      title: input.title,
-      description: input.description || null,
-      dueDate: new Date(input.dueDate),
-      status: input.status,
-    },
-  });
-}
-
-export async function updateAssignment(studentProfileId: string, assignmentId: string, input: AssignmentInput) {
-  await assertSubjectOwnership(studentProfileId, input.subjectId);
-  return prisma.assignment.updateMany({
-    where: { id: assignmentId, subjectId: input.subjectId },
-    data: {
       title: input.title,
       description: input.description || null,
       dueDate: new Date(input.dueDate),

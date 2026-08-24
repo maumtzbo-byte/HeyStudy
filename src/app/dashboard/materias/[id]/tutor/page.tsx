@@ -3,24 +3,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
-import { getSubject } from "@/services/subjects/subjectService";
+import { getSubjectSummary } from "@/services/subjects/subjectService";
 import { listConversations } from "@/services/tutor/tutorService";
 import { listTutorsForSubject } from "@/services/tutor/customTutorService";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { StartTutorForm } from "@/components/tutor/StartTutorForm";
+import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Tutor IA — HeyStudy" };
-
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(
-    date,
-  );
-}
 
 export default async function TutorIndexPage({ params }: PageProps<"/dashboard/materias/[id]/tutor">) {
   const { id } = await params;
   const { studentProfile } = await requireStudentProfile();
-  const subject = await getSubject(studentProfile.id, id);
+  const subject = await getSubjectSummary(studentProfile.id, id);
   if (!subject) notFound();
 
   const [conversations, tutors] = await Promise.all([
@@ -62,7 +57,8 @@ export default async function TutorIndexPage({ params }: PageProps<"/dashboard/m
                     <p className="text-sm font-medium text-foreground">{c.title ?? "Conversación sin título"}</p>
                     <p className="text-xs text-muted">
                       {c.tutorName ? `${c.tutorName} · ` : ""}
-                      {c.messageCount} mensaje{c.messageCount === 1 ? "" : "s"} · {formatDate(c.updatedAt)}
+                      {c.messageCount} mensaje{c.messageCount === 1 ? "" : "s"} ·{" "}
+                      {formatDate(c.updatedAt, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                     </p>
                   </div>
                 </div>
