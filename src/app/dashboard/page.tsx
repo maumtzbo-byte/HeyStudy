@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Flame } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listSubjects } from "@/services/subjects/subjectService";
 import { listUpcomingAssignments } from "@/services/assignments/assignmentService";
@@ -7,11 +8,16 @@ import { listUpcomingExams } from "@/services/exams/examService";
 import { calculateExamReadiness } from "@/services/exams/readinessService";
 import { getTodayPlan } from "@/services/studyplan/studyPlanService";
 import { getVideoRecommendationsForTopic, type VideoRecommendation } from "@/services/video/videoService";
+import { getStudyDates, currentStreakDays } from "@/services/reporting/streakService";
+import { getPlanUsageSummary } from "@/services/usage/planLimits";
+import { todayInTimezone } from "@/lib/utils/dates";
 import { formatDate } from "@/lib/format";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { ReadinessBadge } from "@/components/exams/ReadinessBadge";
 import { GeneratePlanForm } from "@/components/dashboard/GeneratePlanForm";
 import { StudyPlanList } from "@/components/dashboard/StudyPlanList";
+import { PlanUsageCard } from "@/components/dashboard/PlanUsageCard";
+import { StartDiagnosticButton } from "@/components/knowledge/StartDiagnosticButton";
 
 export const metadata: Metadata = { title: "Hoy — HeyStudy" };
 
@@ -26,14 +32,18 @@ function daysUntil(date: Date) {
 }
 
 export default async function DashboardHomePage() {
-  const { studentProfile } = await requireStudentProfile();
+  const { user, studentProfile } = await requireStudentProfile();
 
-  const [subjects, assignments, exams, todayPlan] = await Promise.all([
+  const [subjects, assignments, exams, todayPlan, studyDates, planUsage] = await Promise.all([
     listSubjects(studentProfile.id),
     listUpcomingAssignments(studentProfile.id, 5),
     listUpcomingExams(studentProfile.id, 3),
     getTodayPlan(studentProfile.id),
+    getStudyDates(studentProfile.id),
+    getPlanUsageSummary(user.id),
   ]);
+
+  const streak = currentStreakDays(studyDates, todayInTimezone(studentProfile.timezone));
 
   const examReadiness = await Promise.all(
     exams.map((exam) => calculateExamReadiness(studentProfile.id, exam.id)),
@@ -84,12 +94,24 @@ export default async function DashboardHomePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Hola, {studentProfile.displayName.split(" ")[0]}
-        </h1>
-        <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Hola, {studentProfile.displayName.split(" ")[0]}
+          </h1>
+          <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>
+        </div>
+        {streak > 0 && (
+          <span className="flex items-center gap-1.5 rounded-full bg-warning/10 px-3 py-1.5 text-sm font-medium text-warning">
+            <Flame className="h-4 w-4" />
+            {streak} {streak === 1 ? "día seguido" : "días seguidos"}
+          </span>
+        )}
       </div>
+
+      {planUsage.plan === "FREE" && (
+        <PlanUsageCard diagnosticsUsed={planUsage.diagnosticsUsed} diagnosticsLimit={planUsage.diagnosticsLimit} />
+      )}
 
       {/* Una línea de contexto en vez de tres tarjetas iguales con un número
           gigante: ese layout es plantilla de panel de administración y aquí
@@ -118,21 +140,29 @@ export default async function DashboardHomePage() {
           </Card>
         ) : (
           <div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
-            {examReadiness.map((readiness) => (
-              <Link
-                key={readiness.examId}
-                href={`/dashboard/materias/${exams.find((e) => e.id === readiness.examId)?.subjectId}/examenes/${readiness.examId}`}
-                className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-border/20"
-              >
-                <div>
-                  <p className="text-sm font-medium text-foreground">{readiness.examTitle}</p>
-                  <p className="text-xs text-muted">
-                    {readiness.subjectName} · {daysUntilLabel(readiness.daysUntilExam)}
-                  </p>
+            {examReadiness.map((readiness) => {
+              const subjectId = exams.find((e) => e.id === readiness.examId)?.subjectId;
+              const weakestTopicId = readiness.breakdown[0]?.topicId;
+              return (
+                <div
+                  key={readiness.examId}
+                  className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-border/20"
+                >
+                  <Link href={`/dashboard/materias/${subjectId}/examenes/${readiness.examId}`} className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground">{readiness.examTitle}</p>
+                    <p className="text-xs text-muted">
+                      {readiness.subjectName} · {daysUntilLabel(readiness.daysUntilExam)}
+                    </p>
+                  </Link>
+                  <div className="flex shrink-0 items-center gap-3">
+                    {readiness.status !== "listo" && subjectId && weakestTopicId && (
+                      <StartDiagnosticButton subjectId={subjectId} topicId={weakestTopicId} />
+                    )}
+                    <ReadinessBadge status={readiness.status} score={readiness.score} />
+                  </div>
                 </div>
-                <ReadinessBadge status={readiness.status} score={readiness.score} />
-              </Link>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

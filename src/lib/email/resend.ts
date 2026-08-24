@@ -15,3 +15,8 @@ export const resend = new Resend(process.env.RESEND_API_KEY || "re_not_configure
 // poner ese remitente aquí (env var) antes de que los recordatorios lleguen
 // a estudiantes de verdad.
 export const REVIEW_REMINDER_FROM = process.env.RESEND_FROM_EMAIL || "HeyStudy <onboarding@resend.dev>";
+
+// Mismo remitente para el resto de correos transaccionales (resumen semanal,
+// recordatorio de entregas, reporte a padres/tutores) — no hay razón para
+// que cada uno pida su propio dominio verificado en Resend.
+export const REPORT_FROM = REVIEW_REMINDER_FROM;

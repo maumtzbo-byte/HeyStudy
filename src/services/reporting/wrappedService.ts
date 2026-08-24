@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
+import { longestConsecutiveDayStreak } from "@/services/reporting/streakService";
 
 // Resumen "Wrapped" (sección 4.5): pieza celebratoria, no un reporte
 // académico. Cada métrica de aquí sale de datos que sí existen — no hay
@@ -21,20 +22,6 @@ export interface WrappedSummary {
   hardestTopicMastered: { topicName: string; subjectName: string; errorCount: number } | null;
   mostImprovedSubject: { subjectName: string; topicsOvercome: number } | null;
   readinessAccuracy: { avgPredicted: number; avgActual: number; sampleSize: number } | null;
-}
-
-function longestConsecutiveDayStreak(dates: Date[]): number {
-  if (dates.length === 0) return 0;
-  const dayMs = 24 * 60 * 60 * 1000;
-  const days = [...new Set(dates.map((d) => Math.floor(d.getTime() / dayMs)))].sort((a, b) => a - b);
-
-  let longest = 1;
-  let current = 1;
-  for (let i = 1; i < days.length; i++) {
-    current = days[i] === days[i - 1] + 1 ? current + 1 : 1;
-    longest = Math.max(longest, current);
-  }
-  return longest;
 }
 
 export async function getWrappedSummary(studentProfileId: string): Promise<WrappedSummary> {

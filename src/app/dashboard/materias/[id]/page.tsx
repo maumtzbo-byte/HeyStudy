@@ -143,6 +143,27 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
         <MaterialUploadForm subjectId={subject.id} />
         <MaterialList subjectId={subject.id} materials={subject.materials} />
       </Card>
+
+      <Card className="flex flex-col gap-4">
+        <CardTitle>Historial de calificaciones</CardTitle>
+        {subject.grades.length === 0 ? (
+          <p className="text-sm text-muted">Sin calificaciones registradas todavía.</p>
+        ) : (
+          <div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border">
+            {subject.grades.map((grade) => (
+              <div key={grade.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                <span className="text-sm font-medium text-foreground">{grade.label}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold tabular-nums text-foreground">
+                    {grade.score}/{grade.maxScore}
+                  </span>
+                  <span className="text-xs text-muted">{formatDate(grade.recordedAt)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

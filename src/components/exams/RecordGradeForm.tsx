@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { Award } from "lucide-react";
 import { recordGradeAction } from "@/app/dashboard/materias/[id]/examenes/[examId]/actions";
 import { Button } from "@/components/ui/Button";
@@ -26,6 +27,9 @@ export function RecordGradeForm({ subjectId, examId }: { subjectId: string; exam
           </p>
         </div>
         <p className="text-sm text-foreground">{message}</p>
+        <Link href={`/dashboard/materias/${subjectId}/diagnostico`} className="text-sm font-medium text-accent hover:underline">
+          {actualPercent < predictedScore ? "Repasar los temas más débiles →" : "Seguir subiendo el mapa de conocimiento →"}
+        </Link>
       </div>
     );
   }

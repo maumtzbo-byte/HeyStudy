@@ -3,6 +3,7 @@ import { Flame, Clock, Trophy, TrendingUp, Target } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getWrappedSummary } from "@/services/reporting/wrappedService";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
+import { ButtonLink } from "@/components/ui/Button";
 
 export const metadata: Metadata = { title: "Tu resumen — HeyStudy" };
 
@@ -93,6 +94,10 @@ export default async function WrappedPage() {
           )}
         </div>
       )}
+
+      <ButtonLink href="/dashboard" variant="secondary" className="self-start">
+        Volver a tu día
+      </ButtonLink>
     </div>
   );
 }

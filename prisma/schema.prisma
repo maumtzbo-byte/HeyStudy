@@ -63,6 +63,27 @@ model StudentProfile {
   // estudiante abre la app justo el día que le toca repasar.
   reviewRemindersEnabled   Boolean        @default(true)
   lastReviewReminderSentAt DateTime?
+  // Resumen semanal por correo (ver weeklyReportService.ts) y aviso de
+  // tareas/exámenes próximos (ver deadlineReminderService.ts) — mismo patrón
+  // de opt-out que reviewRemindersEnabled: encendidos por default, apagables
+  // desde el perfil.
+  weeklyReportEnabled       Boolean        @default(true)
+  lastWeeklyReportSentAt    DateTime?
+  deadlineRemindersEnabled  Boolean        @default(true)
+  lastDeadlineReminderSentAt DateTime?
+  // Correo opcional de un padre/tutor (sección 4.5): lo da el propio
+  // estudiante, nunca se pide en el registro ni se infiere de nada — null
+  // significa que no hay a quién mandarle nada. Ver parentReportService.ts.
+  parentEmail               String?
+  parentReportEnabled       Boolean        @default(false)
+  lastParentReportSentAt    DateTime?
+  // Programa de referidos: código propio (se genera una vez, al crear el
+  // perfil) y, si este estudiante llegó por el link de alguien más, quién lo
+  // trajo — se fija una sola vez en completeOnboarding y ya no cambia.
+  referralCode              String?        @unique
+  referredByStudentProfileId String?       @db.Uuid
+  referredBy                StudentProfile? @relation("Referrals", fields: [referredByStudentProfileId], references: [id], onDelete: SetNull)
+  referrals                 StudentProfile[] @relation("Referrals")
   onboardedAt              DateTime?
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
@@ -118,6 +139,11 @@ model StudyGroupMember {
   studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   role             StudyGroupRole @default(MIEMBRO)
   joinedAt         DateTime       @default(now())
+  // Último lugar visto en el ranking del grupo (ver
+  // groupRankNotificationService.ts) — null hasta el primer cálculo. Sirve
+  // sólo para detectar "alguien te rebasó" comparando contra el ranking
+  // actual; no es un historial, se sobreescribe en cada corrida del cron.
+  lastKnownRank    Int?
 
   @@unique([studyGroupId, studentProfileId])
   @@index([studyGroupId])
@@ -567,6 +593,12 @@ model Subscription {
   currentPeriodEnd      DateTime
   diagnosticsUsed       Int      @default(0)
   documentsAnalyzedUsed Int      @default(0)
+  // Días de plan pagado ganados por referidos (ver referralService.ts), no
+  // por Stripe (que todavía no está conectado). Se trata aparte de `plan`
+  // para no pisar una suscripción real cuando exista: el plan efectivo es
+  // PAID si `plan` ya es PAID o si `bonusPaidUntil` sigue en el futuro (ver
+  // getEffectivePlan en usage/effectivePlan.ts).
+  bonusPaidUntil        DateTime?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getAITier } from "@/services/usage/getAITier";
-import { ensureTopicsForSubject } from "@/services/knowledge/topicService";
+import { ensureTopicsForSubject, loadStandardizedTopics } from "@/services/knowledge/topicService";
 import {
   startDiagnosticSession,
   submitAnswer,
@@ -15,6 +15,12 @@ export async function generateTopicsAction(subjectId: string) {
   const { user, studentProfile } = await requireStudentProfile();
   const tier = await getAITier(user.id);
   await ensureTopicsForSubject({ studentProfileId: studentProfile.id, subjectId, userId: user.id, tier });
+  revalidatePath(`/dashboard/materias/${subjectId}/diagnostico`);
+}
+
+export async function loadStandardizedTopicsAction(subjectId: string, templateId: string) {
+  const { studentProfile } = await requireStudentProfile();
+  await loadStandardizedTopics(studentProfile.id, subjectId, templateId);
   revalidatePath(`/dashboard/materias/${subjectId}/diagnostico`);
 }
 

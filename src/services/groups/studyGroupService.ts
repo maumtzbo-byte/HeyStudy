@@ -138,7 +138,7 @@ export interface LeaderboardRow {
 // Ranking de los últimos 7 días. Solo agrega actividad del plan (minutos
 // completados, % de avance, días activos). Nunca toca mastery, diagnósticos,
 // patrones de error ni calificaciones — eso no sale del dueño ni en el grupo.
-async function buildLeaderboard(
+export async function buildLeaderboard(
   memberProfiles: { id: string; displayName: string; timezone: string }[],
   viewerProfileId: string,
   viewerTimezone: string,

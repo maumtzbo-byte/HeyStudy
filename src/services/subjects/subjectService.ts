@@ -7,7 +7,7 @@ export async function listSubjects(studentProfileId: string) {
     where: { studentProfileId },
     orderBy: { createdAt: "asc" },
     include: {
-      _count: { select: { assignments: true, exams: true, materials: true } },
+      _count: { select: { assignments: true, exams: true, materials: true, customTutors: true } },
     },
   });
 }
@@ -19,6 +19,7 @@ export async function getSubject(studentProfileId: string, subjectId: string) {
       assignments: { orderBy: { dueDate: "asc" } },
       exams: { orderBy: { examDate: "asc" } },
       materials: { orderBy: { uploadedAt: "desc" } },
+      grades: { orderBy: { recordedAt: "desc" } },
     },
   });
 }

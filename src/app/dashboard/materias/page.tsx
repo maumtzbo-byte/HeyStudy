@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MessageCircle } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listSubjects } from "@/services/subjects/subjectService";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
@@ -34,6 +35,14 @@ export default async function MateriasPage() {
                 <div className="mb-3 flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: subject.color }} />
                   <CardTitle>{subject.name}</CardTitle>
+                  {subject._count.customTutors > 0 && (
+                    <span
+                      className="flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent"
+                      title="Tiene un tutor personalizado"
+                    >
+                      <MessageCircle className="h-3 w-3" />
+                    </span>
+                  )}
                 </div>
                 <CardDescription>
                   {subject._count.assignments} tareas · {subject._count.exams} exámenes ·{" "}

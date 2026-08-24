@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
+import { getEffectivePlan } from "@/services/usage/effectivePlan";
 
 // Límites de la sección 5 (tabla de freemium). "Documentos analizados/mes"
 // no se incluye: `analyzeDocument` en AIProvider no está conectado a ningún
@@ -21,7 +22,7 @@ const FREE_DIAGNOSTICS_PER_MONTH = 6;
 // puede ganar la carrera.
 export async function claimDiagnostic(userId: string): Promise<void> {
   const subscription = await getOrRollSubscriptionPeriod(userId);
-  if (subscription.plan === "PAID") return;
+  if (getEffectivePlan(subscription) === "PAID") return;
 
   const { count } = await prisma.subscription.updateMany({
     where: { userId, diagnosticsUsed: { lt: FREE_DIAGNOSTICS_PER_MONTH } },
@@ -34,6 +35,26 @@ export async function claimDiagnostic(userId: string): Promise<void> {
         "Mejora tu plan para seguir diagnosticando sin límite.",
     );
   }
+}
+
+export interface PlanUsageSummary {
+  plan: "FREE" | "PAID";
+  diagnosticsUsed: number;
+  diagnosticsLimit: number;
+  periodEnd: Date;
+}
+
+// Para mostrarle al estudiante cuánto le queda — antes el límite existía
+// pero era invisible, así que llegar a él se sentía como un error random en
+// vez de una razón clara para mejorar de plan.
+export async function getPlanUsageSummary(userId: string): Promise<PlanUsageSummary> {
+  const subscription = await getOrRollSubscriptionPeriod(userId);
+  return {
+    plan: getEffectivePlan(subscription),
+    diagnosticsUsed: subscription.diagnosticsUsed,
+    diagnosticsLimit: FREE_DIAGNOSTICS_PER_MONTH,
+    periodEnd: subscription.currentPeriodEnd,
+  };
 }
 
 // Si el ciclo actual ya venció, resetea los contadores y avanza el periodo

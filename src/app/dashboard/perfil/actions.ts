@@ -5,7 +5,15 @@ import { redirect } from "next/navigation";
 import { requireAuthUser } from "@/lib/auth/getCurrentUser";
 import { createClient } from "@/lib/supabase/server";
 import { deleteAccount } from "@/services/account/deleteAccountService";
-import { updatePreferredStudyMethod, updateReviewRemindersEnabled } from "@/services/profile/profileService";
+import { z } from "zod";
+import {
+  updatePreferredStudyMethod,
+  updateReviewRemindersEnabled,
+  updateWeeklyReportEnabled,
+  updateDeadlineRemindersEnabled,
+  updateParentEmail,
+  updateParentReportEnabled,
+} from "@/services/profile/profileService";
 import { studyMethods } from "@/lib/validation/onboardingSchemas";
 import { runAction, type ActionResult, UserFacingError } from "@/lib/actions/result";
 
@@ -35,6 +43,62 @@ export async function updateReviewRemindersEnabledAction(
     const user = await requireAuthUser();
     const enabled = formData.get("reviewRemindersEnabled") === "on";
     await updateReviewRemindersEnabled(user.id, enabled);
+    revalidatePath("/dashboard/perfil");
+  });
+}
+
+export async function updateWeeklyReportEnabledAction(
+  _prev: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    const user = await requireAuthUser();
+    const enabled = formData.get("weeklyReportEnabled") === "on";
+    await updateWeeklyReportEnabled(user.id, enabled);
+    revalidatePath("/dashboard/perfil");
+  });
+}
+
+export async function updateDeadlineRemindersEnabledAction(
+  _prev: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    const user = await requireAuthUser();
+    const enabled = formData.get("deadlineRemindersEnabled") === "on";
+    await updateDeadlineRemindersEnabled(user.id, enabled);
+    revalidatePath("/dashboard/perfil");
+  });
+}
+
+export async function updateParentEmailAction(
+  _prev: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    const user = await requireAuthUser();
+    const raw = String(formData.get("parentEmail") ?? "").trim();
+
+    if (raw === "") {
+      await updateParentEmail(user.id, null);
+    } else {
+      const parsed = z.string().email("Correo inválido").safeParse(raw);
+      if (!parsed.success) throw new UserFacingError(parsed.error.issues[0]?.message ?? "Correo inválido");
+      await updateParentEmail(user.id, parsed.data);
+    }
+
+    revalidatePath("/dashboard/perfil");
+  });
+}
+
+export async function updateParentReportEnabledAction(
+  _prev: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    const user = await requireAuthUser();
+    const enabled = formData.get("parentReportEnabled") === "on";
+    await updateParentReportEnabled(user.id, enabled);
     revalidatePath("/dashboard/perfil");
   });
 }

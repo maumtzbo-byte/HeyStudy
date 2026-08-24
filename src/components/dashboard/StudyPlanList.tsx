@@ -1,6 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
+import { Video, VideoOff } from "lucide-react";
 import { toggleStudyPlanItemAction } from "@/app/dashboard/actions";
 
 interface VideoView {
@@ -21,10 +22,26 @@ interface StudyPlanItemView {
 
 export function StudyPlanList({ items }: { items: StudyPlanItemView[] }) {
   const [, startTransition] = useTransition();
+  // Preferencia por-item, no persistida: la global (preferredStudyMethod)
+  // decide si se traen videos; esto sólo deja ocultar el bloque en un tema
+  // puntual sin cambiar la preferencia de toda la cuenta. Por defecto
+  // visibles, que es el comportamiento de antes de este cambio.
+  const [hiddenVideoItemIds, setHiddenVideoItemIds] = useState<Set<string>>(new Set());
+
+  function toggleVideosForItem(itemId: string) {
+    setHiddenVideoItemIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
+      return next;
+    });
+  }
 
   return (
     <div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border">
-      {items.map((item) => (
+      {items.map((item) => {
+        const videosHidden = hiddenVideoItemIds.has(item.id);
+        return (
         <div key={item.id} className="flex flex-col gap-3 px-4 py-3">
           <div className="flex items-start gap-3">
             <button
@@ -43,10 +60,21 @@ export function StudyPlanList({ items }: { items: StudyPlanItemView[] }) {
               </p>
               <p className="text-xs text-muted">{item.reason}</p>
             </div>
+            {item.videos.length > 0 && (
+              <button
+                type="button"
+                onClick={() => toggleVideosForItem(item.id)}
+                className="shrink-0 text-muted hover:text-foreground"
+                aria-label={videosHidden ? "Mostrar videos" : "Ocultar videos"}
+                title={videosHidden ? "Mostrar videos" : "Ocultar videos"}
+              >
+                {videosHidden ? <VideoOff className="h-4 w-4" /> : <Video className="h-4 w-4" />}
+              </button>
+            )}
             <span className="shrink-0 text-xs font-medium text-muted">{item.minutes} min</span>
           </div>
 
-          {item.videos.length > 0 && (
+          {item.videos.length > 0 && !videosHidden && (
             <div className="ml-8 flex flex-wrap gap-2">
               {item.videos.map((video) => (
                 <a
@@ -67,7 +95,8 @@ export function StudyPlanList({ items }: { items: StudyPlanItemView[] }) {
             </div>
           )}
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
