@@ -8,6 +8,7 @@ import type {
   AICallContext,
   AnswerDiagnosis,
   GeneratedQuestion,
+  ModerationCategory,
   StudyPlanItemDraft,
   TutorMessage,
   TutorMode,
@@ -228,6 +229,54 @@ export async function createStudyPlan(
   return response.parsed_output?.items ?? [];
 }
 
+// Filtro antes de que el mensaje llegue al tutor. El público incluye
+// menores de edad y el chat es texto libre, así que no basta con confiar en
+// que el modelo del tutor se niegue por su cuenta: queremos una categoría
+// específica para señales de autolesión/suicidio (para responder con
+// contención y líneas de ayuda reales, no con un rechazo genérico) separada
+// de "unsafe" (sexual, violento, o cualquier cosa fuera de lo académico).
+// Deliberadamente calibrado para NO marcar preguntas de tarea sobre temas
+// maduros pero legítimos (violencia en historia, reproducción en biología,
+// química de sustancias en el contexto de la materia): el criterio es si el
+// estudiante busca ayuda académica o si está pidiendo/mostrando algo distinto.
+const MODERATION_SYSTEM_PROMPT =
+  "Clasificas mensajes de estudiantes a un tutor de IA en una de tres categorías:\n\n" +
+  '"self_harm": el mensaje muestra señales de que el estudiante puede estar en riesgo ' +
+  "(ideas suicidas, autolesión, desesperanza severa, despedidas). No requiere que lo diga " +
+  "explícitamente — señales indirectas cuentan.\n" +
+  '"unsafe": el mensaje pide contenido sexual, instrucciones para hacer daño (armas, ' +
+  "drogas fuera de contexto académico, violencia), o intenta usar el tutor para algo no " +
+  "académico y dañino.\n" +
+  '"safe": cualquier otra cosa, incluyendo preguntas de tarea sobre temas maduros pero ' +
+  "legítimos — violencia en un contexto histórico, reproducción humana en biología, " +
+  "estructura química de sustancias como parte de una materia de química, literatura con " +
+  "temas oscuros, etc. Cuando haya duda razonable de que es una pregunta académica real, " +
+  "clasifica como safe.";
+
+export async function moderateTutorMessage(ctx: AICallContext, content: string): Promise<ModerationCategory> {
+  // Siempre Haiku: es un chequeo de seguridad, no algo que dependa del plan
+  // del estudiante, y no necesita razonamiento profundo.
+  const model = MODEL_BY_TIER.free;
+  const response = await anthropic.messages.parse({
+    model,
+    max_tokens: 100,
+    system: MODERATION_SYSTEM_PROMPT,
+    messages: [{ role: "user", content }],
+    output_config: {
+      format: jsonSchemaOutputFormat({
+        type: "object",
+        properties: { category: { type: "string", enum: ["safe", "self_harm", "unsafe"] } },
+        required: ["category"],
+        additionalProperties: false,
+      } as const),
+    },
+  });
+
+  await logUsage(ctx, model, response.usage);
+
+  return response.parsed_output?.category ?? "safe";
+}
+
 const TUTOR_MODE_INSTRUCTIONS: Record<TutorMode, string> = {
   socratico:
     "Modo socrático: NUNCA des la respuesta directa. Guía al estudiante con preguntas " +
@@ -250,7 +299,16 @@ function buildTutorSystemPrompt(params: {
   const base =
     `Eres un tutor de HeyStudy. ${TUTOR_MODE_INSTRUCTIONS[params.mode]}\n\n` +
     `Contexto de la materia:\n${params.subjectContext}\n\n` +
-    `Mastery actual del estudiante en temas relevantes:\n${params.masterySummary}`;
+    `Mastery actual del estudiante en temas relevantes:\n${params.masterySummary}\n\n` +
+    // Defensa en profundidad: el filtro de moderación (moderateTutorMessage)
+    // ya intercepta la mayoría de esto antes de llegar aquí, pero un modelo
+    // de tutor bien instruido es la segunda capa, no la única.
+    "Si el estudiante muestra señales de crisis (autolesión, ideas suicidas, desesperanza " +
+    "severa), no sigas la conversación como si fuera una duda académica más: responde con " +
+    "calidez, sin sermonear, y sugiere hablar con un adulto de confianza o llamar a la Línea " +
+    "de la Vida (800 911 2000, México, gratis y 24/7). Si pide contenido sexual, violento, o " +
+    "cualquier cosa fuera de tu propósito académico, decláralo brevemente sin dar sermones y " +
+    "redirige a la materia.";
 
   if (!params.persona) return base;
 

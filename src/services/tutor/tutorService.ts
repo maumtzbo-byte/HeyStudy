@@ -1,7 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
-import { tutorResponse } from "@/services/ai/AIProvider";
+import { tutorResponse, moderateTutorMessage } from "@/services/ai/AIProvider";
 import { MODE_TO_DB, MODE_FROM_DB } from "@/services/tutor/customTutorService";
 import type { AITier } from "@/services/ai/models";
 import type { TutorMode } from "@/services/ai/types";
@@ -10,6 +10,24 @@ import type { TutorMode } from "@/services/ai/types";
 // tokens desproporcionado — la salida ya tiene max_tokens en AIProvider,
 // pero nada topaba la entrada (sección 8.5).
 const MAX_MESSAGE_LENGTH = 4000;
+
+// Respuestas fijas, no generadas por IA: para algo tan sensible como una
+// señal de autolesión, un texto revisado y consistente es más seguro que
+// dejar que el modelo lo redacte distinto cada vez. Sirven también como la
+// respuesta de "unsafe" (fuera del propósito académico), para no gastar una
+// llamada completa al tutor en algo que ya sabemos que se va a rechazar.
+const SELF_HARM_RESPONSE =
+  "Lo que compartes suena difícil, y quiero que sepas que no estás solo/a con esto. " +
+  "No soy la persona indicada para acompañarte en esto — hablarlo con alguien de confianza " +
+  "(un familiar, un profesor, un psicólogo) o con una línea de ayuda puede hacer una " +
+  "diferencia real:\n\n" +
+  "• Línea de la Vida (México): 800 911 2000 — gratis, 24/7\n" +
+  "• SAPTEL: 55 5259 8121\n\n" +
+  "Aquí sigo para ayudarte con lo académico cuando quieras retomarlo.";
+
+const UNSAFE_RESPONSE =
+  "Soy un tutor académico de HeyStudy y no puedo ayudarte con eso. Si tienes una duda de " +
+  "alguna materia, dime el tema y seguimos con gusto.";
 
 async function assertConversationOwnership(studentProfileId: string, conversationId: string) {
   const conversation = await prisma.tutorConversation.findFirst({
@@ -143,26 +161,46 @@ export async function sendMessage(params: {
     data: { tutorConversationId: conversationId, role: "USER", content },
   });
 
-  const masterySummary = await buildMasterySummaryForSubject(studentProfileId, conversation.subjectId);
-
-  const reply = await tutorResponse(
-    { userId, tier, feature: "tutor_chat" },
-    {
-      mode: MODE_FROM_DB[conversation.mode],
-      subjectContext: conversation.subject.name,
-      masterySummary,
-      persona: conversation.customTutor
-        ? { name: conversation.customTutor.name, instructions: conversation.customTutor.instructions }
-        : null,
-      history: [
-        ...priorMessages.map((m) => ({
-          role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
-          content: m.content,
-        })),
-        { role: "user" as const, content },
-      ],
+  // El público incluye menores y el chat es texto libre: se clasifica antes
+  // de gastar una llamada completa al tutor. Si el chequeo mismo falla (red,
+  // API caída), no se bloquea el tutor entero por eso — el modelo del tutor
+  // ya trae su propia instrucción de seguridad como segunda capa (ver
+  // buildTutorSystemPrompt), así que fallar "safe" aquí no deja el chat sin
+  // ninguna protección.
+  const moderation = await moderateTutorMessage({ userId, tier: "free", feature: "tutor_moderation" }, content).catch(
+    (err) => {
+      console.error("[tutor moderation]", err);
+      return "safe" as const;
     },
   );
+
+  let reply: string;
+  if (moderation === "self_harm") {
+    reply = SELF_HARM_RESPONSE;
+  } else if (moderation === "unsafe") {
+    reply = UNSAFE_RESPONSE;
+  } else {
+    const masterySummary = await buildMasterySummaryForSubject(studentProfileId, conversation.subjectId);
+
+    reply = await tutorResponse(
+      { userId, tier, feature: "tutor_chat" },
+      {
+        mode: MODE_FROM_DB[conversation.mode],
+        subjectContext: conversation.subject.name,
+        masterySummary,
+        persona: conversation.customTutor
+          ? { name: conversation.customTutor.name, instructions: conversation.customTutor.instructions }
+          : null,
+        history: [
+          ...priorMessages.map((m) => ({
+            role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
+            content: m.content,
+          })),
+          { role: "user" as const, content },
+        ],
+      },
+    );
+  }
 
   await prisma.tutorChatMessage.create({
     data: { tutorConversationId: conversationId, role: "ASSISTANT", content: reply },

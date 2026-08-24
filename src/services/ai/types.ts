@@ -35,3 +35,7 @@ export interface TutorMessage {
   role: "user" | "assistant";
   content: string;
 }
+
+// self_harm es su propia categoría (no sólo "unsafe") porque necesita una
+// respuesta distinta: contención y líneas de ayuda, no un rechazo seco.
+export type ModerationCategory = "safe" | "self_harm" | "unsafe";
