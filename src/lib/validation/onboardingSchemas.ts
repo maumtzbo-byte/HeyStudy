@@ -8,9 +8,14 @@ import { z } from "zod";
 // con filas existentes; aquí simplemente no se ofrecen como opción nueva.
 export const educationLevels = ["PREPARATORIA", "UNIVERSIDAD", "OTRO"] as const;
 
+// Personalización: si el estudiante prefiere video, el plan de estudio le
+// sugiere videos de YouTube para sus temas más débiles (ver videoService.ts).
+export const studyMethods = ["VIDEOS", "LECTURA", "PRACTICA", "MIXTO"] as const;
+
 export const onboardingSchema = z.object({
   displayName: z.string().min(1, "Cuéntanos cómo te llamas").max(80),
   educationLevel: z.enum(educationLevels),
+  preferredStudyMethod: z.enum(studyMethods),
   subjectNames: z
     .array(z.string().min(1).max(60))
     .min(1, "Agrega al menos una materia")

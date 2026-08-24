@@ -20,6 +20,7 @@ export async function completeOnboarding(params: { userId: string; input: Onboar
         userId,
         displayName: input.displayName,
         educationLevel: input.educationLevel,
+        preferredStudyMethod: input.preferredStudyMethod,
         onboardedAt: now,
       },
     });

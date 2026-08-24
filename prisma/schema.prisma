@@ -38,16 +38,28 @@ enum EducationLevel {
   OTRO
 }
 
+enum StudyMethod {
+  VIDEOS
+  LECTURA
+  PRACTICA
+  MIXTO
+}
+
 model StudentProfile {
-  id             String         @id @default(uuid()) @db.Uuid
-  userId         String         @unique @db.Uuid
-  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName    String
-  educationLevel EducationLevel
-  timezone       String         @default("America/Mexico_City")
-  onboardedAt    DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id                   String         @id @default(uuid()) @db.Uuid
+  userId               String         @unique @db.Uuid
+  user                 User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName          String
+  educationLevel       EducationLevel
+  // Cómo prefiere estudiar (personalización): si incluye video (VIDEOS o
+  // MIXTO), el plan de estudio le sugiere videos de YouTube para sus temas
+  // más débiles del día (ver videoService.ts). MIXTO por default para no
+  // requerir backfill en perfiles creados antes de este campo.
+  preferredStudyMethod StudyMethod    @default(MIXTO)
+  timezone             String         @default("America/Mexico_City")
+  onboardedAt          DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 
   subjects           Subject[]
   knowledgeMastery   KnowledgeMastery[]
@@ -274,15 +286,37 @@ model KnowledgeTopic {
   description String?
   createdAt   DateTime         @default(now())
 
-  mastery        KnowledgeMastery[]
-  questions      Question[]
-  errorPatterns  ErrorPattern[]
-  examTopics     ExamTopic[]
-  studyPlanItems StudyPlanItem[]
+  mastery           KnowledgeMastery[]
+  questions         Question[]
+  errorPatterns     ErrorPattern[]
+  examTopics        ExamTopic[]
+  studyPlanItems    StudyPlanItem[]
+  recommendedVideos RecommendedVideo[]
 
   @@index([subjectId])
   @@index([parentId])
   @@map("knowledge_topics")
+}
+
+// Cache de resultados de YouTube Data API por tema (sección de
+// personalización: estudiantes que prefieren video reciben sugerencias
+// reales, no inventadas por la IA). Cachear por tema —no por estudiante—
+// porque el contenido educativo de un tema no cambia entre estudiantes, y
+// el free tier de la API de YouTube es de sólo 100 búsquedas/día
+// (search.list cuesta 100 de las 10,000 unidades diarias).
+model RecommendedVideo {
+  id               String         @id @default(uuid()) @db.Uuid
+  knowledgeTopicId String         @db.Uuid
+  knowledgeTopic   KnowledgeTopic @relation(fields: [knowledgeTopicId], references: [id], onDelete: Cascade)
+  youtubeVideoId   String
+  title            String
+  channelTitle     String
+  thumbnailUrl     String
+  fetchedAt        DateTime       @default(now())
+
+  @@unique([knowledgeTopicId, youtubeVideoId])
+  @@index([knowledgeTopicId])
+  @@map("recommended_videos")
 }
 
 // Mastery de un StudentProfile sobre un KnowledgeTopic. Se actualiza con

@@ -17,6 +17,14 @@ const EDUCATION_LEVEL_LABELS: Record<string, string> = {
   OTRO: "Otro",
 };
 
+// Ver "studyMethods" en lib/validation/onboardingSchemas.ts.
+const STUDY_METHOD_LABELS: Record<string, string> = {
+  VIDEOS: "Viendo videos",
+  LECTURA: "Leyendo",
+  PRACTICA: "Practicando con ejercicios",
+  MIXTO: "Un poco de todo",
+};
+
 export function OnboardingForm() {
   const [state, formAction, isPending] = useActionState(submitOnboardingAction, undefined);
   const [subjects, setSubjects] = useState<string[]>(["", ""]);
@@ -49,6 +57,20 @@ export function OnboardingForm() {
             </option>
           ))}
         </Select>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="preferredStudyMethod">¿Cuál es tu manera favorita de estudiar?</Label>
+        <Select id="preferredStudyMethod" name="preferredStudyMethod" defaultValue="MIXTO" required>
+          {Object.entries(STUDY_METHOD_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </Select>
+        <p className="text-xs text-muted">
+          Si prefieres video, tu plan de estudio te sugerirá videos de los temas que más te cuesten.
+        </p>
       </div>
 
       <div className="flex flex-col gap-1.5">

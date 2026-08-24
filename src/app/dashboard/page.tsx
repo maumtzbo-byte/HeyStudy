@@ -6,6 +6,7 @@ import { listUpcomingAssignments } from "@/services/assignments/assignmentServic
 import { listUpcomingExams } from "@/services/exams/examService";
 import { calculateExamReadiness } from "@/services/exams/readinessService";
 import { getTodayPlan } from "@/services/studyplan/studyPlanService";
+import { getVideoRecommendationsForTopic, type VideoRecommendation } from "@/services/video/videoService";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { ReadinessBadge } from "@/components/exams/ReadinessBadge";
 import { GeneratePlanForm } from "@/components/dashboard/GeneratePlanForm";
@@ -40,6 +41,30 @@ export default async function DashboardHomePage() {
   const examReadiness = await Promise.all(
     exams.map((exam) => calculateExamReadiness(studentProfile.id, exam.id)),
   );
+
+  // Videos sólo si el estudiante dijo que así prefiere estudiar (onboarding
+  // o /dashboard/perfil). Se limita a los primeros temas del plan —ya vienen
+  // ordenados por debilidad/urgencia— para no gastar de más la cuota diaria
+  // de la YouTube Data API en un solo estudiante.
+  const MAX_TOPICS_WITH_VIDEOS = 3;
+  const videosByItemId = new Map<string, VideoRecommendation[]>();
+  if (todayPlan && studentProfile.preferredStudyMethod !== "LECTURA" && studentProfile.preferredStudyMethod !== "PRACTICA") {
+    const subjectNameById = new Map(subjects.map((s) => [s.id, s.name]));
+    const itemsWithTopic = todayPlan.items
+      .filter((item) => item.knowledgeTopicId && item.knowledgeTopic)
+      .slice(0, MAX_TOPICS_WITH_VIDEOS);
+
+    const results = await Promise.all(
+      itemsWithTopic.map((item) =>
+        getVideoRecommendationsForTopic({
+          knowledgeTopicId: item.knowledgeTopicId!,
+          topicName: item.knowledgeTopic!.name,
+          subjectName: subjectNameById.get(item.knowledgeTopic!.subjectId) ?? "",
+        }),
+      ),
+    );
+    itemsWithTopic.forEach((item, i) => videosByItemId.set(item.id, results[i]));
+  }
 
   const todoItems = [
     ...assignments.map((a) => ({
@@ -126,6 +151,7 @@ export default async function DashboardHomePage() {
                 reason: item.reason,
                 minutes: item.minutes,
                 completed: item.completed,
+                videos: videosByItemId.get(item.id) ?? [],
               }))}
             />
             <GeneratePlanForm regenerate />

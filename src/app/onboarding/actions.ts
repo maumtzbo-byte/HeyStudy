@@ -21,6 +21,7 @@ export async function submitOnboardingAction(
   const parsed = onboardingSchema.safeParse({
     displayName: formData.get("displayName"),
     educationLevel: formData.get("educationLevel"),
+    preferredStudyMethod: formData.get("preferredStudyMethod"),
     subjectNames,
     ageConfirmed: formData.get("ageConfirmed"),
   });
