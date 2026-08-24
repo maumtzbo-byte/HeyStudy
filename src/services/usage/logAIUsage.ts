@@ -7,8 +7,18 @@ export async function logAIUsage(params: {
   feature: string;
   inputTokens: number;
   outputTokens: number;
+  cacheCreationTokens?: number;
+  cacheReadTokens?: number;
 }) {
-  const estimatedCostUsd = estimateCostUsd(params.model, params.inputTokens, params.outputTokens);
+  const cacheCreationTokens = params.cacheCreationTokens ?? 0;
+  const cacheReadTokens = params.cacheReadTokens ?? 0;
+  const estimatedCostUsd = estimateCostUsd(
+    params.model,
+    params.inputTokens,
+    params.outputTokens,
+    cacheCreationTokens,
+    cacheReadTokens,
+  );
 
   await prisma.aIUsageLog.create({
     data: {
@@ -17,6 +27,8 @@ export async function logAIUsage(params: {
       feature: params.feature,
       inputTokens: params.inputTokens,
       outputTokens: params.outputTokens,
+      cacheCreationTokens,
+      cacheReadTokens,
       estimatedCostUsd,
     },
   });

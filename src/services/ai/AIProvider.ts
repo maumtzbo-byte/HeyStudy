@@ -19,8 +19,24 @@ import type {
 
 const MAX_TOKENS_DEFAULT = 2048;
 
-async function logUsage(ctx: AICallContext, model: string, inputTokens: number, outputTokens: number) {
-  await logAIUsage({ userId: ctx.userId, model, feature: ctx.feature, inputTokens, outputTokens });
+// Anthropic siempre manda cache_creation_input_tokens/cache_read_input_tokens
+// en response.usage (0 si la llamada no usa prompt caching), así que pasarlos
+// aquí es seguro para las 5 funciones que comparten este helper, no sólo
+// para tutorResponse.
+async function logUsage(
+  ctx: AICallContext,
+  model: string,
+  usage: { input_tokens: number; output_tokens: number; cache_creation_input_tokens?: number | null; cache_read_input_tokens?: number | null },
+) {
+  await logAIUsage({
+    userId: ctx.userId,
+    model,
+    feature: ctx.feature,
+    inputTokens: usage.input_tokens,
+    outputTokens: usage.output_tokens,
+    cacheCreationTokens: usage.cache_creation_input_tokens ?? 0,
+    cacheReadTokens: usage.cache_read_input_tokens ?? 0,
+  });
 }
 
 // Límite técnico independiente del plan (sección 8.5): máximo 10 llamadas a
@@ -44,7 +60,7 @@ export async function generateText(
     messages: [{ role: "user", content: params.prompt }],
   });
 
-  await logUsage(ctx, model, response.usage.input_tokens, response.usage.output_tokens);
+  await logUsage(ctx, model, response.usage);
 
   const textBlock = response.content.find((block) => block.type === "text");
   return textBlock?.type === "text" ? textBlock.text : "";
@@ -108,7 +124,7 @@ export async function generateQuestions(
     },
   });
 
-  await logUsage(ctx, model, response.usage.input_tokens, response.usage.output_tokens);
+  await logUsage(ctx, model, response.usage);
 
   return response.parsed_output?.questions ?? [];
 }
@@ -149,7 +165,7 @@ export async function diagnoseKnowledge(
     },
   });
 
-  await logUsage(ctx, model, response.usage.input_tokens, response.usage.output_tokens);
+  await logUsage(ctx, model, response.usage);
 
   return (
     response.parsed_output ?? {
@@ -207,7 +223,7 @@ export async function createStudyPlan(
     },
   });
 
-  await logUsage(ctx, model, response.usage.input_tokens, response.usage.output_tokens);
+  await logUsage(ctx, model, response.usage);
 
   return response.parsed_output?.items ?? [];
 }
@@ -268,14 +284,31 @@ export async function tutorResponse(
 ): Promise<string> {
   await checkAIRateLimit(ctx);
   const model = MODEL_BY_TIER[ctx.tier];
+
+  // Prompt caching: el chat del tutor es donde más se repite contenido —
+  // cada mensaje nuevo reenvía toda la conversación anterior, y dentro de
+  // una misma conversación el system prompt no cambia (nada en el chat
+  // actualiza masterySummary). Dos breakpoints: uno en el system prompt, y
+  // uno en el último bloque de mensajes (patrón estándar para chats
+  // multi-turno — cachea el prefijo completo hasta ahí, y el próximo
+  // mensaje lo lee de caché en vez de reprocesarlo). Si el prefijo no llega
+  // al mínimo cacheable del modelo, la API simplemente no lo cachea —no
+  // rompe nada, sólo no ahorra en mensajes tempranos de la conversación.
+  const history = params.history;
   const response = await anthropic.messages.create({
     model,
     max_tokens: MAX_TOKENS_DEFAULT,
-    system: buildTutorSystemPrompt(params),
-    messages: params.history.map((m) => ({ role: m.role, content: m.content })),
+    system: [{ type: "text", text: buildTutorSystemPrompt(params), cache_control: { type: "ephemeral" } }],
+    messages: history.map((m, i) => ({
+      role: m.role,
+      content:
+        i === history.length - 1
+          ? [{ type: "text" as const, text: m.content, cache_control: { type: "ephemeral" as const } }]
+          : m.content,
+    })),
   });
 
-  await logUsage(ctx, model, response.usage.input_tokens, response.usage.output_tokens);
+  await logUsage(ctx, model, response.usage);
 
   const textBlock = response.content.find((block) => block.type === "text");
   return textBlock?.type === "text" ? textBlock.text : "";

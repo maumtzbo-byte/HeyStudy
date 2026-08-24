@@ -577,15 +577,22 @@ model RateLimitEvent {
 // Un registro por llamada a la API de Anthropic. Crítico para validar costo
 // real por usuario activo (sección 8).
 model AIUsageLog {
-  id               String   @id @default(uuid()) @db.Uuid
-  userId           String   @db.Uuid
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  model            String
-  feature          String
-  inputTokens      Int
-  outputTokens     Int
-  estimatedCostUsd Float
-  createdAt        DateTime @default(now())
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String   @db.Uuid
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  model               String
+  feature             String
+  inputTokens         Int
+  outputTokens        Int
+  // Prompt caching (tutor_chat): tokens que se escribieron en caché por
+  // primera vez esta llamada (~1.25x el precio normal) vs. tokens que se
+  // leyeron de una caché ya existente (~0.1x). 0 en llamadas sin caching.
+  // Sin estos dos campos, sumar sólo inputTokens subestima el costo real en
+  // cuanto la caché del tutor empieza a pegar.
+  cacheCreationTokens Int      @default(0)
+  cacheReadTokens     Int      @default(0)
+  estimatedCostUsd    Float
+  createdAt           DateTime @default(now())
 
   @@index([userId])
   @@index([feature])
