@@ -17,9 +17,30 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ["600", "700", "800"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://heystudy.app";
+const DESCRIPTION = "Diagnóstico, plan de estudio y tutor IA personalizados para ti.";
+
+// metadataBase es lo que permite que openGraph-image, canonical, etc. en
+// cada page.tsx usen rutas relativas en vez de tener que repetir el
+// dominio completo por página.
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "HeyStudy",
-  description: "Diagnóstico, plan de estudio y tutor IA personalizados para ti.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "HeyStudy: Sabe qué estudiar, hoy",
+    description: DESCRIPTION,
+    url: "/",
+    siteName: "HeyStudy",
+    locale: "es_MX",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HeyStudy: Sabe qué estudiar, hoy",
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

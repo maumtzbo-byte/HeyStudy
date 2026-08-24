@@ -4,6 +4,8 @@ import { Logo } from "@/components/ui/Logo";
 
 export const metadata: Metadata = {
   title: "Términos de uso — HeyStudy",
+  description: "Condiciones de uso de HeyStudy: edad mínima, propiedad, límite de responsabilidad y más.",
+  alternates: { canonical: "/terminos" },
 };
 
 export default function TerminosPage() {

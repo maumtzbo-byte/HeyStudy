@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/LoginForm";
 
-export const metadata: Metadata = { title: "Iniciar sesión — HeyStudy" };
+export const metadata: Metadata = {
+  title: "Iniciar sesión — HeyStudy",
+  description: "Entra a tu cuenta de HeyStudy para ver tu plan de estudio de hoy.",
+  alternates: { canonical: "/login" },
+};
 
 export default function LoginPage() {
   return (

@@ -4,6 +4,8 @@ import { Logo } from "@/components/ui/Logo";
 
 export const metadata: Metadata = {
   title: "Privacidad — HeyStudy",
+  description: "Qué datos guarda HeyStudy, para qué los usa, y cómo controlas o eliminas los tuyos.",
+  alternates: { canonical: "/privacidad" },
 };
 
 export default function PrivacidadPage() {

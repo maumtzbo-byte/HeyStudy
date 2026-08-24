@@ -24,6 +24,9 @@ import { cn } from "@/lib/utils/cn";
 
 export const metadata: Metadata = {
   title: "HeyStudy: Sabe qué estudiar, hoy",
+  description:
+    "Diagnóstico de tu nivel real, mapa de conocimiento y un plan de estudio diario que se adapta a ti — con tutor de IA incluido.",
+  alternates: { canonical: "/" },
 };
 
 /* ---------------------------------------------------------------------- */

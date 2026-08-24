@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { RegistroForm } from "@/components/auth/RegistroForm";
 
-export const metadata: Metadata = { title: "Crear cuenta — HeyStudy" };
+export const metadata: Metadata = {
+  title: "Crear cuenta — HeyStudy",
+  description: "Crea tu cuenta gratis en HeyStudy y arma tu primer plan de estudio en minutos.",
+  alternates: { canonical: "/registro" },
+};
 
 export default function RegistroPage() {
   return (
