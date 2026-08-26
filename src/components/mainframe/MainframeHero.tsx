@@ -1,23 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useTypewriter } from "@/lib/hooks/useTypewriter";
 
 const VIDEO_SRC =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4";
 const SENSITIVITY = 0.8;
-const EMAIL = "hello@mainframe.co";
 
-const PILLS = ["Pitch us an idea", "Come work here", "Send a brief hello", "See how we operate"];
-
-function CopyIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-      <rect x="3.5" y="3.5" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1" />
-      <rect x="1.5" y="1.5" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1" />
-    </svg>
-  );
-}
+const PILLS = [
+  { label: "Ver cómo funciona", href: "#como-funciona" },
+  { label: "Ver precios", href: "#precios" },
+  { label: "Preguntas frecuentes", href: "#preguntas" },
+];
 
 function VideoScrubBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -106,7 +101,7 @@ function VideoScrubBackground() {
 
 export function MainframeHero() {
   const { displayed, done } = useTypewriter(
-    "Glad you stopped in. Good taste tends to find us. Now, what are we building?",
+    "Diagnosticamos qué sabes de verdad y armamos tu plan de estudio. ¿Con qué materia empezamos?",
   );
   const [pillsVisible, setPillsVisible] = useState(false);
 
@@ -115,12 +110,8 @@ export function MainframeHero() {
     return () => clearTimeout(id);
   }, []);
 
-  function copyEmail() {
-    navigator.clipboard.writeText(EMAIL);
-  }
-
   return (
-    <div className="mainframe-page relative">
+    <div className="relative">
       <VideoScrubBackground />
 
       <section className="relative z-[1] flex h-screen flex-col justify-end overflow-hidden px-5 pb-12 sm:px-8 md:justify-center md:px-10 md:pb-0">
@@ -130,9 +121,9 @@ export function MainframeHero() {
             className="pointer-events-none mb-5 [filter:blur(4px)] select-none sm:mb-6"
             style={{ fontSize: "clamp(18px, 4vw, 26px)", lineHeight: 1.3, fontWeight: 400, color: "#000" }}
           >
-            Hey there, meet A.R.I.A,
+            Antes de que sigas bajando,
             <br />
-            Mainframe&apos;s Adaptive Response Interface Agent
+            esta es la mascota que va a acompañarte a estudiar
           </p>
 
           <p
@@ -161,23 +152,21 @@ export function MainframeHero() {
               transform: pillsVisible ? "translateY(0)" : "translateY(8px)",
             }}
           >
-            {PILLS.map((label) => (
-              <button
-                key={label}
-                type="button"
+            {PILLS.map((pill) => (
+              <a
+                key={pill.href}
+                href={pill.href}
                 className="mx-[0.2em] mb-[0.4em] inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-[0.3em] text-[13px] whitespace-nowrap text-black transition-colors duration-200 hover:bg-black hover:text-white sm:px-5 sm:text-[15px]"
               >
-                {label}
-              </button>
+                {pill.label}
+              </a>
             ))}
-            <button
-              type="button"
-              onClick={copyEmail}
-              className="mx-[0.2em] mb-[0.4em] inline-flex items-center justify-center gap-2 rounded-full border border-white bg-transparent px-4 py-[0.3em] text-[13px] whitespace-nowrap text-white transition-colors duration-200 hover:bg-white hover:text-black sm:gap-3 sm:px-5 sm:text-[15px]"
+            <Link
+              href="/registro"
+              className="mx-[0.2em] mb-[0.4em] inline-flex items-center justify-center rounded-full border border-white bg-transparent px-4 py-[0.3em] text-[13px] whitespace-nowrap text-white transition-colors duration-200 hover:bg-white hover:text-black sm:px-5 sm:text-[15px]"
             >
-              Reach us: <span className="underline underline-offset-1">{EMAIL}</span>
-              <CopyIcon />
-            </button>
+              Comenzar gratis
+            </Link>
           </div>
         </div>
       </section>

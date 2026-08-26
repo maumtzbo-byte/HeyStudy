@@ -1,8 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
-const NAV_LINKS = ["Labs", "Studio", "Openings", "Shop"];
+const NAV_LINKS = [
+  { href: "#como-funciona", label: "Cómo funciona" },
+  { href: "#producto", label: "Producto" },
+  { href: "#precios", label: "Precios" },
+  { href: "#preguntas", label: "Preguntas" },
+];
 
 export function MainframeNavbar() {
   const [open, setOpen] = useState(false);
@@ -10,12 +16,12 @@ export function MainframeNavbar() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-10 flex items-center justify-between px-5 py-4 sm:px-8 sm:py-5">
-        <div className="flex flex-row items-center gap-3">
+        <Link href="/" className="flex flex-row items-center gap-3">
           <span
             className="text-[21px] tracking-tight text-black sm:text-[26px]"
             style={{ fontFamily: "var(--font-heading)" }}
           >
-            Mainframe&reg;
+            HeyStudy
           </span>
           <span
             aria-hidden
@@ -24,25 +30,25 @@ export function MainframeNavbar() {
           >
             ✳︎
           </span>
-        </div>
+        </Link>
 
         <nav className="hidden flex-row text-[23px] text-black md:flex">
-          {NAV_LINKS.map((label, i) => (
-            <span key={label} className="flex flex-row">
-              <a href="#" className="transition-opacity hover:opacity-60">
-                {label}
+          {NAV_LINKS.map((link, i) => (
+            <span key={link.href} className="flex flex-row">
+              <a href={link.href} className="transition-opacity hover:opacity-60">
+                {link.label}
               </a>
               {i < NAV_LINKS.length - 1 && <span>,&nbsp;</span>}
             </span>
           ))}
         </nav>
 
-        <a
-          href="#"
+        <Link
+          href="/registro"
           className="hidden text-[23px] text-black underline underline-offset-2 transition-opacity hover:opacity-60 md:block"
         >
-          Get in touch
-        </a>
+          Comenzar gratis
+        </Link>
 
         <button
           type="button"
@@ -72,23 +78,23 @@ export function MainframeNavbar() {
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
-        {NAV_LINKS.map((label) => (
+        {NAV_LINKS.map((link) => (
           <a
-            key={label}
-            href="#"
+            key={link.href}
+            href={link.href}
             onClick={() => setOpen(false)}
             className="text-left text-[32px] font-medium text-black"
           >
-            {label}
+            {link.label}
           </a>
         ))}
-        <a
-          href="#"
+        <Link
+          href="/registro"
           onClick={() => setOpen(false)}
           className="text-left text-[32px] font-medium text-black underline underline-offset-2"
         >
-          Get in touch
-        </a>
+          Comenzar gratis
+        </Link>
       </div>
     </>
   );
