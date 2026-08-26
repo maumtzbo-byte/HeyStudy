@@ -117,16 +117,6 @@ export function MainframeHero() {
       <section className="relative z-[1] flex h-full flex-col justify-end px-5 pb-12 sm:px-8 md:justify-center md:px-10 md:pb-0">
         <div className="relative z-10 max-w-xl">
           <p
-            aria-hidden
-            className="pointer-events-none mb-5 [filter:blur(4px)] select-none sm:mb-6"
-            style={{ fontSize: "clamp(18px, 4vw, 26px)", lineHeight: 1.3, fontWeight: 400, color: "#000" }}
-          >
-            Antes de que sigas bajando,
-            <br />
-            esta es la mascota que va a acompañarte a estudiar
-          </p>
-
-          <p
             className="mb-5 text-black sm:mb-6"
             style={{
               fontSize: "clamp(18px, 4vw, 26px)",
