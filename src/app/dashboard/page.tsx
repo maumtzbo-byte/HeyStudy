@@ -140,20 +140,22 @@ export default async function DashboardHomePage() {
           texto que había antes — Materias/Tareas/Exámenes viven aquí. */}
       <Card className="border-transparent bg-warning text-white">
         <div className="flex items-center justify-between">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">
+            <Flame className="h-5 w-5 text-white" strokeWidth={2} />
+          </span>
           <span className="text-sm font-medium text-white/80">Racha</span>
-          <Flame className="h-4 w-4 text-white/80" strokeWidth={2} />
         </div>
-        <p className="mt-3 flex items-baseline gap-1.5">
-          <span className="text-4xl font-bold tabular-nums">{streak}</span>
-          <span className="text-sm text-white/70">{streak === 1 ? "día" : "días"}</span>
+        <p className="mt-4 flex items-baseline gap-2">
+          <span className="text-6xl font-bold tabular-nums">{streak}</span>
+          <span className="text-base text-white/70">{streak === 1 ? "día" : "días"}</span>
         </p>
-        <div className="mt-3 flex gap-1.5">
+        <div className="mt-4 flex gap-1.5">
           {last7Days.map((day, i) => (
             <span
               key={i}
               aria-hidden
               className={cn(
-                "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold",
+                "flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold",
                 day.active ? "bg-white text-warning" : "bg-white/15 text-white/50",
               )}
             >
@@ -163,19 +165,22 @@ export default async function DashboardHomePage() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="flex aspect-square flex-col justify-between border-transparent bg-accent text-accent-foreground">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-accent-foreground/80">Hoy</span>
-            <ListChecks className="h-4 w-4 text-accent-foreground/70" strokeWidth={2} />
+      <div className="grid grid-cols-2 gap-5">
+        <Card className="flex aspect-[4/5] flex-col justify-between border-transparent bg-accent text-accent-foreground">
+          <div>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">
+              <ListChecks className="h-5 w-5 text-white" strokeWidth={2} />
+            </span>
+            <p className="mt-3 text-sm font-medium text-accent-foreground/80">Hoy</p>
+            <p className="text-xs text-accent-foreground/60">Tu progreso del día</p>
           </div>
           {todayPlan && todayPlan.items.length > 0 ? (
             <div>
               <p className="flex items-baseline gap-1.5">
-                <span className="text-3xl font-bold tabular-nums">{todayCompletedMinutes}</span>
+                <span className="text-5xl font-bold tabular-nums">{todayCompletedMinutes}</span>
                 <span className="text-sm text-accent-foreground/70">/{todayTotalMinutes} min</span>
               </p>
-              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-white/20">
+              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/20">
                 <div className="h-full rounded-full bg-white" style={{ width: `${todayProgressPct}%` }} />
               </div>
             </div>
@@ -183,12 +188,15 @@ export default async function DashboardHomePage() {
             <p className="text-sm text-accent-foreground/80">Genera tu plan para ver tu avance.</p>
           )}
         </Card>
-        <Card className="flex aspect-square flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-muted">Materias</span>
-            <BookOpen className="h-4 w-4 text-accent" strokeWidth={2} />
+        <Card className="flex aspect-[4/5] flex-col justify-between">
+          <div>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent">
+              <BookOpen className="h-5 w-5" strokeWidth={2} />
+            </span>
+            <p className="mt-3 text-sm font-medium text-muted">Materias</p>
+            <p className="text-xs text-subtle">Todo lo que cursas</p>
           </div>
-          <p className="text-3xl font-bold tabular-nums text-foreground">{subjects.length}</p>
+          <p className="text-5xl font-bold tabular-nums text-foreground">{subjects.length}</p>
         </Card>
       </div>
 
@@ -198,14 +206,14 @@ export default async function DashboardHomePage() {
             <ListChecks className="h-3.5 w-3.5 text-accent" strokeWidth={2} />
             Tareas pendientes
           </span>
-          <p className="text-2xl font-bold tabular-nums text-foreground">{assignments.length}</p>
+          <p className="text-3xl font-bold tabular-nums text-foreground">{assignments.length}</p>
         </div>
         <div className="flex flex-col gap-1 px-5 py-4">
           <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
             <Target className="h-3.5 w-3.5 text-accent" strokeWidth={2} />
             Exámenes próximos
           </span>
-          <p className="text-2xl font-bold tabular-nums text-foreground">{exams.length}</p>
+          <p className="text-3xl font-bold tabular-nums text-foreground">{exams.length}</p>
         </div>
       </Card>
 
