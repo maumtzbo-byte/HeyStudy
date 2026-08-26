@@ -77,13 +77,22 @@ export async function registroAction(_prevState: AuthActionState, formData: Form
   const requestHeaders = await headers();
   const origin = requestHeaders.get("origin");
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: { emailRedirectTo: `${origin}/auth/callback` },
   });
   if (error) {
     return { error: error.message };
+  }
+
+  // Cuando el correo ya tiene una cuenta confirmada, signUp no lanza error
+  // ni manda nada — Supabase devuelve un usuario "obfuscado" con identities
+  // vacío a propósito, para no filtrar qué correos existen. Sin este check
+  // mandábamos igual a "verificar-correo", prometiendo un enlace que nunca
+  // llega porque no hay nada que confirmar.
+  if (data.user && data.user.identities && data.user.identities.length === 0) {
+    return { error: "Ya existe una cuenta con este correo. Inicia sesión en vez de registrarte." };
   }
 
   redirect("/verificar-correo");
