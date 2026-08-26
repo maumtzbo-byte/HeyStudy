@@ -31,9 +31,18 @@ export default async function MateriasPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {subjects.map((subject) => (
             <Link key={subject.id} href={`/dashboard/materias/${subject.id}`}>
-              <Card className="h-full transition-colors hover:border-accent/40">
-                <div className="mb-3 flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: subject.color }} />
+              <Card
+                className="h-full border-t-4 transition-colors hover:border-accent/40"
+                style={{ borderTopColor: subject.color }}
+              >
+                <div className="mb-3 flex items-center gap-3">
+                  <span
+                    aria-hidden
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
+                    style={{ backgroundColor: subject.color }}
+                  >
+                    {subject.name.charAt(0).toUpperCase()}
+                  </span>
                   <CardTitle>{subject.name}</CardTitle>
                   {subject._count.customTutors > 0 && (
                     <span

@@ -16,18 +16,27 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 // transform, no sólo la transición, para que quien pidió menos movimiento
 // no reciba ni el salto instantáneo.
 const baseClasses = cn(
-  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 ease-out",
-  "active:translate-y-0 active:scale-[0.97] motion-reduce:active:scale-100",
+  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-100 ease-out",
+  "active:scale-[0.97] motion-reduce:active:scale-100",
   "disabled:pointer-events-none disabled:opacity-50",
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
 );
 
+// primary/danger llevan el botón "tecla" (estilo Duolingo): un borde sólido
+// abajo que hace de sombra dura, no difusa, así el botón se lee como un
+// objeto con volumen en vez de una superficie plana con blur. Al soltar, se
+// hunde (translate-y) y el borde se acorta — la misma física que un botón
+// físico, sin usar scale (eso ya lo cubre el active:scale de baseClasses,
+// mezclarlo aquí se sentía como doble rebote). motion-reduce cancela el
+// hundido igual que cancela el scale.
 const variantClasses: Record<Variant, string> = {
-  primary: "bg-accent text-accent-foreground shadow-sm hover:-translate-y-px hover:bg-accent-hover hover:shadow-md",
+  primary:
+    "bg-accent text-accent-foreground border-b-4 border-accent-hover hover:brightness-105 active:translate-y-1 active:border-b-0 motion-reduce:active:translate-y-0",
   secondary:
     "border border-border-strong/60 bg-surface text-foreground hover:-translate-y-px hover:border-border-strong hover:bg-surface-elevated hover:shadow-sm",
   ghost: "text-foreground hover:bg-border/40",
-  danger: "bg-danger text-white hover:-translate-y-px hover:opacity-90 hover:shadow-md",
+  danger:
+    "bg-danger text-white border-b-4 border-danger/60 hover:brightness-105 active:translate-y-1 active:border-b-0 motion-reduce:active:translate-y-0",
 };
 
 const sizeClasses: Record<Size, string> = {

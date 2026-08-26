@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Flame } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listSubjects } from "@/services/subjects/subjectService";
@@ -102,9 +103,12 @@ export default async function DashboardHomePage() {
           <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>
         </div>
         {streak > 0 && (
-          <span className="flex items-center gap-1.5 rounded-full bg-warning/10 px-3 py-1.5 text-sm font-medium text-warning">
-            <Flame className="h-4 w-4" />
-            {streak} {streak === 1 ? "día seguido" : "días seguidos"}
+          <span className="flex items-center gap-2 rounded-2xl border-b-4 border-warning/30 bg-warning/10 px-4 py-2.5 text-warning">
+            <Flame className="h-6 w-6 shrink-0" strokeWidth={2} />
+            <span className="flex items-baseline gap-1.5">
+              <span className="text-xl font-bold tabular-nums">{streak}</span>
+              <span className="text-sm font-semibold">{streak === 1 ? "día seguido" : "días seguidos"}</span>
+            </span>
           </span>
         )}
       </div>
@@ -184,13 +188,25 @@ export default async function DashboardHomePage() {
             <GeneratePlanForm regenerate />
           </Card>
         ) : (
-          <Card className="flex flex-col gap-3">
-            <CardTitle>Todavía no tienes un plan para hoy</CardTitle>
-            <CardDescription>
-              Con lo que hayas diagnosticado, armamos qué estudiar hoy y por qué. Si no has diagnosticado ningún
-              tema todavía, hazlo primero desde el mapa de conocimiento de una materia.
-            </CardDescription>
-            <GeneratePlanForm />
+          <Card className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:text-left">
+            <Image
+              src="/mascot/mascota-lectura.png"
+              alt=""
+              aria-hidden
+              width={139}
+              height={111}
+              className="h-20 w-auto shrink-0"
+            />
+            <div className="flex flex-col gap-3">
+              <div>
+                <CardTitle>Todavía no tienes un plan para hoy</CardTitle>
+                <CardDescription>
+                  Con lo que hayas diagnosticado, armamos qué estudiar hoy y por qué. Si no has diagnosticado
+                  ningún tema todavía, hazlo primero desde el mapa de conocimiento de una materia.
+                </CardDescription>
+              </div>
+              <GeneratePlanForm />
+            </div>
           </Card>
         )}
       </section>
