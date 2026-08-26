@@ -74,6 +74,12 @@ export default async function DashboardHomePage() {
     itemsWithTopic.forEach((item, i) => videosByItemId.set(item.id, results[i]));
   }
 
+  const todayCompletedMinutes =
+    todayPlan?.items.filter((item) => item.completed).reduce((sum, item) => sum + item.minutes, 0) ?? 0;
+  const todayTotalMinutes = todayPlan?.items.reduce((sum, item) => sum + item.minutes, 0) ?? 0;
+  const todayCompletedCount = todayPlan?.items.filter((item) => item.completed).length ?? 0;
+  const todayProgressPct = todayTotalMinutes > 0 ? Math.round((todayCompletedMinutes / todayTotalMinutes) * 100) : 0;
+
   const todoItems = [
     ...assignments.map((a) => ({
       id: a.id,
@@ -95,22 +101,47 @@ export default async function DashboardHomePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
-            Hola, {studentProfile.displayName.split(" ")[0]}
-          </h1>
-          <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>
-        </div>
-        {streak > 0 && (
-          <span className="flex items-center gap-2 rounded-2xl border-b-4 border-warning/30 bg-warning/10 px-4 py-2.5 text-warning">
-            <Flame className="h-6 w-6 shrink-0" strokeWidth={2} />
-            <span className="flex items-baseline gap-1.5">
-              <span className="text-xl font-bold tabular-nums">{streak}</span>
-              <span className="text-sm font-semibold">{streak === 1 ? "día seguido" : "días seguidos"}</span>
-            </span>
-          </span>
-        )}
+      <div>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          Hola, {studentProfile.displayName.split(" ")[0]}
+        </h1>
+        <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>
+      </div>
+
+      {/* Vistazo rápido: dos números que sí cambian día a día (a diferencia
+          de materias/tareas/exámenes, que son conteos casi estáticos y ya
+          se desglosan abajo). */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card className="flex flex-col justify-between sm:col-span-2">
+          <h2 className="text-sm font-medium text-muted">Tu plan de hoy</h2>
+          {todayPlan && todayPlan.items.length > 0 ? (
+            <>
+              <p className="mt-3 flex items-baseline gap-1.5">
+                <span className="text-4xl font-bold tabular-nums text-foreground">{todayCompletedMinutes}</span>
+                <span className="text-lg text-muted">/{todayTotalMinutes} min</span>
+              </p>
+              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-border">
+                <div className="h-full rounded-full bg-accent" style={{ width: `${todayProgressPct}%` }} />
+              </div>
+              <p className="mt-2 text-xs text-muted">
+                {todayCompletedCount}/{todayPlan.items.length} temas completados
+              </p>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-muted">Genera tu plan para ver tu avance de hoy.</p>
+          )}
+        </Card>
+        <Card className="flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium text-muted">Racha</h2>
+            <Flame className="h-4 w-4 text-warning" strokeWidth={2} />
+          </div>
+          <p className="mt-3 flex items-baseline gap-1.5">
+            <span className="text-4xl font-bold tabular-nums text-foreground">{streak}</span>
+            <span className="text-sm text-muted">{streak === 1 ? "día" : "días"}</span>
+          </p>
+          <p className="mt-2 text-xs text-muted">{streak > 0 ? "Sigue así" : "Estudia hoy para empezar"}</p>
+        </Card>
       </div>
 
       {planUsage.plan === "FREE" && (
