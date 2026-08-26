@@ -79,7 +79,6 @@ export default async function DashboardHomePage() {
   const todayCompletedMinutes =
     todayPlan?.items.filter((item) => item.completed).reduce((sum, item) => sum + item.minutes, 0) ?? 0;
   const todayTotalMinutes = todayPlan?.items.reduce((sum, item) => sum + item.minutes, 0) ?? 0;
-  const todayCompletedCount = todayPlan?.items.filter((item) => item.completed).length ?? 0;
   const todayProgressPct = todayTotalMinutes > 0 ? Math.round((todayCompletedMinutes / todayTotalMinutes) * 100) : 0;
 
   // Últimos 7 días de racha, para la tira de puntos junto al número — mismo
@@ -135,88 +134,80 @@ export default async function DashboardHomePage() {
         </ButtonLink>
       </Card>
 
-      {/* Bento real: dos tarjetas grandes de color sólido (sin degradados,
-          sin fotos) arriba, tres tarjetas chicas con ícono abajo. Sustituye
-          por completo a la línea de texto que había antes — ahora Materias/
-          Tareas/Exámenes viven aquí, no en dos lugares distintos. */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="flex flex-col justify-between border-transparent bg-accent text-accent-foreground sm:col-span-2">
+      {/* Misma secuencia de formas que la referencia: rectángulo grande
+          (arriba) → rectángulo más chico, ancho completo → dos cuadrados
+          lado a lado → rectángulo ancho completo. Sustituye a la línea de
+          texto que había antes — Materias/Tareas/Exámenes viven aquí. */}
+      <Card className="border-transparent bg-warning text-white">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-white/80">Racha</span>
+          <Flame className="h-4 w-4 text-white/80" strokeWidth={2} />
+        </div>
+        <p className="mt-3 flex items-baseline gap-1.5">
+          <span className="text-4xl font-bold tabular-nums">{streak}</span>
+          <span className="text-sm text-white/70">{streak === 1 ? "día" : "días"}</span>
+        </p>
+        <div className="mt-3 flex gap-1.5">
+          {last7Days.map((day, i) => (
+            <span
+              key={i}
+              aria-hidden
+              className={cn(
+                "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold",
+                day.active ? "bg-white text-warning" : "bg-white/15 text-white/50",
+              )}
+            >
+              {day.letter}
+            </span>
+          ))}
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="flex aspect-square flex-col justify-between border-transparent bg-accent text-accent-foreground">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-accent-foreground/80">Tu plan de hoy</span>
+            <span className="text-sm font-medium text-accent-foreground/80">Hoy</span>
             <ListChecks className="h-4 w-4 text-accent-foreground/70" strokeWidth={2} />
           </div>
           {todayPlan && todayPlan.items.length > 0 ? (
-            <>
-              <p className="mt-3 flex items-baseline gap-1.5">
-                <span className="text-4xl font-bold tabular-nums">{todayCompletedMinutes}</span>
-                <span className="text-lg text-accent-foreground/70">/{todayTotalMinutes} min</span>
+            <div>
+              <p className="flex items-baseline gap-1.5">
+                <span className="text-3xl font-bold tabular-nums">{todayCompletedMinutes}</span>
+                <span className="text-sm text-accent-foreground/70">/{todayTotalMinutes} min</span>
               </p>
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/20">
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-white/20">
                 <div className="h-full rounded-full bg-white" style={{ width: `${todayProgressPct}%` }} />
               </div>
-              <p className="mt-2 text-xs text-accent-foreground/70">
-                {todayCompletedCount}/{todayPlan.items.length} temas completados
-              </p>
-            </>
+            </div>
           ) : (
-            <p className="mt-3 text-sm text-accent-foreground/80">Genera tu plan para ver tu avance de hoy.</p>
+            <p className="text-sm text-accent-foreground/80">Genera tu plan para ver tu avance.</p>
           )}
         </Card>
-        <Card className="flex flex-col justify-between border-transparent bg-warning text-white">
+        <Card className="flex aspect-square flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-white/80">Racha</span>
-            <Flame className="h-4 w-4 text-white/80" strokeWidth={2} />
+            <span className="text-sm font-medium text-muted">Materias</span>
+            <BookOpen className="h-4 w-4 text-accent" strokeWidth={2} />
           </div>
-          <p className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-4xl font-bold tabular-nums">{streak}</span>
-            <span className="text-sm text-white/70">{streak === 1 ? "día" : "días"}</span>
-          </p>
-          <div className="mt-3 flex gap-1.5">
-            {last7Days.map((day, i) => (
-              <span
-                key={i}
-                aria-hidden
-                className={cn(
-                  "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold",
-                  day.active ? "bg-white text-warning" : "bg-white/15 text-white/50",
-                )}
-              >
-                {day.letter}
-              </span>
-            ))}
-          </div>
+          <p className="text-3xl font-bold tabular-nums text-foreground">{subjects.length}</p>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-            <BookOpen className="h-5 w-5" strokeWidth={1.75} />
+      <Card className="grid grid-cols-2 divide-x divide-border p-0">
+        <div className="flex flex-col gap-1 px-5 py-4">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+            <ListChecks className="h-3.5 w-3.5 text-accent" strokeWidth={2} />
+            Tareas pendientes
           </span>
-          <div>
-            <p className="text-2xl font-bold tabular-nums text-foreground">{subjects.length}</p>
-            <p className="text-xs text-muted">Materias</p>
-          </div>
-        </Card>
-        <Card className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-            <ListChecks className="h-5 w-5" strokeWidth={1.75} />
+          <p className="text-2xl font-bold tabular-nums text-foreground">{assignments.length}</p>
+        </div>
+        <div className="flex flex-col gap-1 px-5 py-4">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+            <Target className="h-3.5 w-3.5 text-accent" strokeWidth={2} />
+            Exámenes próximos
           </span>
-          <div>
-            <p className="text-2xl font-bold tabular-nums text-foreground">{assignments.length}</p>
-            <p className="text-xs text-muted">Tareas pendientes</p>
-          </div>
-        </Card>
-        <Card className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-            <Target className="h-5 w-5" strokeWidth={1.75} />
-          </span>
-          <div>
-            <p className="text-2xl font-bold tabular-nums text-foreground">{exams.length}</p>
-            <p className="text-xs text-muted">Exámenes próximos</p>
-          </div>
-        </Card>
-      </div>
+          <p className="text-2xl font-bold tabular-nums text-foreground">{exams.length}</p>
+        </div>
+      </Card>
 
       {planUsage.plan === "FREE" && (
         <PlanUsageCard diagnosticsUsed={planUsage.diagnosticsUsed} diagnosticsLimit={planUsage.diagnosticsLimit} />
