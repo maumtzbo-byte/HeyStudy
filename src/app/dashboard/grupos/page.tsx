@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Users, Share2 } from "lucide-react";
+import { Users, Share2, ShieldCheck } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listMyGroups } from "@/services/groups/studyGroupService";
 import { CreateGroupForm, JoinGroupForm } from "@/components/groups/GroupForms";
@@ -76,10 +76,13 @@ export default async function GruposPage() {
         </Card>
       )}
 
-      <p className="rounded-xl border border-border bg-background px-4 py-3 text-xs text-muted">
-        <strong className="text-foreground">Qué ve tu grupo:</strong> tu nombre, cuánto tiempo llevas estudiado y tu
-        avance en el ranking, más los planes que compartas a propósito. Tus diagnósticos, tu mapa de conocimiento, tus
-        patrones de error y tus calificaciones nunca se comparten.
+      <p className="flex items-start gap-2 text-xs text-subtle">
+        <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
+        <span>
+          <strong className="font-medium text-muted">Qué ve tu grupo:</strong> tu nombre, cuánto tiempo llevas
+          estudiado y tu avance en el ranking, más los planes que compartas a propósito. Tus diagnósticos, tu mapa de
+          conocimiento, tus patrones de error y tus calificaciones nunca se comparten.
+        </span>
       </p>
     </div>
   );

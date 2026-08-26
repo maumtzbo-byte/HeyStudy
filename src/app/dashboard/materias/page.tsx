@@ -33,7 +33,7 @@ export default async function MateriasPage() {
             <Link key={subject.id} href={`/dashboard/materias/${subject.id}`}>
               <Card
                 className="h-full border-t-4 transition-colors hover:border-accent/40"
-                style={{ borderTopColor: subject.color }}
+                style={{ borderTopColor: subject.color, backgroundColor: `${subject.color}0d` }}
               >
                 <div className="mb-3 flex items-center gap-3">
                   <span
