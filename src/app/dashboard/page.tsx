@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Flame, Target, ListChecks } from "lucide-react";
+import { Flame, Target, ListChecks, BookOpen } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listSubjects } from "@/services/subjects/subjectService";
 import { listUpcomingAssignments } from "@/services/assignments/assignmentService";
@@ -77,6 +77,8 @@ export default async function DashboardHomePage() {
   const todayCompletedMinutes =
     todayPlan?.items.filter((item) => item.completed).reduce((sum, item) => sum + item.minutes, 0) ?? 0;
   const todayTotalMinutes = todayPlan?.items.reduce((sum, item) => sum + item.minutes, 0) ?? 0;
+  const todayCompletedCount = todayPlan?.items.filter((item) => item.completed).length ?? 0;
+  const todayProgressPct = todayTotalMinutes > 0 ? Math.round((todayCompletedMinutes / todayTotalMinutes) * 100) : 0;
 
   const todoItems = [
     ...assignments.map((a) => ({
@@ -106,58 +108,78 @@ export default async function DashboardHomePage() {
         <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>
       </div>
 
-      {/* Una sola tarjeta compacta, no dos: en celular todo se apila, y dos
-          tarjetas grandes (una de ellas casi vacía sin plan) duplicaban la
-          sección "Tu plan de hoy" de abajo y hacían la página kilométrica. */}
-      <Card className="grid grid-cols-2 divide-x divide-border p-0">
-        <div className="flex flex-col gap-1 px-5 py-4">
-          <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
-            <Flame className="h-3.5 w-3.5 text-warning" strokeWidth={2} />
-            Racha
-          </span>
-          <p className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold tabular-nums text-foreground">{streak}</span>
-            <span className="text-sm text-muted">{streak === 1 ? "día" : "días"}</span>
-          </p>
-        </div>
-        <div className="flex flex-col gap-1 px-5 py-4">
-          <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
-            <ListChecks className="h-3.5 w-3.5 text-accent" strokeWidth={2} />
-            Minutos hoy
-          </span>
+      {/* Bento real: dos tarjetas grandes de color sólido (sin degradados,
+          sin fotos) arriba, tres tarjetas chicas con ícono abajo. Sustituye
+          por completo a la línea de texto que había antes — ahora Materias/
+          Tareas/Exámenes viven aquí, no en dos lugares distintos. */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card className="flex flex-col justify-between border-transparent bg-accent text-accent-foreground sm:col-span-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-accent-foreground/80">Tu plan de hoy</span>
+            <ListChecks className="h-4 w-4 text-accent-foreground/70" strokeWidth={2} />
+          </div>
           {todayPlan && todayPlan.items.length > 0 ? (
-            <p className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold tabular-nums text-foreground">{todayCompletedMinutes}</span>
-              <span className="text-sm text-muted">/{todayTotalMinutes}</span>
-            </p>
+            <>
+              <p className="mt-3 flex items-baseline gap-1.5">
+                <span className="text-4xl font-bold tabular-nums">{todayCompletedMinutes}</span>
+                <span className="text-lg text-accent-foreground/70">/{todayTotalMinutes} min</span>
+              </p>
+              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/20">
+                <div className="h-full rounded-full bg-white" style={{ width: `${todayProgressPct}%` }} />
+              </div>
+              <p className="mt-2 text-xs text-accent-foreground/70">
+                {todayCompletedCount}/{todayPlan.items.length} temas completados
+              </p>
+            </>
           ) : (
-            <p className="mt-1 text-sm text-muted">Sin plan</p>
+            <p className="mt-3 text-sm text-accent-foreground/80">Genera tu plan para ver tu avance de hoy.</p>
           )}
-        </div>
-      </Card>
+        </Card>
+        <Card className="flex flex-col justify-between border-transparent bg-warning text-white">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-white/80">Racha</span>
+            <Flame className="h-4 w-4 text-white/80" strokeWidth={2} />
+          </div>
+          <p className="mt-3 flex items-baseline gap-1.5">
+            <span className="text-4xl font-bold tabular-nums">{streak}</span>
+            <span className="text-sm text-white/70">{streak === 1 ? "día" : "días"}</span>
+          </p>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+            <BookOpen className="h-5 w-5" strokeWidth={1.75} />
+          </span>
+          <div>
+            <p className="text-2xl font-bold tabular-nums text-foreground">{subjects.length}</p>
+            <p className="text-xs text-muted">Materias</p>
+          </div>
+        </Card>
+        <Card className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+            <ListChecks className="h-5 w-5" strokeWidth={1.75} />
+          </span>
+          <div>
+            <p className="text-2xl font-bold tabular-nums text-foreground">{assignments.length}</p>
+            <p className="text-xs text-muted">Tareas pendientes</p>
+          </div>
+        </Card>
+        <Card className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+            <Target className="h-5 w-5" strokeWidth={1.75} />
+          </span>
+          <div>
+            <p className="text-2xl font-bold tabular-nums text-foreground">{exams.length}</p>
+            <p className="text-xs text-muted">Exámenes próximos</p>
+          </div>
+        </Card>
+      </div>
 
       {planUsage.plan === "FREE" && (
         <PlanUsageCard diagnosticsUsed={planUsage.diagnosticsUsed} diagnosticsLimit={planUsage.diagnosticsLimit} />
       )}
-
-      {/* Una línea de contexto en vez de tres tarjetas iguales con un número
-          gigante: ese layout es plantilla de panel de administración y aquí
-          ni siquiera aporta, porque los mismos datos salen desglosados
-          justo abajo. */}
-      <dl className="flex flex-wrap gap-x-10 gap-y-3 border-y border-border py-4">
-        <div className="flex items-baseline gap-2">
-          <dt className="text-sm text-muted">Materias</dt>
-          <dd className="text-sm font-semibold text-foreground tabular-nums">{subjects.length}</dd>
-        </div>
-        <div className="flex items-baseline gap-2">
-          <dt className="text-sm text-muted">Tareas pendientes</dt>
-          <dd className="text-sm font-semibold text-foreground tabular-nums">{assignments.length}</dd>
-        </div>
-        <div className="flex items-baseline gap-2">
-          <dt className="text-sm text-muted">Exámenes próximos</dt>
-          <dd className="text-sm font-semibold text-foreground tabular-nums">{exams.length}</dd>
-        </div>
-      </dl>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Qué tan preparado estás</h2>
