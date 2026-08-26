@@ -93,7 +93,7 @@ function VideoScrubBackground() {
       muted
       playsInline
       preload="auto"
-      className="fixed inset-0 z-0 h-full w-full object-cover"
+      className="absolute inset-0 z-0 h-full w-full object-cover"
       style={{ objectPosition: "70% center" }}
     />
   );
@@ -111,10 +111,10 @@ export function MainframeHero() {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative h-screen overflow-hidden">
       <VideoScrubBackground />
 
-      <section className="relative z-[1] flex h-screen flex-col justify-end overflow-hidden px-5 pb-12 sm:px-8 md:justify-center md:px-10 md:pb-0">
+      <section className="relative z-[1] flex h-full flex-col justify-end px-5 pb-12 sm:px-8 md:justify-center md:px-10 md:pb-0">
         <div className="relative z-10 max-w-xl">
           <p
             aria-hidden
