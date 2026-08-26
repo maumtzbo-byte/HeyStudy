@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/dashboard/materias", label: "Materias" },
   { href: "/dashboard/tutores", label: "Tutores" },
   { href: "/dashboard/grupos", label: "Grupos" },
+  { href: "/dashboard/amigos", label: "Amigos" },
   { href: "/dashboard/resumen", label: "Resumen" },
 ];
 

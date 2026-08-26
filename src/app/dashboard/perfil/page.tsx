@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import {
   updateWeeklyReportEnabledAction,
@@ -11,6 +12,7 @@ import { StudyMethodForm } from "@/components/account/StudyMethodForm";
 import { ReviewRemindersToggle } from "@/components/account/ReviewRemindersToggle";
 import { EmailToggle } from "@/components/account/EmailToggle";
 import { ParentEmailForm } from "@/components/account/ParentEmailForm";
+import { UsernameForm } from "@/components/account/UsernameForm";
 import { CopyReferralLink } from "@/components/account/CopyReferralLink";
 import { getReferralStats, REFERRAL_REWARD_DAYS } from "@/services/referrals/referralService";
 
@@ -85,6 +87,21 @@ export default async function PerfilPage() {
             enabled={studentProfile.parentReportEnabled}
             label="Mandarle un resumen semanal"
           />
+        </Card>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <p className="text-xs font-semibold tracking-[0.14em] text-muted uppercase">Amigos</p>
+
+        <Card className="flex flex-col gap-3">
+          <CardTitle>Tu usuario</CardTitle>
+          <CardDescription>
+            Elige un @usuario para que tus amigos te agreguen sin necesitar tu correo ni tu nombre real.
+          </CardDescription>
+          <UsernameForm currentUsername={studentProfile.username} />
+          <Link href="/dashboard/amigos" className="text-sm font-medium text-accent hover:underline">
+            Ver mis amigos →
+          </Link>
         </Card>
       </section>
 

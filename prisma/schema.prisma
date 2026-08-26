@@ -84,6 +84,10 @@ model StudentProfile {
   referredByStudentProfileId String?       @db.Uuid
   referredBy                StudentProfile? @relation("Referrals", fields: [referredByStudentProfileId], references: [id], onDelete: SetNull)
   referrals                 StudentProfile[] @relation("Referrals")
+  // @handle público y estable para que te puedan agregar de amigo sin
+  // exponer tu correo o nombre real. Null hasta que lo elijas desde el
+  // perfil — no se pide en el registro para no meter fricción al onboarding.
+  username                  String?        @unique
   onboardedAt              DateTime?
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
@@ -100,6 +104,9 @@ model StudentProfile {
   ownedStudyGroups  StudyGroup[]       @relation("StudyGroupOwner")
   studyGroupMembers StudyGroupMember[]
   sharedStudyPlans  SharedStudyPlan[]
+
+  friendshipsSent     Friendship[] @relation("FriendshipRequester")
+  friendshipsReceived Friendship[] @relation("FriendshipAddressee")
 
   @@map("student_profiles")
 }
@@ -168,6 +175,31 @@ model SharedStudyPlan {
   @@unique([studyPlanId, studyGroupId])
   @@index([studyGroupId])
   @@map("shared_study_plans")
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+}
+
+// Conexión 1 a 1 fuera de los grupos de estudio (que son para competir/
+// rankear). Se agrega por @username exacto, nunca por búsqueda libre de
+// nombre o correo — mismo criterio de privacidad que StudyGroup: buscar por
+// identidad real permitiría averiguar quién tiene cuenta en HeyStudy.
+model Friendship {
+  id          String           @id @default(uuid()) @db.Uuid
+  requesterId String           @db.Uuid
+  requester   StudentProfile   @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String           @db.Uuid
+  addressee   StudentProfile   @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  respondedAt DateTime?
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId])
+  @@map("friendships")
 }
 
 // ---------------------------------------------------------------------------

@@ -14,6 +14,8 @@ import {
   updateParentEmail,
   updateParentReportEnabled,
 } from "@/services/profile/profileService";
+import { updateUsername } from "@/services/friends/friendService";
+import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { studyMethods } from "@/lib/validation/onboardingSchemas";
 import { runAction, type ActionResult, UserFacingError } from "@/lib/actions/result";
 
@@ -100,6 +102,18 @@ export async function updateParentReportEnabledAction(
     const enabled = formData.get("parentReportEnabled") === "on";
     await updateParentReportEnabled(user.id, enabled);
     revalidatePath("/dashboard/perfil");
+  });
+}
+
+export async function updateUsernameAction(
+  _prev: ActionResult | undefined,
+  formData: FormData,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    const { studentProfile } = await requireStudentProfile();
+    await updateUsername(studentProfile.id, String(formData.get("username") ?? ""));
+    revalidatePath("/dashboard/perfil");
+    revalidatePath("/dashboard/amigos");
   });
 }
 
