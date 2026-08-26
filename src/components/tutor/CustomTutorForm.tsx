@@ -86,10 +86,10 @@ export function CustomTutorForm({
               onClick={() => setEmoji(option)}
               aria-label={`Usar ícono ${option}`}
               aria-pressed={emoji === option}
-              className={`flex h-10 w-10 items-center justify-center rounded-xl border text-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
+              className={`flex h-11 w-11 items-center justify-center rounded-xl border text-lg transition-all duration-100 ease-out active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
                 emoji === option
-                  ? "border-accent bg-accent-soft"
-                  : "border-border bg-background hover:border-border-strong"
+                  ? "border-accent bg-accent shadow-sm"
+                  : "border-border bg-background hover:border-border-strong hover:bg-surface-elevated"
               }`}
             >
               {option}

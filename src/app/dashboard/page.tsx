@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Flame } from "lucide-react";
+import { Flame, Target, ListChecks } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listSubjects } from "@/services/subjects/subjectService";
 import { listUpcomingAssignments } from "@/services/assignments/assignmentService";
@@ -139,7 +139,8 @@ export default async function DashboardHomePage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Qué tan preparado estás</h2>
         {examReadiness.length === 0 ? (
-          <Card className="text-center">
+          <Card className="flex items-center gap-3">
+            <Target className="h-5 w-5 shrink-0 text-subtle" strokeWidth={1.75} />
             <CardDescription>No tienes exámenes próximos registrados.</CardDescription>
           </Card>
         ) : (
@@ -214,7 +215,8 @@ export default async function DashboardHomePage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-foreground">Tareas y exámenes próximos</h2>
         {todoItems.length === 0 ? (
-          <Card className="text-center">
+          <Card className="flex items-center gap-3">
+            <ListChecks className="h-5 w-5 shrink-0 text-subtle" strokeWidth={1.75} />
             <CardDescription>
               No tienes tareas ni exámenes próximos. Ve a{" "}
               <Link href="/dashboard/materias" className="font-medium text-accent">

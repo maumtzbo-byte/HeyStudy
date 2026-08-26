@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Trophy, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Trophy, Clock, CheckCircle2, Share2 } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getStudyGroupDetail } from "@/services/groups/studyGroupService";
 import { UserFacingError } from "@/lib/actions/result";
 import { ShareTodayPlanButton, UnshareButton, LeaveGroupButton } from "@/components/groups/GroupActions";
-import { Card } from "@/components/ui/Card";
+import { Card, CardDescription } from "@/components/ui/Card";
 import { cn } from "@/lib/utils/cn";
 import { formatDate } from "@/lib/format";
 
@@ -130,9 +130,10 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
       <section>
         <h2 className="mb-4 text-base font-semibold text-foreground">Planes compartidos</h2>
         {group.sharedPlans.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted">
-            Nadie ha compartido un plan todavía. Sé el primero.
-          </p>
+          <Card className="flex items-center gap-3">
+            <Share2 className="h-5 w-5 shrink-0 text-subtle" strokeWidth={1.75} />
+            <CardDescription>Nadie ha compartido un plan todavía. Sé el primero.</CardDescription>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {group.sharedPlans.map((plan) => (

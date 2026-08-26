@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Users, Share2 } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listMyGroups } from "@/services/groups/studyGroupService";
 import { CreateGroupForm, JoinGroupForm } from "@/components/groups/GroupForms";
-import { Card } from "@/components/ui/Card";
+import { Card, CardDescription } from "@/components/ui/Card";
 
 export const metadata: Metadata = { title: "Grupos de estudio — HeyStudy" };
 
@@ -62,9 +63,17 @@ export default async function GruposPage() {
       </div>
 
       {groups.length === 0 && (
-        <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted">
-          Todavía no estás en ningún grupo. Crea uno y pásale el código a tus compañeros.
-        </p>
+        <Card className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+          <Image
+            src="/mascot/mascota-saludo.png"
+            alt=""
+            aria-hidden
+            width={132}
+            height={99}
+            className="h-16 w-auto shrink-0"
+          />
+          <CardDescription>Todavía no estás en ningún grupo. Crea uno y pásale el código a tus compañeros.</CardDescription>
+        </Card>
       )}
 
       <p className="rounded-xl border border-border bg-background px-4 py-3 text-xs text-muted">

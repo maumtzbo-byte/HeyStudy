@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { Pencil, Trash2 } from "lucide-react";
 import { deleteTutorAction } from "@/app/dashboard/tutores/actions";
 import { CustomTutorForm, type TutorFormValues } from "@/components/tutor/CustomTutorForm";
 import { Button } from "@/components/ui/Button";
+import { Card, CardDescription } from "@/components/ui/Card";
 import type { TutorMode } from "@/services/ai/types";
 
 const MODE_LABEL: Record<TutorMode, string> = {
@@ -41,9 +43,17 @@ export function CustomTutorList({
 
   if (tutors.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted">
-        Todavía no tienes tutores propios. Crea uno para que te explique a tu manera.
-      </p>
+      <Card className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+        <Image
+          src="/mascot/mascota-feliz.png"
+          alt=""
+          aria-hidden
+          width={139}
+          height={104}
+          className="h-16 w-auto shrink-0"
+        />
+        <CardDescription>Todavía no tienes tutores propios. Crea uno para que te explique a tu manera.</CardDescription>
+      </Card>
     );
   }
 
