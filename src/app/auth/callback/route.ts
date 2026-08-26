@@ -18,5 +18,11 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=No se pudo iniciar sesión`);
+  // Cuando el token ya se usó o expiró, Supabase redirige aquí con
+  // error_description en vez de code — mostrarlo tal cual (en vez de un
+  // genérico "no se pudo iniciar sesión") le dice al estudiante que pida
+  // un enlace nuevo en lugar de reintentar el mismo sin saber por qué falla.
+  const description = searchParams.get("error_description");
+  const message = description ? description.replace(/\+/g, " ") : "No se pudo iniciar sesión";
+  return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(message)}`);
 }
