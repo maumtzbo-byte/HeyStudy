@@ -59,7 +59,10 @@ export function Comparison() {
       {/* Móvil — una tarjeta por criterio, las cuatro respuestas a la vista */}
       <ul className="flex flex-col gap-3 md:hidden">
         {ROWS.map(({ feature, values }) => (
-          <li key={feature} className="rounded-2xl border border-border bg-background p-4">
+          <li
+            key={feature}
+            className="rounded-2xl border border-border bg-background p-4 shadow-xs transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md"
+          >
             <p className="text-sm font-medium text-foreground">{feature}</p>
             <div className="mt-4 grid grid-cols-4 gap-2">
               {values.map((v, i) => (

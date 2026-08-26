@@ -44,10 +44,10 @@ export function Pricing() {
         <div
           key={plan.name}
           className={cn(
-            "relative flex h-full flex-col rounded-xl border p-7 sm:p-8",
+            "relative flex h-full flex-col rounded-xl border p-7 transition-all duration-200 ease-out hover:-translate-y-0.5 sm:p-8",
             plan.highlighted
-              ? "border-accent/40 bg-surface shadow-lg"
-              : "border-border bg-surface shadow-sm",
+              ? "border-accent/40 bg-surface shadow-lg hover:shadow-xl"
+              : "border-border bg-surface shadow-sm hover:shadow-md",
           )}
         >
           {plan.highlighted && (

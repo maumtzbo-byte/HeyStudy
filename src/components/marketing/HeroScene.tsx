@@ -1,10 +1,13 @@
 "use client";
 
+import { useRef, type PointerEvent as ReactPointerEvent } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { ArrowRight, ChevronDown, PlayCircle } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { Mascot3D } from "@/components/marketing/Mascot3D";
+import { HEADING_HERO } from "@/lib/utils/typography";
+import { cn } from "@/lib/utils/cn";
 
 /* ----------------------------------------------------------------------- */
 /* Hero conducido por el personaje.                                         */
@@ -39,8 +42,42 @@ const POSES = [
 ];
 
 export function HeroScene() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduceMotion = useReducedMotion();
+
+  // Profundidad al hacer scroll: la mascota se encoge y sube un poco
+  // mientras el hero sale de pantalla, en vez de sólo desaparecer. Progreso
+  // 0→1 va de "hero recién entrando arriba" a "hero a punto de salir por
+  // arriba" — confinado al alto del propio hero, no toda la página.
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  const mascotY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : -36]);
+  const mascotScale = useTransform(scrollYProgress, [0, 1], [1, reduceMotion ? 1 : 0.94]);
+
+  // CTA "magnético": se acerca unos px al cursor dentro de su propio botón,
+  // mismo resorte que el tilt de la mascota (stiffness 140 / damping 18)
+  // para que se sienta como el mismo sistema de física en todo el hero.
+  const ctaX = useMotionValue(0);
+  const ctaY = useMotionValue(0);
+  const springConfig = { stiffness: 140, damping: 18, mass: 0.6 };
+  const ctaSpringX = useSpring(ctaX, springConfig);
+  const ctaSpringY = useSpring(ctaY, springConfig);
+
+  function handleCtaPointerMove(e: ReactPointerEvent<HTMLDivElement>) {
+    if (reduceMotion || e.pointerType === "touch") return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width - 0.5;
+    const relY = (e.clientY - rect.top) / rect.height - 0.5;
+    ctaX.set(relX * 12);
+    ctaY.set(relY * 12);
+  }
+
+  function resetCta() {
+    ctaX.set(0);
+    ctaY.set(0);
+  }
+
   return (
-    <section className="relative overflow-hidden bg-background">
+    <section ref={sectionRef} className="relative overflow-hidden bg-background">
       <motion.div
         variants={container}
         initial="hidden"
@@ -49,20 +86,22 @@ export function HeroScene() {
       >
         {/* La mascota entra primero y ocupa casi todo el ancho: es la única
             pieza de marca que el visitante reconoce antes de leer nada. */}
-        <motion.div variants={item}>
+        <motion.div variants={item} style={{ y: mascotY, scale: mascotScale }}>
           <Mascot3D className="w-[100vw] max-w-[32rem] sm:w-[30rem] sm:max-w-none lg:w-[37rem]" />
         </motion.div>
 
         {/* Acciones antes que titular, como en la referencia. */}
         <motion.div variants={item} className="mt-7 w-full max-w-sm sm:mt-9">
-          <ButtonLink
-            href="/registro"
-            size="lg"
-            className="w-full rounded-full shadow-[0_12px_32px_-8px_var(--accent)]"
+          <motion.div
+            onPointerMove={handleCtaPointerMove}
+            onPointerLeave={resetCta}
+            style={{ x: ctaSpringX, y: ctaSpringY }}
           >
-            Comenzar gratis
-            <ArrowRight className="h-4 w-4" strokeWidth={2} />
-          </ButtonLink>
+            <ButtonLink href="/registro" size="lg" className="w-full rounded-full">
+              Comenzar gratis
+              <ArrowRight className="h-4 w-4" strokeWidth={2} />
+            </ButtonLink>
+          </motion.div>
         </motion.div>
 
         <motion.a
@@ -93,10 +132,7 @@ export function HeroScene() {
           </p>
         </motion.div>
 
-        <motion.h1
-          variants={item}
-          className="mt-9 font-display text-[2.4rem] leading-[1.06] font-extrabold tracking-[-0.04em] text-foreground sm:mt-11 sm:text-6xl lg:text-[4.5rem]"
-        >
+        <motion.h1 variants={item} className={cn(HEADING_HERO, "mt-9 text-foreground sm:mt-11")}>
           {/* Los saltos van forzados: dejados al flujo, "intención." queda
               pegado a "No" y se pierde el ritmo de tres líneas del mockup. */}
           Estudia con

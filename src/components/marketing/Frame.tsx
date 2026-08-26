@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Reveal } from "@/components/marketing/Reveal";
 import { cn } from "@/lib/utils/cn";
+import { HEADING_SECTION } from "@/lib/utils/typography";
 
 /* ----------------------------------------------------------------------- */
 /* Frame — una sección = una idea = una prueba visual.                       */
@@ -71,9 +72,7 @@ export function FrameHeading({
           {eyebrow}
         </p>
       )}
-      <h2 className="mt-4 font-display text-[1.7rem] leading-[1.15] font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-[1.12]">
-        {title}
-      </h2>
+      <h2 className={cn(HEADING_SECTION, "mt-4 text-foreground")}>{title}</h2>
       {lead && <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">{lead}</p>}
     </Reveal>
   );

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function PrivacidadPage() {
   return (
-    <div className="flex flex-1 flex-col bg-background">
+    <div className="force-light flex flex-1 flex-col bg-background">
       <SiteHeader />
       <main className="flex-1 px-6 py-20 sm:px-8">
         <div className="mx-auto w-full max-w-2xl">

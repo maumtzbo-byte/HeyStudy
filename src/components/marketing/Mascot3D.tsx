@@ -105,42 +105,92 @@ export function Mascot3D({ className }: { className?: string }) {
         transition={reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
         className="relative"
       >
+        {/* Gesto periódico: un wiggle breve cada ~7s (rotate + scale), no
+            sólo la deriva ambiental de la flotación — lee como una reacción,
+            no como ruido. Va en su propio contenedor para no pelearse con
+            el tilt del cursor (capa siguiente, con sus propios motion
+            values) ni con el ciclo de la flotación (capa de arriba, otra
+            duración). */}
         <motion.div
-          style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+          animate={
+            reduceMotion
+              ? undefined
+              : { rotate: [0, 0, -4, 4, -2, 0, 0], scale: [1, 1, 1.03, 1.03, 1.01, 1, 1] }
+          }
+          transition={
+            reduceMotion
+              ? undefined
+              : { duration: 7, repeat: Infinity, ease: "easeInOut", times: [0, 0.5, 0.58, 0.68, 0.76, 0.85, 1] }
+          }
           className="relative"
         >
-          {/* 3 — el personaje */}
-          <div className="relative">
-            <Image
-              src="/mascot/mascota-feliz.png"
-              alt=""
-              aria-hidden
-              width={351}
-              height={263}
-              priority
-              className="pointer-events-none w-full"
-            />
+          <motion.div
+            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+            className="relative"
+          >
+            {/* 3 — el personaje */}
+            <div className="relative">
+              <Image
+                src="/mascot/mascota-feliz.png"
+                alt=""
+                aria-hidden
+                width={351}
+                height={263}
+                priority
+                className="pointer-events-none w-full"
+              />
 
-            {/* 4 — especular recortado a la silueta.
+              {/* Parpadeo: el PNG es una sola imagen plana, no hay capa de
+                  ojos aparte para animar — así que se simula con dos
+                  óvalos del mismo tono del parche de la cara que tapan cada
+                  ojo un instante. scaleY va de 0 (invisible) a 1 (ojo
+                  tapado) y de vuelta, casi todo el ciclo en 0 — el "times"
+                  concentra el parpadeo en menos del 10% del ciclo para que
+                  se sienta como un parpadeo real, no un tic. Posición en %
+                  calculada del centroide real de cada pupila (script de
+                  análisis de píxeles sobre este PNG, no a ojo) — left/top
+                  son el centro exacto, con translate(-50%,-50%) para que el
+                  óvalo quede centrado sobre el punto sin importar su tamaño. */}
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute h-[14%] w-[12%] origin-center rounded-full bg-[#fbf9f7]"
+                style={{ left: "38.1%", top: "46.4%", transform: "translate(-50%, -50%)" }}
+                animate={reduceMotion ? undefined : { scaleY: [0, 0, 1, 0, 0] }}
+                transition={
+                  reduceMotion ? undefined : { duration: 4.5, repeat: Infinity, ease: "easeInOut", times: [0, 0.9, 0.93, 0.96, 1] }
+                }
+              />
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute h-[14%] w-[12%] origin-center rounded-full bg-[#fbf9f7]"
+                style={{ left: "59.2%", top: "45.1%", transform: "translate(-50%, -50%)" }}
+                animate={reduceMotion ? undefined : { scaleY: [0, 0, 1, 0, 0] }}
+                transition={
+                  reduceMotion ? undefined : { duration: 4.5, repeat: Infinity, ease: "easeInOut", times: [0, 0.9, 0.93, 0.96, 1] }
+                }
+              />
 
-                El mask NO usa el PNG del personaje: apuntarlo ahí forzaba una
-                segunda descarga del original crudo (72 KB) porque next/image
-                sirve el hero como WebP desde otra URL — quince veces el peso
-                del hero por un brillo. mascota-feliz-mask.png es el mismo
-                canal alfa en PNG gris+alfa con RGB constante: 1.1 KB a
-                resolución completa, que es todo lo que el mask necesita. */}
-            <motion.div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 mix-blend-soft-light"
-              style={{
-                backgroundImage: shine,
-                maskImage: "url(/mascot/mascota-feliz-mask.png)",
-                WebkitMaskImage: "url(/mascot/mascota-feliz-mask.png)",
-                maskSize: "100% 100%",
-                WebkitMaskSize: "100% 100%",
-              }}
-            />
-          </div>
+              {/* 4 — especular recortado a la silueta.
+
+                  El mask NO usa el PNG del personaje: apuntarlo ahí forzaba una
+                  segunda descarga del original crudo (72 KB) porque next/image
+                  sirve el hero como WebP desde otra URL — quince veces el peso
+                  del hero por un brillo. mascota-feliz-mask.png es el mismo
+                  canal alfa en PNG gris+alfa con RGB constante: 1.1 KB a
+                  resolución completa, que es todo lo que el mask necesita. */}
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 mix-blend-soft-light"
+                style={{
+                  backgroundImage: shine,
+                  maskImage: "url(/mascot/mascota-feliz-mask.png)",
+                  WebkitMaskImage: "url(/mascot/mascota-feliz-mask.png)",
+                  maskSize: "100% 100%",
+                  WebkitMaskSize: "100% 100%",
+                }}
+              />
+            </div>
+          </motion.div>
         </motion.div>
       </motion.div>
 
