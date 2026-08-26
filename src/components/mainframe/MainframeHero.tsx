@@ -1,103 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTypewriter } from "@/lib/hooks/useTypewriter";
-
-const VIDEO_SRC =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4";
-const SENSITIVITY = 0.8;
+import { Mascot3D } from "@/components/marketing/Mascot3D";
 
 const PILLS = [
   { label: "Ver cómo funciona", href: "#como-funciona" },
   { label: "Ver precios", href: "#precios" },
   { label: "Preguntas frecuentes", href: "#preguntas" },
 ];
-
-function VideoScrubBackground() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const prevXRef = useRef(0);
-  const targetTimeRef = useRef(0);
-  const isSeekingRef = useRef(false);
-  const readyRef = useRef(false);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    function onLoadedMetadata() {
-      if (!video) return;
-      // Sin esto el <video> se queda en blanco en iOS Safari: pausado y
-      // sin haber reproducido nunca, no decodifica ni pinta ningún frame
-      // solo por cargar metadata o hacer un seek — necesita play() real
-      // (aunque sea una fracción de segundo) para arrancar el decoder.
-      // muted + playsInline es justo lo que permite que ese play() no
-      // choque con las políticas de autoplay.
-      video
-        .play()
-        .then(() => video.pause())
-        .catch(() => {
-          // Autoplay bloqueado igual: al menos intenta pintar el primer
-          // frame con un seek, que sí funciona en la mayoría de escritorio.
-          video.currentTime = 0.001;
-        })
-        .finally(() => {
-          readyRef.current = true;
-        });
-    }
-
-    function seekTo(time: number) {
-      if (!video) return;
-      isSeekingRef.current = true;
-      video.currentTime = time;
-    }
-
-    function onSeeked() {
-      if (video && Math.abs(video.currentTime - targetTimeRef.current) > 0.01) {
-        seekTo(targetTimeRef.current);
-      } else {
-        isSeekingRef.current = false;
-      }
-    }
-
-    function onMouseMove(e: MouseEvent) {
-      if (!video || !readyRef.current || !video.duration) {
-        prevXRef.current = e.clientX;
-        return;
-      }
-      const delta = e.clientX - prevXRef.current;
-      prevXRef.current = e.clientX;
-
-      const offset = (delta / window.innerWidth) * SENSITIVITY * video.duration;
-      const targetTime = Math.min(Math.max(targetTimeRef.current + offset, 0), video.duration);
-      targetTimeRef.current = targetTime;
-
-      if (!isSeekingRef.current) seekTo(targetTime);
-    }
-
-    video.addEventListener("loadedmetadata", onLoadedMetadata);
-    video.addEventListener("seeked", onSeeked);
-    window.addEventListener("mousemove", onMouseMove);
-
-    return () => {
-      video.removeEventListener("loadedmetadata", onLoadedMetadata);
-      video.removeEventListener("seeked", onSeeked);
-      window.removeEventListener("mousemove", onMouseMove);
-    };
-  }, []);
-
-  return (
-    <video
-      ref={videoRef}
-      src={VIDEO_SRC}
-      muted
-      playsInline
-      preload="auto"
-      className="absolute inset-0 z-0 h-full w-full object-cover"
-      style={{ objectPosition: "70% center" }}
-    />
-  );
-}
 
 export function MainframeHero() {
   const { displayed, done } = useTypewriter(
@@ -111,10 +23,8 @@ export function MainframeHero() {
   }, []);
 
   return (
-    <div className="relative h-screen overflow-hidden">
-      <VideoScrubBackground />
-
-      <section className="relative z-[1] flex h-full flex-col justify-end px-5 pb-12 sm:px-8 md:justify-center md:px-10 md:pb-0">
+    <section className="relative flex min-h-screen flex-col justify-center px-5 pt-28 pb-16 sm:px-8 md:px-10">
+      <div className="mx-auto flex w-full max-w-[1180px] flex-col items-center gap-12 lg:flex-row lg:justify-between lg:gap-10">
         <div className="relative z-10 max-w-xl">
           <p
             className="mb-5 text-black sm:mb-6"
@@ -159,7 +69,9 @@ export function MainframeHero() {
             </Link>
           </div>
         </div>
-      </section>
-    </div>
+
+        <Mascot3D className="w-full max-w-[280px] shrink-0 sm:max-w-sm lg:max-w-md" />
+      </div>
+    </section>
   );
 }
