@@ -4,6 +4,7 @@ import { useId, useState, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { LogoMark } from "@/components/ui/Logo";
 
 /* ----------------------------------------------------------------------- */
 /* Secciones de HeyStudy en el lenguaje visual del hero de Mainframe:       */
@@ -123,7 +124,7 @@ export function ProductShowcase() {
           </ul>
           <Link
             href="/registro"
-            className="mt-9 inline-flex items-center justify-center rounded-full border border-black/10 bg-black px-6 py-3 text-[15px] text-white transition-colors duration-200 hover:bg-white hover:text-black hover:border-black/10"
+            className="mt-9 inline-flex items-center justify-center rounded-full border border-accent bg-accent px-6 py-3 text-[15px] text-white transition-colors duration-200 hover:border-accent-hover hover:bg-accent-hover"
           >
             Comenzar gratis
           </Link>
@@ -175,10 +176,10 @@ export function Comparativa() {
             <p className="text-sm font-medium text-black">{row.feature}</p>
             <div className="mt-4 grid grid-cols-4 gap-2">
               {row.values.map((v, i) => (
-                <div key={i} className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2.5 ${i === 0 ? "bg-black/5" : ""}`}>
+                <div key={i} className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2.5 ${i === 0 ? "bg-accent/10" : ""}`}>
                   <span
                     aria-label={VERDICT_LABEL[v]}
-                    className={`text-base ${v === "yes" ? "text-black" : "text-black/30"}`}
+                    className={`text-base ${v === "yes" ? (i === 0 ? "text-accent" : "text-black") : "text-black/30"}`}
                   >
                     {VERDICT_GLYPH[v]}
                   </span>
@@ -206,7 +207,7 @@ export function Comparativa() {
                 scope="col"
                 className={`pb-4 text-center align-bottom text-sm ${i === 0 ? "font-semibold text-black" : "font-medium text-black/50"}`}
               >
-                {i === 0 ? <span className="inline-block rounded-full bg-black px-3 py-1.5 text-white">{col}</span> : col}
+                {i === 0 ? <span className="inline-block rounded-full bg-accent px-3 py-1.5 text-white">{col}</span> : col}
               </th>
             ))}
           </tr>
@@ -218,8 +219,11 @@ export function Comparativa() {
                 {row.feature}
               </th>
               {row.values.map((v, i) => (
-                <td key={i} className={`py-4 text-center ${i === 0 ? "bg-black/5" : ""}`}>
-                  <span aria-label={VERDICT_LABEL[v]} className={`text-base ${v === "yes" ? "text-black" : "text-black/30"}`}>
+                <td key={i} className={`py-4 text-center ${i === 0 ? "bg-accent/10" : ""}`}>
+                  <span
+                    aria-label={VERDICT_LABEL[v]}
+                    className={`text-base ${v === "yes" ? (i === 0 ? "text-accent" : "text-black") : "text-black/30"}`}
+                  >
                     {VERDICT_GLYPH[v]}
                   </span>
                 </td>
@@ -274,7 +278,7 @@ export function Precios() {
           <div
             key={plan.name}
             className={`relative flex h-full flex-col rounded-2xl border p-7 sm:p-8 ${
-              plan.highlighted ? "border-black bg-black text-white" : "border-black/10 text-black"
+              plan.highlighted ? "border-accent bg-accent text-white" : "border-black/10 text-black"
             }`}
           >
             <p className={`text-xs font-semibold tracking-wide uppercase ${plan.highlighted ? "text-white/60" : "text-black/50"}`}>
@@ -302,8 +306,8 @@ export function Precios() {
               href="/registro"
               className={`mt-8 inline-flex w-full items-center justify-center rounded-full border px-6 py-3 text-[15px] transition-colors duration-200 ${
                 plan.highlighted
-                  ? "border-white bg-white text-black hover:bg-transparent hover:text-white"
-                  : "border-black/10 bg-black text-white hover:bg-white hover:text-black"
+                  ? "border-white bg-white text-accent hover:bg-transparent hover:text-white"
+                  : "border-accent bg-accent text-white hover:border-accent-hover hover:bg-accent-hover"
               }`}
             >
               {plan.cta}
@@ -415,7 +419,7 @@ export function CtaFinal() {
       </h2>
       <Link
         href="/registro"
-        className="mt-9 inline-flex items-center justify-center rounded-full border border-black bg-black px-7 py-3.5 text-[15px] text-white transition-colors duration-200 hover:bg-white hover:text-black"
+        className="mt-9 inline-flex items-center justify-center rounded-full border border-accent bg-accent px-7 py-3.5 text-[15px] text-white transition-colors duration-200 hover:border-accent-hover hover:bg-accent-hover"
       >
         Comenzar gratis
       </Link>
@@ -431,9 +435,7 @@ export function MainframeFooter() {
           <span className="text-[18px] tracking-tight text-black" style={{ fontFamily: "var(--font-heading)" }}>
             HeyStudy
           </span>
-          <span aria-hidden className="select-none text-[20px] text-black" style={{ letterSpacing: "-0.02em" }}>
-            ✳︎
-          </span>
+          <LogoMark className="h-5 w-5 shrink-0 text-accent" />
         </div>
         <nav className="flex items-center gap-6 text-sm text-black/60">
           <Link href="/login" className="transition-opacity hover:opacity-60">

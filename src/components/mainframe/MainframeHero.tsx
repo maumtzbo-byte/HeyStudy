@@ -153,7 +153,7 @@ export function MainframeHero() {
             ))}
             <Link
               href="/registro"
-              className="mx-[0.2em] mb-[0.4em] inline-flex items-center justify-center rounded-full border border-white bg-transparent px-4 py-[0.3em] text-[13px] whitespace-nowrap text-white transition-colors duration-200 hover:bg-white hover:text-black sm:px-5 sm:text-[15px]"
+              className="mx-[0.2em] mb-[0.4em] inline-flex items-center justify-center rounded-full border border-accent bg-accent px-4 py-[0.3em] text-[13px] whitespace-nowrap text-white transition-colors duration-200 hover:border-accent-hover hover:bg-accent-hover sm:px-5 sm:text-[15px]"
             >
               Comenzar gratis
             </Link>

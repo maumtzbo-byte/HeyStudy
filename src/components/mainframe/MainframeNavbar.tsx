@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { LogoMark } from "@/components/ui/Logo";
 
 const NAV_LINKS = [
   { href: "#como-funciona", label: "Cómo funciona" },
@@ -23,13 +24,7 @@ export function MainframeNavbar() {
           >
             HeyStudy
           </span>
-          <span
-            aria-hidden
-            className="select-none text-[25px] text-black sm:text-[30px]"
-            style={{ letterSpacing: "-0.02em" }}
-          >
-            ✳︎
-          </span>
+          <LogoMark className="h-6 w-6 shrink-0 text-accent sm:h-7 sm:w-7" />
         </Link>
 
         <nav className="hidden flex-row text-[23px] text-black md:flex">
@@ -45,7 +40,7 @@ export function MainframeNavbar() {
 
         <Link
           href="/registro"
-          className="hidden text-[23px] text-black underline underline-offset-2 transition-opacity hover:opacity-60 md:block"
+          className="hidden text-[23px] text-accent underline underline-offset-2 transition-opacity hover:opacity-60 md:block"
         >
           Comenzar gratis
         </Link>
@@ -91,7 +86,7 @@ export function MainframeNavbar() {
         <Link
           href="/registro"
           onClick={() => setOpen(false)}
-          className="text-left text-[32px] font-medium text-black underline underline-offset-2"
+          className="text-left text-[32px] font-medium text-accent underline underline-offset-2"
         >
           Comenzar gratis
         </Link>

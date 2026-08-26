@@ -25,7 +25,7 @@ export default async function Home() {
   if (user) redirect("/dashboard");
 
   return (
-    <div className="mainframe-page bg-[#fbfaf9]">
+    <div className="mainframe-page force-light bg-[#fbfaf9]">
       <MainframeNavbar />
       <MainframeHero />
       <HowItWorks />
