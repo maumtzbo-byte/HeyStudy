@@ -25,7 +25,9 @@ export function MainframeHero() {
   return (
     <section className="relative flex min-h-screen flex-col justify-center px-5 pt-28 pb-16 sm:px-8 md:px-10">
       <div className="mx-auto flex w-full max-w-[1180px] flex-col items-center gap-12 lg:flex-row lg:justify-between lg:gap-10">
-        <div className="relative z-10 max-w-xl">
+        <Mascot3D interactive={false} className="order-1 w-full max-w-[280px] shrink-0 sm:max-w-sm lg:order-2 lg:max-w-md" />
+
+        <div className="relative z-10 order-2 max-w-xl lg:order-1">
           <p
             className="mb-5 text-black sm:mb-6"
             style={{
@@ -69,8 +71,6 @@ export function MainframeHero() {
             </Link>
           </div>
         </div>
-
-        <Mascot3D className="w-full max-w-[280px] shrink-0 sm:max-w-sm lg:max-w-md" />
       </div>
     </section>
   );

@@ -37,8 +37,16 @@ import { cn } from "@/lib/utils/cn";
 // lee como parte de la escena.
 const MAX_TILT = 11;
 
-export function Mascot3D({ className }: { className?: string }) {
+export function Mascot3D({
+  className,
+  interactive = true,
+}: {
+  className?: string;
+  /** false = sin flotación, gesto, inclinación por cursor ni partículas — sólo el parpadeo. */
+  interactive?: boolean;
+}) {
   const reduceMotion = useReducedMotion();
+  const ambient = interactive && !reduceMotion;
   const ref = useRef<HTMLDivElement>(null);
 
   // -1..1 en cada eje, relativo al centro del personaje.
@@ -62,7 +70,7 @@ export function Mascot3D({ className }: { className?: string }) {
   const shadowScale = useTransform(sy, [-1, 1], [1.06, 0.9]);
 
   function onPointerMove(e: React.PointerEvent) {
-    if (reduceMotion || e.pointerType === "touch") return;
+    if (!interactive || reduceMotion || e.pointerType === "touch") return;
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -87,8 +95,8 @@ export function Mascot3D({ className }: { className?: string }) {
       <motion.div
         aria-hidden
         className="pointer-events-none absolute inset-[12%] rounded-full bg-accent/25 blur-[70px]"
-        animate={reduceMotion ? undefined : { opacity: [0.55, 0.9, 0.55], scale: [0.94, 1.06, 0.94] }}
-        transition={reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        animate={ambient ? { opacity: [0.55, 0.9, 0.55], scale: [0.94, 1.06, 0.94] } : undefined}
+        transition={ambient ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : undefined}
       />
 
       {/* 2 — sombra de contacto */}
@@ -101,8 +109,8 @@ export function Mascot3D({ className }: { className?: string }) {
       {/* Flotación: va en su propio contenedor para no pelearse con la
           inclinación, que vive en valores de movimiento. */}
       <motion.div
-        animate={reduceMotion ? undefined : { y: [0, -16, 0] }}
-        transition={reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        animate={ambient ? { y: [0, -16, 0] } : undefined}
+        transition={ambient ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : undefined}
         className="relative"
       >
         {/* Gesto periódico: un wiggle breve cada ~7s (rotate + scale), no
@@ -113,14 +121,12 @@ export function Mascot3D({ className }: { className?: string }) {
             duración). */}
         <motion.div
           animate={
-            reduceMotion
-              ? undefined
-              : { rotate: [0, 0, -4, 4, -2, 0, 0], scale: [1, 1, 1.03, 1.03, 1.01, 1, 1] }
+            ambient ? { rotate: [0, 0, -4, 4, -2, 0, 0], scale: [1, 1, 1.03, 1.03, 1.01, 1, 1] } : undefined
           }
           transition={
-            reduceMotion
-              ? undefined
-              : { duration: 7, repeat: Infinity, ease: "easeInOut", times: [0, 0.5, 0.58, 0.68, 0.76, 0.85, 1] }
+            ambient
+              ? { duration: 7, repeat: Infinity, ease: "easeInOut", times: [0, 0.5, 0.58, 0.68, 0.76, 0.85, 1] }
+              : undefined
           }
           className="relative"
         >
@@ -198,14 +204,14 @@ export function Mascot3D({ className }: { className?: string }) {
       <motion.span
         aria-hidden
         className="pointer-events-none absolute top-[10%] left-[9%] h-2 w-2 rounded-full bg-accent/70"
-        animate={reduceMotion ? undefined : { y: [0, -22, 0], opacity: [0.25, 1, 0.25] }}
-        transition={reduceMotion ? undefined : { duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+        animate={ambient ? { y: [0, -22, 0], opacity: [0.25, 1, 0.25] } : undefined}
+        transition={ambient ? { duration: 4.5, repeat: Infinity, ease: "easeInOut" } : undefined}
       />
       <motion.span
         aria-hidden
         className="pointer-events-none absolute right-[8%] bottom-[22%] h-3 w-3 rounded-full bg-accent/45"
-        animate={reduceMotion ? undefined : { y: [0, 18, 0], opacity: [0.2, 0.75, 0.2] }}
-        transition={reduceMotion ? undefined : { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        animate={ambient ? { y: [0, 18, 0], opacity: [0.2, 0.75, 0.2] } : undefined}
+        transition={ambient ? { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1 } : undefined}
       />
     </div>
   );
