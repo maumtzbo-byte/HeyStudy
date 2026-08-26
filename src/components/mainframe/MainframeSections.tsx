@@ -144,6 +144,66 @@ export function ProductShowcase() {
   );
 }
 
+/* --------------------------------- Exámenes -------------------------------- */
+
+const EXAMS = [
+  {
+    name: "EXANI-I",
+    org: "CENEVAL",
+    body: "Ingreso a bachillerato/prepa. Habilidad matemática y español, con base en el temario oficial de CENEVAL.",
+  },
+  {
+    name: "EXANI-II",
+    org: "CENEVAL",
+    body: "Ingreso a licenciatura. Pensamiento matemático, comprensión lectora y pensamiento científico.",
+  },
+  {
+    name: "ECOEMS",
+    org: "Zona metropolitana CDMX",
+    body: "El examen único para asignación a preparatorias públicas de la CDMX y zona conurbada (antes COMIPEMS).",
+  },
+  {
+    name: "Examen UNAM",
+    org: "DGAE",
+    body: "Selección a nivel licenciatura: matemáticas, español y las materias de tu área académica.",
+  },
+  {
+    name: "Examen IPN",
+    org: "Nivel superior",
+    body: "Habilidades matemáticas y verbales, más conocimientos específicos de tu área.",
+  },
+  {
+    name: "PAA",
+    org: "College Board",
+    body: "La que piden el Tec de Monterrey y varias universidades privadas.",
+  },
+];
+
+export function Exams() {
+  return (
+    <Section id="examenes" className="bg-white">
+      <Eyebrow>Exámenes de admisión</Eyebrow>
+      <SectionTitle>Nos basamos en el temario oficial de cada examen.</SectionTitle>
+
+      <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        {EXAMS.map((exam) => (
+          <div key={exam.name} className="border-t border-black/10 pt-5">
+            <p className="text-xs font-semibold tracking-wide text-black/40 uppercase">{exam.org}</p>
+            <h3 className="mt-1.5 text-lg font-medium text-black">{exam.name}</h3>
+            <p className="mt-2 text-[15px] leading-relaxed text-black/60">{exam.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-12 max-w-2xl text-xs leading-relaxed text-black/40">
+        HeyStudy no está afiliado a CENEVAL, la UNAM, el IPN, College Board Latinoamérica ni a ECOEMS. Usamos los
+        nombres de estos exámenes únicamente para describir para cuáles te ayudamos a prepararte, con base en sus
+        temarios públicos.
+      </p>
+    </Section>
+  );
+}
+
 /* -------------------------------- Comparativa ----------------------------- */
 
 type Verdict = "yes" | "partial" | "no";

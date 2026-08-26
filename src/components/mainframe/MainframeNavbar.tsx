@@ -7,6 +7,7 @@ import { LogoMark } from "@/components/ui/Logo";
 const NAV_LINKS = [
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#producto", label: "Producto" },
+  { href: "#examenes", label: "Exámenes" },
   { href: "#precios", label: "Precios" },
   { href: "#preguntas", label: "Preguntas" },
 ];

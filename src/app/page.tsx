@@ -6,6 +6,7 @@ import { MainframeHero } from "@/components/mainframe/MainframeHero";
 import {
   HowItWorks,
   ProductShowcase,
+  Exams,
   Comparativa,
   Precios,
   Faq,
@@ -30,6 +31,7 @@ export default async function Home() {
       <MainframeHero />
       <HowItWorks />
       <ProductShowcase />
+      <Exams />
       <Comparativa />
       <Precios />
       <Faq />
