@@ -2,11 +2,10 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { loginAction, signInWithGoogleAction } from "@/app/(auth)/actions";
+import { loginAction } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
-import { GoogleIcon } from "@/components/ui/GoogleIcon";
 
 export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, undefined);
@@ -25,19 +24,6 @@ export function LoginForm() {
         {state?.error && <p className="text-sm text-danger">{state.error}</p>}
         <Button type="submit" disabled={isPending} className="mt-2">
           {isPending ? "Entrando..." : "Entrar"}
-        </Button>
-      </form>
-
-      <div className="flex items-center gap-3 text-xs text-muted">
-        <div className="h-px flex-1 bg-border" />
-        o
-        <div className="h-px flex-1 bg-border" />
-      </div>
-
-      <form action={signInWithGoogleAction}>
-        <Button type="submit" variant="secondary" className="w-full">
-          <GoogleIcon className="h-4 w-4" />
-          Continuar con Google
         </Button>
       </form>
 

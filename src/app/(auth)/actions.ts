@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { loginSchema, registroSchema } from "@/lib/validation/authSchemas";
 import { checkRateLimit } from "@/services/security/rateLimit";
 import { clientIp } from "@/lib/http/clientIp";
+import { UserFacingError } from "@/lib/actions/result";
 
 export type AuthActionState = { error?: string } | undefined;
 
@@ -16,6 +17,22 @@ export type AuthActionState = { error?: string } | undefined;
 // correo que se está probando — así un atacante no puede esquivar el
 // límite repartiendo intentos entre varias IPs contra la misma cuenta.
 const RATE_LIMIT_ERROR = "Demasiados intentos. Espera un minuto e intenta de nuevo.";
+const GENERIC_ERROR = "Algo salió mal. Vuelve a intentarlo.";
+
+// checkRateLimit sólo lanza UserFacingError cuando el límite se excedió de
+// verdad — cualquier otro error (la base de datos no responde, etc.) es un
+// fallo real que no debería disfrazarse de "demasiados intentos": eso le
+// dice al estudiante que espere cuando en realidad algo está roto.
+async function guardRateLimit(fn: () => Promise<void>): Promise<string | undefined> {
+  try {
+    await fn();
+  } catch (err) {
+    if (err instanceof UserFacingError) return RATE_LIMIT_ERROR;
+    console.error("[auth rate limit]", err);
+    return GENERIC_ERROR;
+  }
+  return undefined;
+}
 
 export async function loginAction(_prevState: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const parsed = loginSchema.safeParse({
@@ -27,12 +44,11 @@ export async function loginAction(_prevState: AuthActionState, formData: FormDat
   }
 
   const ip = await clientIp();
-  try {
+  const rateLimitError = await guardRateLimit(async () => {
     await checkRateLimit(`login-ip:${ip}`, 10, 60);
     await checkRateLimit(`login-email:${parsed.data.email.toLowerCase()}`, 5, 60);
-  } catch {
-    return { error: RATE_LIMIT_ERROR };
-  }
+  });
+  if (rateLimitError) return { error: rateLimitError };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
@@ -54,11 +70,8 @@ export async function registroAction(_prevState: AuthActionState, formData: Form
   }
 
   const ip = await clientIp();
-  try {
-    await checkRateLimit(`registro-ip:${ip}`, 5, 60);
-  } catch {
-    return { error: RATE_LIMIT_ERROR };
-  }
+  const rateLimitError = await guardRateLimit(() => checkRateLimit(`registro-ip:${ip}`, 5, 60));
+  if (rateLimitError) return { error: rateLimitError };
 
   const supabase = await createClient();
   const requestHeaders = await headers();
