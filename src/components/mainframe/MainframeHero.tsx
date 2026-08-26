@@ -31,11 +31,24 @@ function VideoScrubBackground() {
     if (!video) return;
 
     function onLoadedMetadata() {
-      readyRef.current = true;
-      // Sin esto el <video> se queda en blanco hasta el primer mousemove:
-      // pausado y sin haber reproducido nunca, algunos navegadores no
-      // decodifican ni pintan el frame inicial solo por cargar metadata.
-      if (video) video.currentTime = 0.001;
+      if (!video) return;
+      // Sin esto el <video> se queda en blanco en iOS Safari: pausado y
+      // sin haber reproducido nunca, no decodifica ni pinta ningún frame
+      // solo por cargar metadata o hacer un seek — necesita play() real
+      // (aunque sea una fracción de segundo) para arrancar el decoder.
+      // muted + playsInline es justo lo que permite que ese play() no
+      // choque con las políticas de autoplay.
+      video
+        .play()
+        .then(() => video.pause())
+        .catch(() => {
+          // Autoplay bloqueado igual: al menos intenta pintar el primer
+          // frame con un seek, que sí funciona en la mayoría de escritorio.
+          video.currentTime = 0.001;
+        })
+        .finally(() => {
+          readyRef.current = true;
+        });
     }
 
     function seekTo(time: number) {
