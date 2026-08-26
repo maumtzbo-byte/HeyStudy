@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Video, VideoOff } from "lucide-react";
 import { toggleStudyPlanItemAction } from "@/app/dashboard/actions";
+import { Button } from "@/components/ui/Button";
 
 interface VideoView {
   url: string;
@@ -61,15 +62,16 @@ export function StudyPlanList({ items }: { items: StudyPlanItemView[] }) {
               <p className="text-xs text-muted">{item.reason}</p>
             </div>
             {item.videos.length > 0 && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => toggleVideosForItem(item.id)}
-                className="shrink-0 text-muted hover:text-foreground"
                 aria-label={videosHidden ? "Mostrar videos" : "Ocultar videos"}
                 title={videosHidden ? "Mostrar videos" : "Ocultar videos"}
               >
                 {videosHidden ? <VideoOff className="h-4 w-4" /> : <Video className="h-4 w-4" />}
-              </button>
+              </Button>
             )}
             <span className="shrink-0 text-xs font-medium text-muted">{item.minutes} min</span>
           </div>

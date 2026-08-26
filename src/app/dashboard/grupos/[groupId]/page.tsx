@@ -6,6 +6,7 @@ import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getStudyGroupDetail } from "@/services/groups/studyGroupService";
 import { UserFacingError } from "@/lib/actions/result";
 import { ShareTodayPlanButton, UnshareButton, LeaveGroupButton } from "@/components/groups/GroupActions";
+import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils/cn";
 import { formatDate } from "@/lib/format";
 
@@ -64,7 +65,7 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
           <Trophy className="h-5 w-5 text-premium" strokeWidth={1.75} />
           <h2 className="text-base font-semibold text-foreground">Ranking de los últimos 7 días</h2>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+        <Card className="overflow-hidden p-0">
           {group.leaderboard.map((row, i) => (
             <div
               key={row.studentProfileId}
@@ -105,7 +106,7 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
               </div>
             </div>
           ))}
-        </div>
+        </Card>
         <p className="mt-2 text-xs text-subtle">
           El ranking usa minutos de tu plan marcados como completados. Nadie ve tus diagnósticos ni tu mapa de
           conocimiento.
@@ -113,7 +114,7 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
       </section>
 
       {/* Compartir plan */}
-      <section className="rounded-2xl border border-border bg-surface p-6">
+      <Card as="section">
         <h2 className="mb-1 text-base font-semibold text-foreground">Tu plan de hoy</h2>
         <p className="mb-4 text-sm text-muted">
           Compartirlo es opcional. Solo se ven los temas y los minutos, no el porqué de cada uno.
@@ -123,7 +124,7 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
           alreadyShared={group.myTodayPlanShared}
           hasPlan={group.myTodayPlanId !== null}
         />
-      </section>
+      </Card>
 
       {/* Planes compartidos */}
       <section>
@@ -135,7 +136,7 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {group.sharedPlans.map((plan) => (
-              <article key={plan.id} className="rounded-2xl border border-border bg-surface p-5">
+              <Card key={plan.id} as="article">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-foreground">
@@ -171,7 +172,7 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
                     </li>
                   ))}
                 </ul>
-              </article>
+              </Card>
             ))}
           </div>
         )}

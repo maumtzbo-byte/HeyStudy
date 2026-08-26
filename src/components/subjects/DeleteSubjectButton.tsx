@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { deleteSubjectAction } from "@/app/dashboard/materias/actions";
+import { Button } from "@/components/ui/Button";
 
 export function DeleteSubjectButton({ subjectId, subjectName }: { subjectId: string; subjectName: string }) {
   const router = useRouter();
@@ -20,12 +21,14 @@ export function DeleteSubjectButton({ subjectId, subjectName }: { subjectId: str
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="sm"
       onClick={handleDelete}
-      className="flex items-center gap-1.5 text-sm font-medium text-danger hover:opacity-80"
+      className="text-danger hover:bg-danger/10"
     >
-      <Trash2 className="h-4 w-4" /> Eliminar materia
-    </button>
+      <Trash2 className="h-4 w-4" strokeWidth={1.75} /> Eliminar materia
+    </Button>
   );
 }

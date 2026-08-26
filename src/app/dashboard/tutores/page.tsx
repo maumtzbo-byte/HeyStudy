@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma/client";
 import { listCustomTutors } from "@/services/tutor/customTutorService";
 import { CustomTutorForm } from "@/components/tutor/CustomTutorForm";
 import { CustomTutorList, type TutorListItem } from "@/components/tutor/CustomTutorList";
+import { Card } from "@/components/ui/Card";
 
 export const metadata: Metadata = { title: "Mis tutores — HeyStudy" };
 
@@ -38,10 +39,10 @@ export default async function TutoresPage() {
         </p>
       </div>
 
-      <section className="rounded-2xl border border-border bg-surface p-6">
+      <Card as="section">
         <h2 className="mb-5 text-base font-semibold text-foreground">Nuevo tutor</h2>
         <CustomTutorForm subjects={subjects} />
-      </section>
+      </Card>
 
       <section>
         <h2 className="mb-4 text-base font-semibold text-foreground">

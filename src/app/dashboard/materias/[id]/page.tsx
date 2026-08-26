@@ -7,7 +7,7 @@ import { getSubject, getSubjectSummary } from "@/services/subjects/subjectServic
 import { toggleAssignmentAction, deleteAssignmentAction, deleteExamAction } from "@/app/dashboard/materias/actions";
 import { formatDate } from "@/lib/format";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { CreateAssignmentForm } from "@/components/subjects/CreateAssignmentForm";
 import { CreateExamForm } from "@/components/subjects/CreateExamForm";
 import { MaterialUploadForm } from "@/components/subjects/MaterialUploadForm";
@@ -33,7 +33,7 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
         <div>
           <div className="mb-1 flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: subject.color }} />
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">{subject.name}</h1>
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">{subject.name}</h1>
           </div>
           <p className="text-muted">Tareas, exámenes y materiales de esta materia.</p>
         </div>
@@ -98,9 +98,9 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-muted">{formatDate(assignment.dueDate)}</span>
                   <form action={deleteAssignmentAction.bind(null, assignment.id, subject.id)}>
-                    <button type="submit" className="text-muted hover:text-danger" aria-label="Eliminar tarea">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <Button type="submit" variant="ghost" size="icon" aria-label="Eliminar tarea">
+                      <Trash2 className="h-4 w-4 text-danger" strokeWidth={1.75} />
+                    </Button>
                   </form>
                 </div>
               </div>
@@ -127,9 +127,9 @@ export default async function SubjectDetailPage({ params }: PageProps<"/dashboar
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-muted">{formatDate(exam.examDate)}</span>
                   <form action={deleteExamAction.bind(null, exam.id, subject.id)}>
-                    <button type="submit" className="text-muted hover:text-danger" aria-label="Eliminar examen">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    <Button type="submit" variant="ghost" size="icon" aria-label="Eliminar examen">
+                      <Trash2 className="h-4 w-4 text-danger" strokeWidth={1.75} />
+                    </Button>
                   </form>
                 </div>
               </div>

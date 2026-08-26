@@ -1,10 +1,21 @@
 import { type HTMLAttributes } from "react";
 import { cn } from "@/lib/utils/cn";
 
-export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+type As = "div" | "section" | "article";
+
+// `as` existe para que secciones que sí necesitan semántica HTML5
+// (<section>, <article>) puedan usar el mismo tratamiento visual que Card
+// en vez de duplicar su className a mano — es lo que unifica los dos
+// idiomas de "card" que había en el dashboard.
+export function Card({
+  className,
+  as = "div",
+  ...props
+}: HTMLAttributes<HTMLElement> & { as?: As }) {
+  const Comp = as;
   return (
-    <div
-      className={cn("rounded-xl border border-border bg-surface p-5 shadow-soft", className)}
+    <Comp
+      className={cn("rounded-2xl border border-border bg-surface p-6 shadow-soft", className)}
       {...props}
     />
   );

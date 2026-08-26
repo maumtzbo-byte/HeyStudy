@@ -27,7 +27,7 @@ export default async function WrappedPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
           Tu resumen, {studentProfile.displayName.split(" ")[0]}
         </h1>
         <p className="text-muted">Todo lo que has hecho en HeyStudy hasta hoy.</p>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FileText, Image as ImageIcon, Trash2 } from "lucide-react";
 import { deleteMaterialAction, getMaterialUrlAction } from "@/app/dashboard/materias/actions";
+import { Button } from "@/components/ui/Button";
 
 interface MaterialItem {
   id: string;
@@ -50,9 +51,9 @@ export function MaterialList({ subjectId, materials }: { subjectId: string; mate
             <span className="truncate text-sm font-medium text-foreground">{material.fileName}</span>
           </button>
           <form action={deleteMaterialAction.bind(null, material.id, subjectId)}>
-            <button type="submit" className="text-muted hover:text-danger" aria-label="Eliminar material">
-              <Trash2 className="h-4 w-4" />
-            </button>
+            <Button type="submit" variant="ghost" size="icon" aria-label="Eliminar material">
+              <Trash2 className="h-4 w-4 text-danger" strokeWidth={1.75} />
+            </Button>
           </form>
         </div>
       ))}

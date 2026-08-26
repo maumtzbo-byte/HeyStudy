@@ -74,7 +74,7 @@ export function CustomTutorList({
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
+                size="icon"
                 onClick={() => setEditingId(tutor.id)}
                 aria-label={`Editar ${tutor.name}`}
               >
@@ -83,7 +83,7 @@ export function CustomTutorList({
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
+                size="icon"
                 disabled={isPending}
                 onClick={() => handleDelete(tutor.id, tutor.name)}
                 aria-label={`Borrar ${tutor.name}`}

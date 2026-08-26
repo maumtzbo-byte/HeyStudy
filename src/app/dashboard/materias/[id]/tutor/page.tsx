@@ -26,7 +26,7 @@ export default async function TutorIndexPage({ params }: PageProps<"/dashboard/m
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Tutor IA</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Tutor IA</h1>
         <p className="text-muted">{subject.name} — pregunta lo que no entiendas, en el modo que prefieras.</p>
       </div>
 

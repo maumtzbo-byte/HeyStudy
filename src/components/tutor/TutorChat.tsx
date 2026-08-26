@@ -58,22 +58,24 @@ export function TutorChat({
   }
 
   return (
+    // 8rem = DashboardHeader's h-16 (4rem) + dashboard layout's py-8 (4rem)
+    // — si cualquiera de los dos cambia, este cálculo hay que revisarlo.
     <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-2xl flex-col gap-4">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Tutor IA</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">Tutor IA</h1>
         <p className="text-sm text-muted">
           {subjectName} · Modo {MODE_LABELS[mode]}
         </p>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto rounded-xl border border-border bg-surface p-4">
+      <div className="flex flex-1 flex-col gap-3 overflow-y-auto rounded-2xl border border-border bg-surface p-4">
         {messages.length === 0 ? (
           <CardDescription>Escribe tu primera pregunta para empezar.</CardDescription>
         ) : (
           messages.map((m, i) => (
             <div
               key={m.id ?? i}
-              className={`max-w-[85%] rounded-xl px-4 py-2.5 text-sm ${
+              className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                 m.role === "user"
                   ? "self-end bg-accent text-accent-foreground"
                   : "self-start border border-border bg-background text-foreground"
@@ -84,7 +86,7 @@ export function TutorChat({
           ))
         )}
         {isPending && (
-          <div className="self-start rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-muted">
+          <div className="self-start rounded-2xl border border-border bg-background px-4 py-2.5 text-sm text-muted">
             Pensando...
           </div>
         )}

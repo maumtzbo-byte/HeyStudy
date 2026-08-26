@@ -3,7 +3,7 @@ import Link, { type LinkProps } from "next/link";
 import { cn } from "@/lib/utils/cn";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
-type Size = "sm" | "md" | "lg";
+type Size = "sm" | "md" | "lg" | "icon";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -34,6 +34,7 @@ const sizeClasses: Record<Size, string> = {
   sm: "h-9 px-4 text-sm",
   md: "h-11 px-5 text-sm",
   lg: "h-[3.25rem] px-7 text-base",
+  icon: "h-9 w-9 p-0",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

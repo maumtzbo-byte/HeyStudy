@@ -96,7 +96,7 @@ export default async function DashboardHomePage() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
             Hola, {studentProfile.displayName.split(" ")[0]}
           </h1>
           <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>

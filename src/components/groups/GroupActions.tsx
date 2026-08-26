@@ -56,8 +56,10 @@ export function UnshareButton({ groupId, sharedPlanId }: { groupId: string; shar
 
   return (
     <div className="flex shrink-0 flex-col items-end gap-1">
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon"
         disabled={isPending}
         aria-label="Dejar de compartir este plan"
         onClick={() => {
@@ -67,10 +69,9 @@ export function UnshareButton({ groupId, sharedPlanId }: { groupId: string; shar
             if (!result.ok) setError(result.error);
           });
         }}
-        className="rounded-md p-1 text-subtle transition-colors hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
-        <X className="h-4 w-4" strokeWidth={1.75} />
-      </button>
+        <X className="h-4 w-4 text-subtle" strokeWidth={1.75} />
+      </Button>
       {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   );
