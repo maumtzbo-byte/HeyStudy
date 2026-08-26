@@ -16,5 +16,21 @@ export const registroSchema = z
     path: ["confirmPassword"],
   });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Correo inválido"),
+});
+
+export const updatePasswordSchema = z
+  .object({
+    password: z.string().min(6, "Mínimo 6 caracteres"),
+    confirmPassword: z.string().min(6, "Mínimo 6 caracteres"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegistroInput = z.infer<typeof registroSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type UpdatePasswordInput = z.infer<typeof updatePasswordSchema>;

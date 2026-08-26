@@ -3,12 +3,12 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { loginSchema, registroSchema } from "@/lib/validation/authSchemas";
+import { loginSchema, registroSchema, forgotPasswordSchema, updatePasswordSchema } from "@/lib/validation/authSchemas";
 import { checkRateLimit } from "@/services/security/rateLimit";
 import { clientIp } from "@/lib/http/clientIp";
 import { UserFacingError } from "@/lib/actions/result";
 
-export type AuthActionState = { error?: string } | undefined;
+export type AuthActionState = { error?: string; message?: string } | undefined;
 
 // Sin esto, login y registro no tenían ningún límite técnico — nada impedía
 // probar contraseñas en loop contra una cuenta, o crear cuentas en loop
@@ -96,6 +96,59 @@ export async function registroAction(_prevState: AuthActionState, formData: Form
   }
 
   redirect("/verificar-correo");
+}
+
+// Confirmación genérica siempre, exista o no la cuenta — es lo mismo que
+// hace signUp con identities vacío: si dijéramos "no existe cuenta con ese
+// correo" cuando sí falla, cualquiera podría usar este formulario para
+// averiguar qué correos están registrados.
+const FORGOT_PASSWORD_MESSAGE = "Si existe una cuenta con ese correo, te mandamos un enlace para restablecer tu contraseña.";
+
+export async function forgotPasswordAction(
+  _prevState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const parsed = forgotPasswordSchema.safeParse({ email: formData.get("email") });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const ip = await clientIp();
+  const rateLimitError = await guardRateLimit(() => checkRateLimit(`forgot-password-ip:${ip}`, 5, 60));
+  if (rateLimitError) return { error: rateLimitError };
+
+  const supabase = await createClient();
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin");
+
+  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${origin}/auth/callback?next=/actualizar-contrasena`,
+  });
+
+  // Mismo mensaje neutral exista o no la cuenta — en "message", no "error",
+  // para que la UI no lo pinte de rojo como si algo hubiera fallado.
+  return { message: FORGOT_PASSWORD_MESSAGE };
+}
+
+export async function updatePasswordAction(
+  _prevState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const parsed = updatePasswordSchema.safeParse({
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
+  if (error) {
+    return { error: "No se pudo actualizar la contraseña. Pide un nuevo enlace e intenta de nuevo." };
+  }
+
+  redirect("/dashboard");
 }
 
 export async function signInWithGoogleAction() {

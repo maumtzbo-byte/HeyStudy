@@ -2,13 +2,13 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { loginAction } from "@/app/(auth)/actions";
+import { forgotPasswordAction } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 
-export function LoginForm() {
-  const [state, formAction, isPending] = useActionState(loginAction, undefined);
+export function RecuperarForm() {
+  const [state, formAction, isPending] = useActionState(forgotPasswordAction, undefined);
 
   return (
     <div className="flex flex-col gap-6">
@@ -17,25 +17,16 @@ export function LoginForm() {
           <Label htmlFor="email">Correo</Label>
           <Input id="email" name="email" type="email" autoComplete="email" required />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Contraseña</Label>
-            <Link href="/recuperar" className="text-xs font-medium text-accent">
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </div>
-          <Input id="password" name="password" type="password" autoComplete="current-password" required />
-        </div>
         {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+        {state?.message && <p className="text-sm text-success">{state.message}</p>}
         <Button type="submit" disabled={isPending} className="mt-2">
-          {isPending ? "Entrando..." : "Entrar"}
+          {isPending ? "Enviando..." : "Enviar enlace"}
         </Button>
       </form>
 
       <p className="text-center text-sm text-muted">
-        ¿No tienes cuenta?{" "}
-        <Link href="/registro" className="font-medium text-accent">
-          Regístrate
+        <Link href="/login" className="font-medium text-accent">
+          Volver a iniciar sesión
         </Link>
       </p>
     </div>
