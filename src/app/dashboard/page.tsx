@@ -12,8 +12,10 @@ import { getVideoRecommendationsForTopic, type VideoRecommendation } from "@/ser
 import { getStudyDates, currentStreakDays } from "@/services/reporting/streakService";
 import { getPlanUsageSummary } from "@/services/usage/planLimits";
 import { todayInTimezone } from "@/lib/utils/dates";
+import { cn } from "@/lib/utils/cn";
 import { formatDate } from "@/lib/format";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
+import { ButtonLink } from "@/components/ui/Button";
 import { ReadinessBadge } from "@/components/exams/ReadinessBadge";
 import { GeneratePlanForm } from "@/components/dashboard/GeneratePlanForm";
 import { StudyPlanList } from "@/components/dashboard/StudyPlanList";
@@ -80,6 +82,17 @@ export default async function DashboardHomePage() {
   const todayCompletedCount = todayPlan?.items.filter((item) => item.completed).length ?? 0;
   const todayProgressPct = todayTotalMinutes > 0 ? Math.round((todayCompletedMinutes / todayTotalMinutes) * 100) : 0;
 
+  // Últimos 7 días de racha, para la tira de puntos junto al número — mismo
+  // criterio de "día activo" que currentStreakDays (día con algo completado).
+  const today = todayInTimezone(studentProfile.timezone);
+  const activeDayNumbers = new Set(studyDates.map((d) => Math.floor(d.getTime() / 86400000)));
+  const todayDayNumber = Math.floor(today.getTime() / 86400000);
+  const WEEKDAY_LETTERS = ["D", "L", "M", "M", "J", "V", "S"];
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const dayNumber = todayDayNumber - (6 - i);
+    return { active: activeDayNumbers.has(dayNumber), letter: WEEKDAY_LETTERS[new Date(dayNumber * 86400000).getUTCDay()] };
+  });
+
   const todoItems = [
     ...assignments.map((a) => ({
       id: a.id,
@@ -107,6 +120,20 @@ export default async function DashboardHomePage() {
         </h1>
         <p className="text-muted">Esto es lo que tienes y lo que sigue.</p>
       </div>
+
+      <Card className="flex flex-col gap-4 bg-accent-soft">
+        <div>
+          <p className="font-display text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+            Cada minuto cuenta.
+          </p>
+          <p className="mt-1 text-sm text-muted">
+            Organiza tus materias, cierra tus pendientes y llega listo a tus exámenes.
+          </p>
+        </div>
+        <ButtonLink href="#plan-de-hoy" variant="primary" className="w-fit rounded-full">
+          Ver mi plan de hoy
+        </ButtonLink>
+      </Card>
 
       {/* Bento real: dos tarjetas grandes de color sólido (sin degradados,
           sin fotos) arriba, tres tarjetas chicas con ícono abajo. Sustituye
@@ -144,6 +171,20 @@ export default async function DashboardHomePage() {
             <span className="text-4xl font-bold tabular-nums">{streak}</span>
             <span className="text-sm text-white/70">{streak === 1 ? "día" : "días"}</span>
           </p>
+          <div className="mt-3 flex gap-1.5">
+            {last7Days.map((day, i) => (
+              <span
+                key={i}
+                aria-hidden
+                className={cn(
+                  "flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-semibold",
+                  day.active ? "bg-white text-warning" : "bg-white/15 text-white/50",
+                )}
+              >
+                {day.letter}
+              </span>
+            ))}
+          </div>
         </Card>
       </div>
 
@@ -217,7 +258,7 @@ export default async function DashboardHomePage() {
         )}
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section id="plan-de-hoy" className="flex flex-col gap-3 scroll-mt-6">
         <h2 className="text-lg font-semibold text-foreground">Tu plan de hoy</h2>
         {todayPlan && todayPlan.items.length > 0 ? (
           <Card className="flex flex-col gap-4">
