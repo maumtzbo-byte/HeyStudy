@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { runAction } from "@/lib/actions/result";
 import { getAITier } from "@/services/usage/getAITier";
-import { startConversation, sendMessage } from "@/services/tutor/tutorService";
+import { startConversation, sendMessage, generateWrapUp } from "@/services/tutor/tutorService";
 import type { TutorMode } from "@/services/ai/types";
 
 export async function startConversationAction(
@@ -34,6 +34,19 @@ export async function sendMessageAction(conversationId: string, content: string)
       tier,
       conversationId,
       content,
+    });
+  });
+}
+
+export async function generateWrapUpAction(conversationId: string) {
+  return runAction(async () => {
+    const { user, studentProfile } = await requireStudentProfile();
+    const tier = await getAITier(user.id);
+    return generateWrapUp({
+      studentProfileId: studentProfile.id,
+      userId: user.id,
+      tier,
+      conversationId,
     });
   });
 }

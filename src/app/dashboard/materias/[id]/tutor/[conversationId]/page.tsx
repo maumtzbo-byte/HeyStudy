@@ -22,9 +22,11 @@ export default async function TutorConversationPage({
   return (
     <TutorChat
       conversationId={conversation.id}
+      subjectId={conversation.subjectId}
       subjectName={conversation.subjectName}
       mode={conversation.mode}
       initialMessages={conversation.messages}
+      initialNotes={conversation.notes}
       canUseVoice={planUsage.plan === "PAID"}
     />
   );

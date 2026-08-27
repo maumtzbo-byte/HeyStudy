@@ -1,7 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
-import { tutorResponse, moderateTutorMessage } from "@/services/ai/AIProvider";
+import { tutorResponse, moderateTutorMessage, summarizeTutorConversation } from "@/services/ai/AIProvider";
 import { MODE_TO_DB, MODE_FROM_DB } from "@/services/tutor/customTutorService";
 import { assertSubjectOwnership } from "@/lib/auth/ownership";
 import type { AITier } from "@/services/ai/models";
@@ -97,6 +97,7 @@ export async function getConversation(studentProfileId: string, conversationId: 
     subjectName: conversation.subject.name,
     tutorName: conversation.customTutor?.name ?? null,
     tutorEmoji: conversation.customTutor?.emoji ?? null,
+    notes: conversation.notes,
     messages: conversation.messages.map((m) => ({
       id: m.id,
       role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
@@ -183,7 +184,10 @@ export async function sendMessage(params: {
   } else if (moderation === "unsafe") {
     reply = UNSAFE_RESPONSE;
   } else {
-    const masterySummary = await buildMasterySummaryForSubject(studentProfileId, conversation.subjectId);
+    const [masterySummary, studentProfile] = await Promise.all([
+      buildMasterySummaryForSubject(studentProfileId, conversation.subjectId),
+      prisma.studentProfile.findUnique({ where: { id: studentProfileId }, select: { learningStyleNotes: true } }),
+    ]);
 
     reply = await tutorResponse(
       { userId, tier, feature: "tutor_chat" },
@@ -194,6 +198,7 @@ export async function sendMessage(params: {
         persona: conversation.customTutor
           ? { name: conversation.customTutor.name, instructions: conversation.customTutor.instructions }
           : null,
+        learningStyleNotes: studentProfile?.learningStyleNotes ?? null,
         history: [
           ...priorMessages.map((m) => ({
             role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
@@ -216,4 +221,65 @@ export async function sendMessage(params: {
   });
 
   return reply;
+}
+
+// Libreta de notas + actualización del perfil de estilo de aprendizaje + un
+// tema sugerido para practicar, todo de una sola llamada a IA sobre la
+// conversación completa (ver summarizeTutorConversation). El estudiante lo
+// dispara a mano ("Generar mis notas"), no corre solo.
+export async function generateWrapUp(params: {
+  studentProfileId: string;
+  userId: string;
+  tier: AITier;
+  conversationId: string;
+}) {
+  const { studentProfileId, userId, tier, conversationId } = params;
+
+  const conversation = await assertConversationOwnership(studentProfileId, conversationId);
+
+  const [messages, studentProfile, topics] = await Promise.all([
+    prisma.tutorChatMessage.findMany({
+      where: { tutorConversationId: conversationId },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.studentProfile.findUnique({ where: { id: studentProfileId }, select: { learningStyleNotes: true } }),
+    prisma.knowledgeTopic.findMany({
+      where: { subjectId: conversation.subjectId },
+      select: { id: true, name: true },
+    }),
+  ]);
+
+  if (messages.length === 0) throw new UserFacingError("Todavía no hay nada que resumir.");
+
+  const wrapUp = await summarizeTutorConversation(
+    { userId, tier, feature: "tutor_wrap_up" },
+    {
+      history: messages.map((m) => ({
+        role: m.role === "USER" ? ("user" as const) : ("assistant" as const),
+        content: m.content,
+      })),
+      subjectName: conversation.subject.name,
+      existingLearningNotes: studentProfile?.learningStyleNotes ?? null,
+      topics,
+    },
+  );
+
+  await prisma.tutorConversation.update({
+    where: { id: conversationId },
+    data: { notes: wrapUp.notes, notesGeneratedAt: new Date() },
+  });
+
+  if (wrapUp.learningStyleUpdate) {
+    await prisma.studentProfile.update({
+      where: { id: studentProfileId },
+      data: { learningStyleNotes: wrapUp.learningStyleUpdate },
+    });
+  }
+
+  const suggestedTopic = wrapUp.suggestedTopicId ? (topics.find((t) => t.id === wrapUp.suggestedTopicId) ?? null) : null;
+
+  return {
+    notes: wrapUp.notes,
+    suggestedTopic: suggestedTopic ? { id: suggestedTopic.id, name: suggestedTopic.name } : null,
+  };
 }

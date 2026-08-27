@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { Mic, Volume2, Loader2 } from "lucide-react";
-import { sendMessageAction } from "@/app/dashboard/materias/[id]/tutor/actions";
+import { Mic, Volume2, Loader2, NotebookText, Sparkles } from "lucide-react";
+import { sendMessageAction, generateWrapUpAction } from "@/app/dashboard/materias/[id]/tutor/actions";
+import { startDiagnosticAction } from "@/app/dashboard/materias/[id]/diagnostico/actions";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
-import { CardDescription } from "@/components/ui/Card";
+import { Card, CardDescription } from "@/components/ui/Card";
 import { cn } from "@/lib/utils/cn";
 import type { TutorMode } from "@/services/ai/types";
 
@@ -64,15 +65,19 @@ function getSpeechRecognitionCtor(): SpeechRecognitionConstructor | null {
 
 export function TutorChat({
   conversationId,
+  subjectId,
   subjectName,
   mode,
   initialMessages,
+  initialNotes,
   canUseVoice,
 }: {
   conversationId: string;
+  subjectId: string;
   subjectName: string;
   mode: TutorMode;
   initialMessages: ChatMessage[];
+  initialNotes: string | null;
   canUseVoice: boolean;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
@@ -80,6 +85,15 @@ export function TutorChat({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Libreta de notas + tema sugerido para practicar (ver
+  // tutorService.generateWrapUp). suggestedTopic no se guarda en base de
+  // datos — es efímero, se vuelve a calcular cada vez que se generan notas.
+  const [notes, setNotes] = useState<string | null>(initialNotes);
+  const [suggestedTopic, setSuggestedTopic] = useState<{ id: string; name: string } | null>(null);
+  const [isGeneratingNotes, startNotesTransition] = useTransition();
+  const [notesError, setNotesError] = useState<string | null>(null);
+  const [isStartingPractice, startPracticeTransition] = useTransition();
 
   // Voz: dictar la pregunta (Web Speech API, gratis) y escuchar la
   // respuesta (voz de IA por ElevenLabs, beneficio de plan pagado — ver
@@ -206,6 +220,27 @@ export function TutorChat({
     });
   }
 
+  function handleGenerateNotes() {
+    setNotesError(null);
+    startNotesTransition(async () => {
+      const result = await generateWrapUpAction(conversationId);
+      if (!result.ok) {
+        setNotesError(result.error);
+        return;
+      }
+      setNotes(result.data.notes);
+      setSuggestedTopic(result.data.suggestedTopic);
+    });
+  }
+
+  function handlePractice(topicId: string) {
+    startPracticeTransition(async () => {
+      // Puede redirigir (comportamiento normal de startDiagnosticAction) —
+      // startTransition deja pasar el redirect igual que en GroupActions.
+      await startDiagnosticAction(subjectId, topicId);
+    });
+  }
+
   return (
     // 8rem = DashboardHeader's h-16 (4rem) + dashboard layout's py-8 (4rem)
     // — si cualquiera de los dos cambia, este cálculo hay que revisarlo.
@@ -219,25 +254,62 @@ export function TutorChat({
             {subjectName} · Modo {MODE_LABELS[mode]}
           </p>
         </div>
-        {canUseVoice ? (
-          <Button
-            type="button"
-            variant={voiceMode ? "primary" : "secondary"}
-            size="sm"
-            onClick={() => setVoiceMode((v) => !v)}
-          >
-            <Volume2 className="h-4 w-4" strokeWidth={1.75} />
-            {voiceMode ? "Modo voz activado" : "Activar modo voz"}
-          </Button>
-        ) : (
-          <p className="text-xs text-subtle">
-            <Link href="/#precios" className="font-medium text-accent hover:underline">
-              Mejora tu plan
-            </Link>{" "}
-            para que el tutor te responda en voz.
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {messages.length > 0 && (
+            <Button type="button" variant="secondary" size="sm" disabled={isGeneratingNotes} onClick={handleGenerateNotes}>
+              <NotebookText className="h-4 w-4" strokeWidth={1.75} />
+              {isGeneratingNotes ? "Generando..." : notes ? "Actualizar mis notas" : "Generar mis notas"}
+            </Button>
+          )}
+          {canUseVoice ? (
+            <Button
+              type="button"
+              variant={voiceMode ? "primary" : "secondary"}
+              size="sm"
+              onClick={() => setVoiceMode((v) => !v)}
+            >
+              <Volume2 className="h-4 w-4" strokeWidth={1.75} />
+              {voiceMode ? "Modo voz activado" : "Activar modo voz"}
+            </Button>
+          ) : (
+            <p className="text-xs text-subtle">
+              <Link href="/#precios" className="font-medium text-accent hover:underline">
+                Mejora tu plan
+              </Link>{" "}
+              para que el tutor te responda en voz.
+            </p>
+          )}
+        </div>
       </div>
+
+      {notesError && <p className="text-sm text-danger">{notesError}</p>}
+
+      {notes && (
+        <Card className="flex flex-col gap-3">
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+            <NotebookText className="h-4 w-4 text-accent" strokeWidth={1.75} />
+            Tu libreta de esta conversación
+          </p>
+          <p className="whitespace-pre-line text-sm text-muted">{notes}</p>
+          {suggestedTopic && (
+            <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+              <p className="flex items-center gap-1.5 text-sm text-foreground">
+                <Sparkles className="h-4 w-4 text-accent" strokeWidth={1.75} />
+                Te conviene practicar: <strong>{suggestedTopic.name}</strong>
+              </p>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={isStartingPractice}
+                onClick={() => handlePractice(suggestedTopic.id)}
+              >
+                {isStartingPractice ? "Abriendo..." : "Practicar esto"}
+              </Button>
+            </div>
+          )}
+        </Card>
+      )}
 
       <div className="flex flex-1 flex-col gap-3 overflow-y-auto rounded-2xl border border-border bg-surface p-4">
         {messages.length === 0 ? (

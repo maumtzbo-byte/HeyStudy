@@ -88,6 +88,12 @@ model StudentProfile {
   // exponer tu correo o nombre real. Null hasta que lo elijas desde el
   // perfil — no se pide en el registro para no meter fricción al onboarding.
   username                  String?        @unique
+  // Perfil de estilo de aprendizaje que la IA actualiza a partir de las
+  // conversaciones con el tutor (ver tutorService.generateWrapUp). Solo
+  // afecta tono/ritmo de cómo el tutor explica — nunca la corrección
+  // pedagógica, mismo límite que las instrucciones de un tutor
+  // personalizado (buildTutorSystemPrompt).
+  learningStyleNotes        String?
   onboardedAt              DateTime?
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
@@ -556,6 +562,10 @@ model TutorConversation {
   customTutorId    String?               @db.Uuid
   customTutor      CustomTutor?          @relation(fields: [customTutorId], references: [id], onDelete: SetNull)
   title            String?
+  // Libreta generada por IA a partir de la conversación completa — ver
+  // tutorService.generateWrapUp. Null hasta que el estudiante la pide.
+  notes            String?
+  notesGeneratedAt DateTime?
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
 

@@ -39,3 +39,13 @@ export interface TutorMessage {
 // self_harm es su propia categoría (no sólo "unsafe") porque necesita una
 // respuesta distinta: contención y líneas de ayuda, no un rechazo seco.
 export type ModerationCategory = "safe" | "self_harm" | "unsafe";
+
+// Resultado de cerrar una conversación con el tutor (ver
+// tutorService.generateWrapUp): la libreta de notas, una actualización del
+// perfil de estilo de aprendizaje del estudiante (o null si no hay nada
+// nuevo que agregar), y un tema existente sugerido para practicar (o null).
+export interface ConversationWrapUp {
+  notes: string;
+  learningStyleUpdate: string | null;
+  suggestedTopicId: string | null;
+}
