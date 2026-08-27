@@ -11,6 +11,7 @@ const CACHE_DAYS = 30;
 const MAX_VIDEOS_PER_TOPIC = 2;
 
 export interface VideoRecommendation {
+  knowledgeTopicId: string;
   youtubeVideoId: string;
   title: string;
   channelTitle: string;
@@ -19,6 +20,7 @@ export interface VideoRecommendation {
 }
 
 function toView(row: {
+  knowledgeTopicId: string;
   youtubeVideoId: string;
   title: string;
   channelTitle: string;

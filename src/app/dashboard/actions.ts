@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getAITier } from "@/services/usage/getAITier";
 import { generateTodayPlan, toggleStudyPlanItem } from "@/services/studyplan/studyPlanService";
+import { getOrGenerateVideoNotes } from "@/services/video/videoNotesService";
+import { runAction } from "@/lib/actions/result";
 
 export type PlanActionState = { error?: string } | undefined;
 
@@ -32,4 +34,12 @@ export async function toggleStudyPlanItemAction(itemId: string) {
   const { studentProfile } = await requireStudentProfile();
   await toggleStudyPlanItem(studentProfile.id, itemId);
   revalidatePath("/dashboard");
+}
+
+export async function generateVideoNotesAction(knowledgeTopicId: string, youtubeVideoId: string) {
+  return runAction(async () => {
+    const { user } = await requireStudentProfile();
+    const tier = await getAITier(user.id);
+    return getOrGenerateVideoNotes({ knowledgeTopicId, youtubeVideoId, userId: user.id, tier });
+  });
 }

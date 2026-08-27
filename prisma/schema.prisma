@@ -383,6 +383,12 @@ model RecommendedVideo {
   channelTitle     String
   thumbnailUrl     String
   fetchedAt        DateTime       @default(now())
+  // Resumen generado por IA a partir de la transcripción del video (ver
+  // videoNotesService.ts) — cacheado aquí porque el contenido del video es
+  // el mismo sin importar qué estudiante lo pida. Null hasta que alguien lo
+  // pide por primera vez.
+  notes            String?
+  notesGeneratedAt DateTime?
 
   @@unique([knowledgeTopicId, youtubeVideoId])
   @@index([knowledgeTopicId])
