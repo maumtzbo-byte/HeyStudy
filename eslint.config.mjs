@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Skills/plugins de terceros instalados vía `npx skills add` o
+    // `claude plugin` — no son código de la app, no hace falta lintearlos.
+    ".agents/**",
+    ".claude/**",
   ]),
 ]);
 

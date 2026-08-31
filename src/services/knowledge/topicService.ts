@@ -66,6 +66,24 @@ export async function loadStandardizedTopics(studentProfileId: string, subjectId
   }
 }
 
+// Carga TODAS las plantillas de una familia de examen de un jalón (ver
+// admissionExamService.ts) — a diferencia de loadStandardizedTopics, que
+// carga una sola plantilla a la vez.
+export async function loadTopicsForFamily(studentProfileId: string, subjectId: string, familyId: string) {
+  await assertSubjectOwnership(studentProfileId, subjectId);
+
+  const templates = STANDARDIZED_TOPIC_TEMPLATES.filter((t) => t.familyId === familyId);
+  if (templates.length === 0) throw new UserFacingError("No encontramos temario para ese examen.");
+
+  const existing = await prisma.knowledgeTopic.findMany({ where: { subjectId }, select: { name: true } });
+  const existingNames = new Set(existing.map((t) => t.name));
+  const newNames = templates.flatMap((t) => t.topics).filter((name) => !existingNames.has(name));
+
+  if (newNames.length > 0) {
+    await prisma.knowledgeTopic.createMany({ data: newNames.map((name) => ({ subjectId, name })) });
+  }
+}
+
 export async function listTopicsWithMastery(studentProfileId: string, subjectId: string) {
   await assertSubjectOwnership(studentProfileId, subjectId);
 
