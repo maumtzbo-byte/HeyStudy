@@ -27,6 +27,7 @@ export async function completeOnboarding(params: { userId: string; input: Onboar
         displayName: input.displayName,
         educationLevel: input.educationLevel,
         preferredStudyMethod: input.preferredStudyMethod,
+        schoolCalendarUrl: input.schoolCalendarUrl,
         onboardedAt: now,
         referredByStudentProfileId: referrerStudentProfileId,
       },

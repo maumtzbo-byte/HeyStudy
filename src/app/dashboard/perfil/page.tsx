@@ -12,6 +12,7 @@ import { StudyMethodForm } from "@/components/account/StudyMethodForm";
 import { ReviewRemindersToggle } from "@/components/account/ReviewRemindersToggle";
 import { EmailToggle } from "@/components/account/EmailToggle";
 import { ParentEmailForm } from "@/components/account/ParentEmailForm";
+import { SchoolCalendarUrlForm } from "@/components/account/SchoolCalendarUrlForm";
 import { UsernameForm } from "@/components/account/UsernameForm";
 import { CopyReferralLink } from "@/components/account/CopyReferralLink";
 import { getReferralStats, REFERRAL_REWARD_DAYS } from "@/services/referrals/referralService";
@@ -51,6 +52,15 @@ export default async function PerfilPage() {
             espaciada sirva de algo, en vez de depender de que te acuerdes de abrir la app.
           </CardDescription>
           <ReviewRemindersToggle enabled={studentProfile.reviewRemindersEnabled} />
+        </Card>
+
+        <Card className="flex flex-col gap-3">
+          <CardTitle>Calendario de tu escuela</CardTitle>
+          <CardDescription>
+            Si tu escuela usa Toddle, Google Classroom, Canvas, Moodle o algo parecido, pega aquí el link de
+            &ldquo;Suscribirse&rdquo;/&ldquo;Exportar calendario&rdquo; que te da esa plataforma.
+          </CardDescription>
+          <SchoolCalendarUrlForm currentUrl={studentProfile.schoolCalendarUrl} />
         </Card>
       </section>
 

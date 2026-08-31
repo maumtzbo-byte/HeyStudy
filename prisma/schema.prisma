@@ -94,6 +94,12 @@ model StudentProfile {
   // pedagógica, mismo límite que las instrucciones de un tutor
   // personalizado (buildTutorSystemPrompt).
   learningStyleNotes        String?
+  // Link de suscripción de calendario (ICS/webcal) de la plataforma de su
+  // escuela (Toddle, Google Classroom, Canvas, Moodle, etc. — cualquiera
+  // que exporte calendario). Opcional, se puede dar en el onboarding o
+  // después desde el perfil. Aún no hay un importador leyéndolo (ver
+  // conversación del proyecto) — por ahora solo se captura y se guarda.
+  schoolCalendarUrl        String?
   onboardedAt              DateTime?
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt

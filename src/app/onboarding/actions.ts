@@ -25,6 +25,7 @@ export async function submitOnboardingAction(
     educationLevel: formData.get("educationLevel"),
     preferredStudyMethod: formData.get("preferredStudyMethod"),
     subjectNames,
+    schoolCalendarUrl: formData.get("schoolCalendarUrl") ?? "",
     ageConfirmed: formData.get("ageConfirmed"),
   });
   if (!parsed.success) {

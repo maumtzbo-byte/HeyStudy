@@ -44,6 +44,16 @@ export async function updateParentEmail(userId: string, parentEmail: string | nu
   });
 }
 
+// Link de calendario (ICS/webcal) de la plataforma de la escuela — ver
+// schoolCalendarUrlSchema en onboardingSchemas.ts. Se puede dar en el
+// onboarding o agregar/cambiar después desde aquí.
+export async function updateSchoolCalendarUrl(userId: string, schoolCalendarUrl: string | null) {
+  await prisma.studentProfile.update({
+    where: { userId },
+    data: { schoolCalendarUrl },
+  });
+}
+
 export async function updateParentReportEnabled(userId: string, enabled: boolean) {
   if (enabled) {
     const profile = await prisma.studentProfile.findUnique({ where: { userId }, select: { parentEmail: true } });

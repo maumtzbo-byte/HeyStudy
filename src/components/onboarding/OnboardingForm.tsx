@@ -106,6 +106,16 @@ export function OnboardingForm() {
         </button>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="schoolCalendarUrl">Link de calendario de tu escuela (opcional)</Label>
+        <Input id="schoolCalendarUrl" name="schoolCalendarUrl" type="url" placeholder="https://..." />
+        <p className="text-xs text-muted">
+          Si tu escuela usa Toddle, Google Classroom, Canvas, Moodle o algo parecido, busca la opción de
+          &ldquo;Suscribirse&rdquo; o &ldquo;Exportar calendario&rdquo; y pega aquí ese link — así podremos avisarte de tareas y
+          exámenes sin que los captures a mano. Si no lo tienes a la mano, lo puedes agregar después desde tu cuenta.
+        </p>
+      </div>
+
       <label className="flex items-start gap-2.5 text-sm text-muted">
         <input
           type="checkbox"
