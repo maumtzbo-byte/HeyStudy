@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { Flame, Target, ListChecks, BookOpen } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listSubjects } from "@/services/subjects/subjectService";
@@ -274,25 +273,13 @@ export default async function DashboardHomePage() {
             <GeneratePlanForm regenerate />
           </Card>
         ) : (
-          <Card className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:text-left">
-            <Image
-              src="/mascot/mascota-lectura.png"
-              alt=""
-              aria-hidden
-              width={139}
-              height={111}
-              className="h-20 w-auto shrink-0"
-            />
-            <div className="flex flex-col gap-3">
-              <div>
-                <CardTitle>Todavía no tienes un plan para hoy</CardTitle>
-                <CardDescription>
-                  Con lo que hayas diagnosticado, armamos qué estudiar hoy y por qué. Si no has diagnosticado
-                  ningún tema todavía, hazlo primero desde el mapa de conocimiento de una materia.
-                </CardDescription>
-              </div>
-              <GeneratePlanForm />
-            </div>
+          <Card className="flex flex-col gap-3">
+            <CardTitle>Todavía no tienes un plan para hoy</CardTitle>
+            <CardDescription>
+              Con lo que hayas diagnosticado, armamos qué estudiar hoy y por qué. Si no has diagnosticado
+              ningún tema todavía, hazlo primero desde el mapa de conocimiento de una materia.
+            </CardDescription>
+            <GeneratePlanForm />
           </Card>
         )}
       </section>

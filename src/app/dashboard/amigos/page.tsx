@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { UserPlus } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
@@ -78,15 +77,7 @@ export default async function AmigosPage() {
       <section className="flex flex-col gap-3">
         <h2 className="text-base font-semibold text-foreground">Tus amigos</h2>
         {friends.length === 0 ? (
-          <Card className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
-            <Image
-              src="/mascot/mascota-feliz.png"
-              alt=""
-              aria-hidden
-              width={139}
-              height={104}
-              className="h-16 w-auto shrink-0"
-            />
+          <Card>
             <CardDescription>
               Todavía no tienes amigos agregados. Pídele su @usuario a alguien y agrégalo arriba.
             </CardDescription>

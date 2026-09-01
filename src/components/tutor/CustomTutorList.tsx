@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Image from "next/image";
 import { Pencil, Trash2 } from "lucide-react";
 import { deleteTutorAction } from "@/app/dashboard/tutores/actions";
 import { CustomTutorForm, type TutorFormValues } from "@/components/tutor/CustomTutorForm";
@@ -43,15 +42,7 @@ export function CustomTutorList({
 
   if (tutors.length === 0) {
     return (
-      <Card className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
-        <Image
-          src="/mascot/mascota-feliz.png"
-          alt=""
-          aria-hidden
-          width={139}
-          height={104}
-          className="h-16 w-auto shrink-0"
-        />
+      <Card>
         <CardDescription>Todavía no tienes tutores propios. Crea uno para que te explique a tu manera.</CardDescription>
       </Card>
     );
