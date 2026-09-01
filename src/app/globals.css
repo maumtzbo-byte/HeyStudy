@@ -12,11 +12,10 @@
      colores de alerta (aviso/peligro) están desaturados a propósito para
      que "esto se te da mal" se lea como información, no como amenaza.
 
-     El acento es petróleo profundo, no el periwinkle de antes. Dos razones:
-     el morado pastel es el color por defecto de cualquier producto de IA y
-     hacía que la página se leyera como plantilla; y siendo la mascota
-     lavanda, un acento complementario la vuelve el punto de color de la
-     página en vez de fundirla con el resto. Tinta fría sobre papel cálido. */
+     El acento es un morado periwinkle (#6d46e3), elegido a propósito en
+     vez de dejarlo en el azul/morado por defecto de cualquier producto de
+     IA — sin mascota (se quitó de dashboard y landing), es el único punto
+     de color de marca en una paleta por lo demás neutra. */
   --background: #fbfaf9;
   --surface: #ffffff;
   --surface-elevated: #fcfcfd;

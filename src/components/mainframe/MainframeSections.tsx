@@ -1,10 +1,10 @@
 "use client";
 
 import { useId, useState, type ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { LogoMark } from "@/components/ui/Logo";
+import { Reveal } from "@/components/marketing/Reveal";
 
 /* ----------------------------------------------------------------------- */
 /* Secciones de HeyStudy en el lenguaje visual del hero de Mainframe:       */
@@ -78,12 +78,14 @@ const STEPS = [
 export function HowItWorks() {
   return (
     <Section id="como-funciona">
-      <Eyebrow>Cómo funciona</Eyebrow>
-      <SectionTitle>De adivinar a saber, en cuatro pasos.</SectionTitle>
+      <Reveal>
+        <Eyebrow>Cómo funciona</Eyebrow>
+        <SectionTitle>De adivinar a saber, en cuatro pasos.</SectionTitle>
+      </Reveal>
 
       <div className="mt-14 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-        {STEPS.map((step) => (
-          <div key={step.n}>
+        {STEPS.map((step, i) => (
+          <Reveal key={step.n} delay={i * 0.08}>
             <span
               className="text-[15px] text-black/35"
               style={{ fontFamily: "var(--font-heading)" }}
@@ -92,7 +94,7 @@ export function HowItWorks() {
             </span>
             <h3 className="mt-3 text-lg font-medium text-black">{step.title}</h3>
             <p className="mt-2 text-[15px] leading-relaxed text-black/60">{step.body}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </Section>
@@ -107,11 +109,22 @@ const PRODUCTO_BULLETS = [
   "Empieza gratis. Sin tarjeta, sin compromiso.",
 ];
 
+// Mock estático del mapa de conocimiento — mismos tokens de color que ya
+// usa el resto de la app por materia (subject.color), como acento chico
+// (un punto), no como fondo sólido — consistente con el "sin tarjetas de
+// color" del resto de esta landing.
+const SHOWCASE_SUBJECTS = [
+  { name: "Matemáticas", color: "#6d46e3", mastery: 78 },
+  { name: "Historia", color: "#7e5e25", mastery: 52 },
+  { name: "Biología", color: "#396a5a", mastery: 91 },
+  { name: "Química", color: "#974535", mastery: 34 },
+];
+
 export function ProductShowcase() {
   return (
     <Section id="producto" className="bg-white">
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
-        <div>
+        <Reveal>
           <Eyebrow>Producto</Eyebrow>
           <SectionTitle>Para prepa, universidad y admisión.</SectionTitle>
           <ul className="mt-8 flex flex-col gap-4">
@@ -128,17 +141,26 @@ export function ProductShowcase() {
           >
             Comenzar gratis
           </Link>
-        </div>
-        <div className="flex items-center justify-center">
-          <Image
-            src="/mascot/mascota-feliz.png"
-            alt=""
-            aria-hidden
-            width={351}
-            height={263}
-            className="w-full max-w-sm"
-          />
-        </div>
+        </Reveal>
+        <Reveal delay={0.15} className="flex items-center justify-center">
+          <div
+            aria-hidden="true"
+            className="w-full max-w-sm rounded-[28px] border border-black/10 bg-white p-6 shadow-[0_20px_60px_-24px_rgba(0,0,0,0.15)]"
+          >
+            <p className="text-xs font-medium tracking-wide text-black/40 uppercase">Tus materias</p>
+            <div className="mt-4 flex flex-col divide-y divide-black/10">
+              {SHOWCASE_SUBJECTS.map((s) => (
+                <div key={s.name} className="flex items-center justify-between gap-3 py-3">
+                  <span className="flex items-center gap-2.5 text-sm text-black/80">
+                    <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
+                    {s.name}
+                  </span>
+                  <span className="text-xs font-medium text-black/40">{s.mastery}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
       </div>
     </Section>
   );
@@ -182,16 +204,18 @@ const EXAMS = [
 export function Exams() {
   return (
     <Section id="examenes" className="bg-white">
-      <Eyebrow>Exámenes de admisión</Eyebrow>
-      <SectionTitle>Nos basamos en el temario oficial de cada examen.</SectionTitle>
+      <Reveal>
+        <Eyebrow>Exámenes de admisión</Eyebrow>
+        <SectionTitle>Nos basamos en el temario oficial de cada examen.</SectionTitle>
+      </Reveal>
 
       <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-        {EXAMS.map((exam) => (
-          <div key={exam.name} className="border-t border-black/10 pt-5">
+        {EXAMS.map((exam, i) => (
+          <Reveal key={exam.name} delay={(i % 3) * 0.08} className="border-t border-black/10 pt-5">
             <p className="text-xs font-semibold tracking-wide text-black/40 uppercase">{exam.org}</p>
             <h3 className="mt-1.5 text-lg font-medium text-black">{exam.name}</h3>
             <p className="mt-2 text-[15px] leading-relaxed text-black/60">{exam.body}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
 
@@ -226,72 +250,78 @@ const VERDICT_LABEL: Record<Verdict, string> = { yes: "Sí", partial: "A medias"
 export function Comparativa() {
   return (
     <Section id="comparativa">
-      <Eyebrow>Comparación</Eyebrow>
-      <SectionTitle>Contra lo que de verdad compite HeyStudy.</SectionTitle>
+      <Reveal>
+        <Eyebrow>Comparación</Eyebrow>
+        <SectionTitle>Contra lo que de verdad compite HeyStudy.</SectionTitle>
+      </Reveal>
 
       {/* Móvil — una tarjeta por criterio */}
-      <ul className="mt-12 flex flex-col gap-3 md:hidden">
-        {ROWS.map((row) => (
-          <li key={row.feature} className="rounded-2xl border border-black/10 p-4">
-            <p className="text-sm font-medium text-black">{row.feature}</p>
-            <div className="mt-4 grid grid-cols-4 gap-2">
-              {row.values.map((v, i) => (
-                <div key={i} className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2.5 ${i === 0 ? "bg-accent/10" : ""}`}>
-                  <span
-                    aria-label={VERDICT_LABEL[v]}
-                    className={`text-base ${v === "yes" ? (i === 0 ? "text-accent" : "text-black") : "text-black/30"}`}
-                  >
-                    {VERDICT_GLYPH[v]}
-                  </span>
-                  <span className={`text-center text-[10px] leading-tight ${i === 0 ? "font-semibold text-black" : "text-black/40"}`}>
-                    {COLUMNS[i]}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </li>
-        ))}
-      </ul>
+      <Reveal delay={0.1} className="mt-12 md:hidden">
+        <ul className="flex flex-col gap-3">
+          {ROWS.map((row) => (
+            <li key={row.feature} className="rounded-2xl border border-black/10 p-4">
+              <p className="text-sm font-medium text-black">{row.feature}</p>
+              <div className="mt-4 grid grid-cols-4 gap-2">
+                {row.values.map((v, i) => (
+                  <div key={i} className={`flex flex-col items-center gap-1.5 rounded-xl px-1 py-2.5 ${i === 0 ? "bg-accent/10" : ""}`}>
+                    <span
+                      aria-label={VERDICT_LABEL[v]}
+                      className={`text-base ${v === "yes" ? (i === 0 ? "text-accent" : "text-black") : "text-black/30"}`}
+                    >
+                      {VERDICT_GLYPH[v]}
+                    </span>
+                    <span className={`text-center text-[10px] leading-tight ${i === 0 ? "font-semibold text-black" : "text-black/40"}`}>
+                      {COLUMNS[i]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
 
       {/* md+ — tabla completa */}
-      <table className="mt-12 hidden w-full border-collapse text-left md:table">
-        <caption className="sr-only">
-          Comparación de HeyStudy contra estudiar por tu cuenta, una IA de uso general y un tutor particular
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col" className="w-[34%] pb-4" />
-            {COLUMNS.map((col, i) => (
-              <th
-                key={col}
-                scope="col"
-                className={`pb-4 text-center align-bottom text-sm ${i === 0 ? "font-semibold text-black" : "font-medium text-black/50"}`}
-              >
-                {i === 0 ? <span className="inline-block rounded-full bg-accent px-3 py-1.5 text-white">{col}</span> : col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {ROWS.map((row) => (
-            <tr key={row.feature} className="border-t border-black/10">
-              <th scope="row" className="py-4 pr-4 text-sm font-medium text-black">
-                {row.feature}
-              </th>
-              {row.values.map((v, i) => (
-                <td key={i} className={`py-4 text-center ${i === 0 ? "bg-accent/10" : ""}`}>
-                  <span
-                    aria-label={VERDICT_LABEL[v]}
-                    className={`text-base ${v === "yes" ? (i === 0 ? "text-accent" : "text-black") : "text-black/30"}`}
-                  >
-                    {VERDICT_GLYPH[v]}
-                  </span>
-                </td>
+      <Reveal delay={0.1} className="mt-12 hidden md:block">
+        <table className="w-full border-collapse text-left">
+          <caption className="sr-only">
+            Comparación de HeyStudy contra estudiar por tu cuenta, una IA de uso general y un tutor particular
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" className="w-[34%] pb-4" />
+              {COLUMNS.map((col, i) => (
+                <th
+                  key={col}
+                  scope="col"
+                  className={`pb-4 text-center align-bottom text-sm ${i === 0 ? "font-semibold text-black" : "font-medium text-black/50"}`}
+                >
+                  {i === 0 ? <span className="inline-block rounded-full bg-accent px-3 py-1.5 text-white">{col}</span> : col}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {ROWS.map((row) => (
+              <tr key={row.feature} className="border-t border-black/10">
+                <th scope="row" className="py-4 pr-4 text-sm font-medium text-black">
+                  {row.feature}
+                </th>
+                {row.values.map((v, i) => (
+                  <td key={i} className={`py-4 text-center ${i === 0 ? "bg-accent/10" : ""}`}>
+                    <span
+                      aria-label={VERDICT_LABEL[v]}
+                      className={`text-base ${v === "yes" ? (i === 0 ? "text-accent" : "text-black") : "text-black/30"}`}
+                    >
+                      {VERDICT_GLYPH[v]}
+                    </span>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Reveal>
     </Section>
   );
 }
@@ -330,13 +360,16 @@ const PLANS = [
 export function Precios() {
   return (
     <Section id="precios" className="bg-white">
-      <Eyebrow>Precios</Eyebrow>
-      <SectionTitle>Empieza gratis. Sin tarjeta.</SectionTitle>
+      <Reveal>
+        <Eyebrow>Precios</Eyebrow>
+        <SectionTitle>Empieza gratis. Sin tarjeta.</SectionTitle>
+      </Reveal>
 
       <div className="mx-auto mt-12 grid w-full max-w-3xl grid-cols-1 gap-5 sm:grid-cols-2">
-        {PLANS.map((plan) => (
-          <div
+        {PLANS.map((plan, i) => (
+          <Reveal
             key={plan.name}
+            delay={i * 0.1}
             className={`relative flex h-full flex-col rounded-2xl border p-7 sm:p-8 ${
               plan.highlighted ? "border-accent bg-accent text-white" : "border-black/10 text-black"
             }`}
@@ -372,7 +405,7 @@ export function Precios() {
             >
               {plan.cta}
             </Link>
-          </div>
+          </Reveal>
         ))}
       </div>
     </Section>
@@ -471,18 +504,20 @@ export function Faq() {
 export function CtaFinal() {
   return (
     <Section className="bg-white text-center">
-      <h2
-        className="mx-auto max-w-2xl text-[32px] leading-[1.1] font-medium tracking-tight text-black sm:text-[48px]"
-        style={{ fontFamily: "var(--font-heading)" }}
-      >
-        Deja de adivinar qué estudiar.
-      </h2>
-      <Link
-        href="/registro"
-        className="mt-9 inline-flex items-center justify-center rounded-full border border-accent bg-accent px-7 py-3.5 text-[15px] text-white transition-colors duration-200 hover:border-accent-hover hover:bg-accent-hover"
-      >
-        Comenzar gratis
-      </Link>
+      <Reveal>
+        <h2
+          className="mx-auto max-w-2xl text-[32px] leading-[1.1] font-medium tracking-tight text-black sm:text-[48px]"
+          style={{ fontFamily: "var(--font-heading)" }}
+        >
+          Deja de adivinar qué estudiar.
+        </h2>
+        <Link
+          href="/registro"
+          className="mt-9 inline-flex items-center justify-center rounded-full border border-accent bg-accent px-7 py-3.5 text-[15px] text-white transition-colors duration-200 hover:border-accent-hover hover:bg-accent-hover"
+        >
+          Comenzar gratis
+        </Link>
+      </Reveal>
     </Section>
   );
 }
