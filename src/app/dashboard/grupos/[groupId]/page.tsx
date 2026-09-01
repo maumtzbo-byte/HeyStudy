@@ -7,6 +7,7 @@ import { getStudyGroupDetail } from "@/services/groups/studyGroupService";
 import { UserFacingError } from "@/lib/actions/result";
 import { ShareTodayPlanButton, UnshareButton, LeaveGroupButton } from "@/components/groups/GroupActions";
 import { Card, CardDescription } from "@/components/ui/Card";
+import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/utils/cn";
 import { formatDate } from "@/lib/format";
 
@@ -55,7 +56,12 @@ export default async function GroupDetailPage({ params }: PageProps<"/dashboard/
               </code>
             </p>
           </div>
-          <LeaveGroupButton groupId={group.id} isOwner={group.myRole === "OWNER"} />
+          <div className="flex items-center gap-3">
+            <ButtonLink href="/dashboard/drops" variant="secondary" size="sm">
+              Ver Drops
+            </ButtonLink>
+            <LeaveGroupButton groupId={group.id} isOwner={group.myRole === "OWNER"} />
+          </div>
         </div>
       </div>
 

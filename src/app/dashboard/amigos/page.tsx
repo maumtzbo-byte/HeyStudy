@@ -4,6 +4,7 @@ import { UserPlus } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { listFriends, listPendingRequests } from "@/services/friends/friendService";
 import { Card, CardDescription } from "@/components/ui/Card";
+import { ButtonLink } from "@/components/ui/Button";
 import { AddFriendForm } from "@/components/friends/AddFriendForm";
 import { IncomingRequestActions, RemoveFriendButton } from "@/components/friends/FriendRequestActions";
 
@@ -18,11 +19,16 @@ export default async function AmigosPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Amigos</h1>
-        <p className="mt-1 text-sm text-muted">
-          Conecta con quien ya conoces por su @usuario. No hay búsqueda pública: solo se agrega por usuario exacto.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">Amigos</h1>
+          <p className="mt-1 text-sm text-muted">
+            Conecta con quien ya conoces por su @usuario. No hay búsqueda pública: solo se agrega por usuario exacto.
+          </p>
+        </div>
+        <ButtonLink href="/dashboard/drops" variant="secondary" size="sm">
+          Ver Drops
+        </ButtonLink>
       </div>
 
       <Card as="section">

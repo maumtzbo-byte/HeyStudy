@@ -120,6 +120,9 @@ model StudentProfile {
   friendshipsSent     Friendship[] @relation("FriendshipRequester")
   friendshipsReceived Friendship[] @relation("FriendshipAddressee")
 
+  studyDrops     StudyDrop[]
+  studyDropLikes StudyDropLike[]
+
   @@map("student_profiles")
 }
 
@@ -215,6 +218,53 @@ model Friendship {
 }
 
 // ---------------------------------------------------------------------------
+// Study Drops — video/imagen corta entre amigos y grupo
+// ---------------------------------------------------------------------------
+
+enum StudyDropMediaType {
+  VIDEO
+  IMAGEN
+}
+
+// Publicación corta (video ≤60s o una imagen) visible sólo para el propio
+// autor, sus amigos aceptados y sus compañeros de grupo — nunca pública ni
+// descubrible por desconocidos, mismo criterio de privacidad que
+// Friendship/StudyGroup. No guarda una URL: como Material, sólo el
+// storagePath, resuelto a una URL firmada al servir el feed
+// (studyDropService.getFeed).
+model StudyDrop {
+  id               String             @id @default(uuid()) @db.Uuid
+  studentProfileId String             @db.Uuid
+  studentProfile   StudentProfile     @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  subjectId        String?            @db.Uuid
+  subject          Subject?           @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  caption          String?
+  mediaType        StudyDropMediaType
+  storagePath      String
+  durationSeconds  Int?
+  fileSizeKb       Int?
+  createdAt        DateTime           @default(now())
+
+  likes StudyDropLike[]
+
+  @@index([studentProfileId, createdAt])
+  @@map("study_drops")
+}
+
+model StudyDropLike {
+  id               String         @id @default(uuid()) @db.Uuid
+  studyDropId      String         @db.Uuid
+  studyDrop        StudyDrop      @relation(fields: [studyDropId], references: [id], onDelete: Cascade)
+  studentProfileId String         @db.Uuid
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  createdAt        DateTime       @default(now())
+
+  @@unique([studyDropId, studentProfileId])
+  @@index([studyDropId])
+  @@map("study_drop_likes")
+}
+
+// ---------------------------------------------------------------------------
 // Materias, tareas, exámenes, materiales — cargados manualmente
 // ---------------------------------------------------------------------------
 
@@ -234,6 +284,7 @@ model Subject {
   grades             Grade[]
   tutorConversations TutorConversation[]
   customTutors       CustomTutor[]
+  studyDrops         StudyDrop[]
 
   @@index([studentProfileId])
   @@map("subjects")
