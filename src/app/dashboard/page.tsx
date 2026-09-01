@@ -8,6 +8,7 @@ import { listUpcomingExams } from "@/services/exams/examService";
 import { calculateExamReadiness } from "@/services/exams/readinessService";
 import { getTodayPlan } from "@/services/studyplan/studyPlanService";
 import { getVideoRecommendationsForTopic, type VideoRecommendation } from "@/services/video/videoService";
+import type { ReadinessStatus } from "@/services/exams/readinessService";
 import { getStudyDates, currentStreakDays } from "@/services/reporting/streakService";
 import { getPlanUsageSummary } from "@/services/usage/planLimits";
 import { todayInTimezone } from "@/lib/utils/dates";
@@ -15,7 +16,6 @@ import { cn } from "@/lib/utils/cn";
 import { formatDate } from "@/lib/format";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import { ButtonLink } from "@/components/ui/Button";
-import { ReadinessBadge } from "@/components/exams/ReadinessBadge";
 import { GeneratePlanForm } from "@/components/dashboard/GeneratePlanForm";
 import { StudyPlanList } from "@/components/dashboard/StudyPlanList";
 import { PlanUsageCard } from "@/components/dashboard/PlanUsageCard";
@@ -32,6 +32,18 @@ function daysUntilLabel(diff: number) {
 function daysUntil(date: Date) {
   return daysUntilLabel(Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
 }
+
+// Mismo mapeo de 4 estados que ReadinessBadge, promovido de pill chico a
+// color de identidad de la tarjeta completa.
+const READINESS_CARD_META: Record<
+  ReadinessStatus,
+  { label: string; borderClassName: string; textClassName: string; barClassName: string }
+> = {
+  sin_temas: { label: "Sin configurar", borderClassName: "border-l-border", textClassName: "text-subtle", barClassName: "bg-subtle" },
+  en_riesgo: { label: "En riesgo", borderClassName: "border-l-danger", textClassName: "text-danger", barClassName: "bg-danger" },
+  en_progreso: { label: "En progreso", borderClassName: "border-l-warning", textClassName: "text-warning", barClassName: "bg-warning" },
+  listo: { label: "Listo", borderClassName: "border-l-success", textClassName: "text-success", barClassName: "bg-success" },
+};
 
 export default async function DashboardHomePage() {
   const { user, studentProfile } = await requireStudentProfile();
@@ -91,6 +103,12 @@ export default async function DashboardHomePage() {
     return { active: activeDayNumbers.has(dayNumber), letter: WEEKDAY_LETTERS[new Date(dayNumber * 86400000).getUTCDay()] };
   });
 
+  // Para la tira de tarjetas destacadas: mismo criterio de "día" que
+  // last7Days, sobre las tareas ya obtenidas (sin fetch nuevo).
+  const dueTodayCount = assignments.filter(
+    (a) => Math.floor(a.dueDate.getTime() / 86400000) === todayDayNumber,
+  ).length;
+
   const todoItems = [
     ...assignments.map((a) => ({
       id: a.id,
@@ -132,6 +150,37 @@ export default async function DashboardHomePage() {
           Ver mi plan de hoy
         </ButtonLink>
       </Card>
+
+      {/* Tira horizontal de tarjetas de color sólido — vista rápida sin
+          scrollear a las secciones de abajo, mismos datos ya obtenidos
+          arriba (sin fetches nuevos). */}
+      <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-1">
+        {dueTodayCount > 0 && (
+          <Card className="flex w-36 shrink-0 snap-start flex-col justify-between gap-4 border-transparent bg-danger p-4 text-white">
+            <ListChecks className="h-5 w-5 text-white" strokeWidth={2} />
+            <div>
+              <p className="text-3xl font-bold tabular-nums">{dueTodayCount}</p>
+              <p className="text-xs text-white/80">{dueTodayCount === 1 ? "tarea vence hoy" : "tareas vencen hoy"}</p>
+            </div>
+          </Card>
+        )}
+        <Card className="flex w-36 shrink-0 snap-start flex-col justify-between gap-4 border-transparent bg-warning p-4 text-white">
+          <Flame className="h-5 w-5 text-white" strokeWidth={2} />
+          <div>
+            <p className="text-3xl font-bold tabular-nums">{streak}</p>
+            <p className="text-xs text-white/80">{streak === 1 ? "día de racha" : "días de racha"}</p>
+          </div>
+        </Card>
+        {exams.length > 0 && (
+          <Card className="flex w-36 shrink-0 snap-start flex-col justify-between gap-4 border-transparent bg-accent p-4 text-accent-foreground">
+            <Target className="h-5 w-5 text-accent-foreground" strokeWidth={2} />
+            <div>
+              <p className="line-clamp-1 text-sm font-semibold">{exams[0].subject.name}</p>
+              <p className="text-xs text-accent-foreground/80">{daysUntil(exams[0].examDate)}</p>
+            </div>
+          </Card>
+        )}
+      </div>
 
       {/* Misma secuencia de formas que la referencia: rectángulo grande
           (arriba) → rectángulo más chico, ancho completo → dos cuadrados
@@ -228,28 +277,37 @@ export default async function DashboardHomePage() {
             <CardDescription>No tienes exámenes próximos registrados.</CardDescription>
           </Card>
         ) : (
-          <div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {examReadiness.map((readiness) => {
               const subjectId = exams.find((e) => e.id === readiness.examId)?.subjectId;
               const weakestTopicId = readiness.breakdown[0]?.topicId;
+              const meta = READINESS_CARD_META[readiness.status];
+              const pct = readiness.score ?? 0;
               return (
-                <div
-                  key={readiness.examId}
-                  className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-border/20"
-                >
-                  <Link href={`/dashboard/materias/${subjectId}/examenes/${readiness.examId}`} className="min-w-0 flex-1">
+                <Card key={readiness.examId} className={cn("flex flex-col gap-3 border-l-4", meta.borderClassName)}>
+                  <Link href={`/dashboard/materias/${subjectId}/examenes/${readiness.examId}`} className="min-w-0">
                     <p className="text-sm font-medium text-foreground">{readiness.examTitle}</p>
                     <p className="text-xs text-muted">
                       {readiness.subjectName} · {daysUntilLabel(readiness.daysUntilExam)}
                     </p>
                   </Link>
-                  <div className="flex shrink-0 items-center gap-3">
-                    {readiness.status !== "listo" && subjectId && weakestTopicId && (
-                      <StartDiagnosticButton subjectId={subjectId} topicId={weakestTopicId} />
-                    )}
-                    <ReadinessBadge status={readiness.status} score={readiness.score} />
+                  <div className="flex items-end justify-between gap-3">
+                    <p className={cn("text-4xl font-bold tabular-nums", meta.textClassName)}>
+                      {readiness.score !== null ? `${pct}%` : "—"}
+                    </p>
+                    <div className="flex shrink-0 items-center gap-3">
+                      {readiness.status !== "listo" && subjectId && weakestTopicId && (
+                        <StartDiagnosticButton subjectId={subjectId} topicId={weakestTopicId} />
+                      )}
+                      <span className={cn("text-xs font-medium", meta.textClassName)}>{meta.label}</span>
+                    </div>
                   </div>
-                </div>
+                  {readiness.score !== null && (
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
+                      <div className={cn("h-full rounded-full", meta.barClassName)} style={{ width: `${pct}%` }} />
+                    </div>
+                  )}
+                </Card>
               );
             })}
           </div>
@@ -302,12 +360,15 @@ export default async function DashboardHomePage() {
             {todoItems.map((item) => (
               <div key={`${item.kind}-${item.id}`} className="flex items-center justify-between gap-4 px-5 py-4">
                 <div className="flex items-center gap-3">
-                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: item.subjectColor }} />
+                  <span
+                    className="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold"
+                    style={{ backgroundColor: `${item.subjectColor}1a`, color: item.subjectColor }}
+                  >
+                    {item.kind}
+                  </span>
                   <div>
                     <p className="text-sm font-medium text-foreground">{item.title}</p>
-                    <p className="text-xs text-muted">
-                      {item.kind} · {item.subjectName}
-                    </p>
+                    <p className="text-xs text-muted">{item.subjectName}</p>
                   </div>
                 </div>
                 <div className="text-right">
