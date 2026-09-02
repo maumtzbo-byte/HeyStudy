@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Flame, Target, ListChecks, BookOpen } from "lucide-react";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
+import { prisma } from "@/lib/prisma/client";
 import { listSubjects } from "@/services/subjects/subjectService";
 import { listUpcomingAssignments } from "@/services/assignments/assignmentService";
 import { listUpcomingExams } from "@/services/exams/examService";
@@ -48,14 +49,30 @@ const READINESS_CARD_META: Record<
 export default async function DashboardHomePage() {
   const { user, studentProfile } = await requireStudentProfile();
 
-  const [subjects, assignments, exams, todayPlan, studyDates, planUsage] = await Promise.all([
+  const [subjects, assignments, exams, todayPlan, studyDates, planUsage, diagnosedTopicCount] = await Promise.all([
     listSubjects(studentProfile.id),
     listUpcomingAssignments(studentProfile.id, 5),
     listUpcomingExams(studentProfile.id, 3),
     getTodayPlan(studentProfile.id),
     getStudyDates(studentProfile.id),
     getPlanUsageSummary(user.id),
+    // generateTodayPlan devuelve null si no hay ni una fila de mastery
+    // (studyPlanService.ts), y esas filas sólo nacen al RESPONDER una
+    // pregunta de diagnóstico. Sin este conteo, al estudiante nuevo se le
+    // mostraba el formulario de "Generar mi plan", que para él siempre
+    // falla. No sirve usar planUsage.diagnosticsUsed como atajo: se puede
+    // empezar un diagnóstico y abandonarlo sin responder, y ahí el
+    // contador va en 1 pero el plan sigue sin poder generarse.
+    prisma.knowledgeMastery.count({ where: { studentProfileId: studentProfile.id } }),
   ]);
+
+  const hasDiagnosed = diagnosedTopicCount > 0;
+  // A dónde mandarlo a dar su primer paso: la materia de admisión sembrada
+  // en el onboarding si existe, si no la primera materia que tenga.
+  const firstStepSubject = subjects.find((s) => s.name.startsWith("Admisión —")) ?? subjects[0];
+  const firstStepHref = firstStepSubject
+    ? `/dashboard/materias/${firstStepSubject.id}/diagnostico`
+    : "/dashboard/materias";
 
   const streak = currentStreakDays(studyDates, todayInTimezone(studentProfile.timezone));
 
@@ -330,14 +347,24 @@ export default async function DashboardHomePage() {
             />
             <GeneratePlanForm regenerate />
           </Card>
-        ) : (
+        ) : hasDiagnosed ? (
           <Card className="flex flex-col gap-3">
             <CardTitle>Todavía no tienes un plan para hoy</CardTitle>
             <CardDescription>
-              Con lo que hayas diagnosticado, armamos qué estudiar hoy y por qué. Si no has diagnosticado
-              ningún tema todavía, hazlo primero desde el mapa de conocimiento de una materia.
+              Con lo que ya diagnosticaste armamos qué estudiar hoy y por qué.
             </CardDescription>
             <GeneratePlanForm />
+          </Card>
+        ) : (
+          <Card className="flex flex-col gap-3 border-transparent bg-accent-soft">
+            <CardTitle>Empieza por un diagnóstico</CardTitle>
+            <CardDescription>
+              Tu plan se arma a partir de lo que te falta, así que primero necesitamos ver qué tan bien conoces
+              un tema. Son unas cuantas preguntas y con eso ya podemos priorizar tu día.
+            </CardDescription>
+            <ButtonLink href={firstStepHref} variant="primary" className="w-fit">
+              {firstStepSubject ? "Hacer mi primer diagnóstico" : "Agregar mi primera materia"}
+            </ButtonLink>
           </Card>
         )}
       </section>

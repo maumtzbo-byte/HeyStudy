@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { findReferrerByCode, grantReferralReward } from "@/services/referrals/referralService";
+import { selectAdmissionTarget } from "@/services/knowledge/admissionExamService";
 import type { OnboardingInput } from "@/lib/validation/onboardingSchemas";
 
 const SUBJECT_COLORS = ["#C1502E", "#2A6F73", "#B8860B", "#4B7B5D", "#7D4F6D", "#B15D5D"];
@@ -52,6 +53,20 @@ export async function completeOnboarding(params: { userId: string; input: Onboar
 
     return created;
   });
+
+  // Siembra del temario de admisión. Va fuera de la transacción por la misma
+  // razón que la recompensa de referido: selectAdmissionTarget usa el cliente
+  // global de Prisma, así que adentro no vería el perfil recién creado.
+  //
+  // Es lo que hace que el dashboard nazca con contenido en vez de con seis
+  // ceros y un botón que falla: carga entre 12 y 19 áreas del examen, de
+  // forma determinista y sin gastar una llamada de IA. Si falla no se tumba
+  // el registro — el dashboard igual guía al mapa de conocimiento.
+  if (input.admissionTargetId) {
+    await selectAdmissionTarget(studentProfile.id, input.admissionTargetId).catch((err) => {
+      console.error("[onboarding] fallo al sembrar el temario de admisión", err);
+    });
+  }
 
   // Fuera de la transacción, después de que el nuevo perfil ya existe: si
   // esto falla no debe tumbar el onboarding de quien se está registrando.

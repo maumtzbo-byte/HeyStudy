@@ -24,6 +24,7 @@ export async function submitOnboardingAction(
     displayName: formData.get("displayName"),
     educationLevel: formData.get("educationLevel"),
     preferredStudyMethod: formData.get("preferredStudyMethod"),
+    admissionTargetId: formData.get("admissionTargetId"),
     subjectNames,
     schoolCalendarUrl: formData.get("schoolCalendarUrl") ?? "",
     ageConfirmed: formData.get("ageConfirmed"),

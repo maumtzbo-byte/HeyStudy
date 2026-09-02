@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Select } from "@/components/ui/Select";
+import { ADMISSION_TARGETS } from "@/lib/data/standardizedExams";
 
 // Solo lo que HeyStudy realmente sirve — ver la sección "educationLevels"
 // en lib/validation/onboardingSchemas.ts.
@@ -28,6 +29,7 @@ const STUDY_METHOD_LABELS: Record<string, string> = {
 export function OnboardingForm() {
   const [state, formAction, isPending] = useActionState(submitOnboardingAction, undefined);
   const [subjects, setSubjects] = useState<string[]>(["", ""]);
+  const [admissionTargetId, setAdmissionTargetId] = useState("");
 
   function updateSubject(index: number, value: string) {
     setSubjects((prev) => prev.map((s, i) => (i === index ? value : s)));
@@ -74,7 +76,27 @@ export function OnboardingForm() {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label>¿Qué materias cursas?</Label>
+        <Label htmlFor="admissionTargetId">¿Te estás preparando para un examen de admisión?</Label>
+        <Select
+          id="admissionTargetId"
+          name="admissionTargetId"
+          value={admissionTargetId}
+          onChange={(e) => setAdmissionTargetId(e.target.value)}
+        >
+          <option value="">No, sólo llevo mis materias de la escuela</option>
+          {ADMISSION_TARGETS.map((target) => (
+            <option key={target.id} value={target.id}>
+              {target.name}
+            </option>
+          ))}
+        </Select>
+        <p className="text-xs text-muted">
+          Si eliges uno, dejamos listas las áreas de ese examen para que puedas diagnosticarte desde el primer día.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label>¿Qué materias cursas?{admissionTargetId && " (opcional)"}</Label>
         <div className="flex flex-col gap-2">
           {subjects.map((subject, index) => (
             <div key={index} className="flex items-center gap-2">
