@@ -4,6 +4,7 @@ import { UserFacingError } from "@/lib/actions/result";
 import { tutorResponse, moderateTutorMessage, summarizeTutorConversation } from "@/services/ai/AIProvider";
 import { MODE_TO_DB, MODE_FROM_DB } from "@/services/tutor/customTutorService";
 import { assertSubjectOwnership } from "@/lib/auth/ownership";
+import { claimTutorMessage } from "@/services/usage/aiQuotas";
 import type { AITier } from "@/services/ai/models";
 import type { TutorMode } from "@/services/ai/types";
 
@@ -155,6 +156,11 @@ export async function sendMessage(params: {
   }
 
   const conversation = await assertConversationOwnership(studentProfileId, conversationId);
+
+  // Cuota mensual antes de escribir nada ni llamar a la IA: el chat del
+  // tutor no tenía ningún tope en ningún plan, y es de las operaciones más
+  // caras del producto (cada turno reenvía toda la conversación).
+  await claimTutorMessage(userId, tier);
 
   const priorMessages = await prisma.tutorChatMessage.findMany({
     where: { tutorConversationId: conversationId },
