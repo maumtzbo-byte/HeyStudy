@@ -255,6 +255,13 @@ const MODERATION_SYSTEM_PROMPT =
   "clasifica como safe.";
 
 export async function moderateTutorMessage(ctx: AICallContext, content: string): Promise<ModerationCategory> {
+  // Esta era la única llamada a Anthropic sin rate limit, y el hueco no era
+  // teórico: cuando modera como unsafe/self_harm, tutorService responde con
+  // un texto fijo y NUNCA llega a tutorResponse, que es donde estaba el
+  // único limitador del flujo. Un loop de mensajes marcados como inseguros
+  // gastaba IA sin consumir presupuesto de rate limit.
+  await checkAIRateLimit(ctx);
+
   // Siempre Haiku: es un chequeo de seguridad, no algo que dependa del plan
   // del estudiante, y no necesita razonamiento profundo.
   const model = MODEL_BY_TIER.free;

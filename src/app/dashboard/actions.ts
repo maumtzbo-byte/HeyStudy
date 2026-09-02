@@ -38,8 +38,14 @@ export async function toggleStudyPlanItemAction(itemId: string) {
 
 export async function generateVideoNotesAction(knowledgeTopicId: string, youtubeVideoId: string) {
   return runAction(async () => {
-    const { user } = await requireStudentProfile();
+    const { user, studentProfile } = await requireStudentProfile();
     const tier = await getAITier(user.id);
-    return getOrGenerateVideoNotes({ knowledgeTopicId, youtubeVideoId, userId: user.id, tier });
+    return getOrGenerateVideoNotes({
+      knowledgeTopicId,
+      youtubeVideoId,
+      studentProfileId: studentProfile.id,
+      userId: user.id,
+      tier,
+    });
   });
 }

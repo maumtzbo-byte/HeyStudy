@@ -13,6 +13,7 @@ export function StandardizedTopicsPicker({ subjectId }: { subjectId: string }) {
   const [templateId, setTemplateId] = useState(STANDARDIZED_TOPIC_TEMPLATES[0]?.id ?? "");
   const [isPending, startTransition] = useTransition();
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (STANDARDIZED_TOPIC_TEMPLATES.length === 0) return null;
 
@@ -44,7 +45,12 @@ export function StandardizedTopicsPicker({ subjectId }: { subjectId: string }) {
           disabled={isPending || !templateId}
           onClick={() =>
             startTransition(async () => {
-              await loadStandardizedTopicsAction(subjectId, templateId);
+              setError(null);
+              const result = await loadStandardizedTopicsAction(subjectId, templateId);
+              if (!result.ok) {
+                setError(result.error);
+                return;
+              }
               setDone(true);
             })
           }
@@ -52,6 +58,7 @@ export function StandardizedTopicsPicker({ subjectId }: { subjectId: string }) {
           {isPending ? "Cargando..." : "Cargar temas"}
         </Button>
         {done && !isPending && <span className="text-xs text-success">Temas cargados.</span>}
+        {error && <span className="text-xs text-danger">{error}</span>}
       </div>
     </div>
   );

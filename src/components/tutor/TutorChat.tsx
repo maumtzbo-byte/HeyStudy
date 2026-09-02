@@ -234,10 +234,12 @@ export function TutorChat({
   }
 
   function handlePractice(topicId: string) {
+    setNotesError(null);
     startPracticeTransition(async () => {
-      // Puede redirigir (comportamiento normal de startDiagnosticAction) —
-      // startTransition deja pasar el redirect igual que en GroupActions.
-      await startDiagnosticAction(subjectId, topicId);
+      // Si tiene éxito redirige, así que sólo seguimos aquí cuando falló
+      // (típicamente por el límite de diagnósticos del plan free).
+      const result = await startDiagnosticAction(subjectId, topicId);
+      if (!result.ok) setNotesError(result.error);
     });
   }
 

@@ -24,13 +24,22 @@ const NOTES_INSTRUCTIONS =
 export async function getOrGenerateVideoNotes(params: {
   knowledgeTopicId: string;
   youtubeVideoId: string;
+  studentProfileId: string;
   userId: string;
   tier: AITier;
 }): Promise<string> {
-  const { knowledgeTopicId, youtubeVideoId, userId, tier } = params;
+  const { knowledgeTopicId, youtubeVideoId, studentProfileId, userId, tier } = params;
 
-  const video = await prisma.recommendedVideo.findUnique({
-    where: { knowledgeTopicId_youtubeVideoId: { knowledgeTopicId, youtubeVideoId } },
+  // El tema tiene que ser de una materia de este estudiante. Sin este filtro
+  // el knowledgeTopicId venía del cliente sin acotar, así que con un id ajeno
+  // se podían leer las notas de otro estudiante y además dispararle una
+  // generación de IA que se escribía en su propia fila.
+  const video = await prisma.recommendedVideo.findFirst({
+    where: {
+      knowledgeTopicId,
+      youtubeVideoId,
+      knowledgeTopic: { subject: { studentProfileId } },
+    },
   });
   if (!video) throw new UserFacingError("No encontramos ese video.");
   if (video.notes) return video.notes;

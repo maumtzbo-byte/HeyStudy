@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { getAITier } from "@/services/usage/getAITier";
+import { runAction } from "@/lib/actions/result";
 import { ensureTopicsForSubject, loadStandardizedTopics } from "@/services/knowledge/topicService";
 import {
   startDiagnosticSession,
@@ -11,32 +12,44 @@ import {
   completeDiagnosticSession,
 } from "@/services/knowledge/diagnosisService";
 
+// Estas tres iban sin runAction, y no era un detalle de estilo: el
+// UserFacingError de claimDiagnostic ("Ya usaste tus N diagnósticos de este
+// mes") subía sin manejar hasta el cliente, donde Next redacta el mensaje en
+// producción. O sea, el aviso de límite del plan —la única conversación de
+// venta del producto— era literalmente inalcanzable para el estudiante.
 export async function generateTopicsAction(subjectId: string) {
-  const { user, studentProfile } = await requireStudentProfile();
-  const tier = await getAITier(user.id);
-  await ensureTopicsForSubject({ studentProfileId: studentProfile.id, subjectId, userId: user.id, tier });
-  revalidatePath(`/dashboard/materias/${subjectId}/diagnostico`);
+  return runAction(async () => {
+    const { user, studentProfile } = await requireStudentProfile();
+    const tier = await getAITier(user.id);
+    await ensureTopicsForSubject({ studentProfileId: studentProfile.id, subjectId, userId: user.id, tier });
+    revalidatePath(`/dashboard/materias/${subjectId}/diagnostico`);
+  });
 }
 
 export async function loadStandardizedTopicsAction(subjectId: string, templateId: string) {
-  const { studentProfile } = await requireStudentProfile();
-  await loadStandardizedTopics(studentProfile.id, subjectId, templateId);
-  revalidatePath(`/dashboard/materias/${subjectId}/diagnostico`);
+  return runAction(async () => {
+    const { studentProfile } = await requireStudentProfile();
+    await loadStandardizedTopics(studentProfile.id, subjectId, templateId);
+    revalidatePath(`/dashboard/materias/${subjectId}/diagnostico`);
+  });
 }
 
 export async function startDiagnosticAction(subjectId: string, topicId: string) {
-  const { user, studentProfile } = await requireStudentProfile();
-  const tier = await getAITier(user.id);
+  return runAction(async () => {
+    const { user, studentProfile } = await requireStudentProfile();
+    const tier = await getAITier(user.id);
 
-  const sessionId = await startDiagnosticSession({
-    studentProfileId: studentProfile.id,
-    userId: user.id,
-    subjectId,
-    topicId,
-    tier,
+    const sessionId = await startDiagnosticSession({
+      studentProfileId: studentProfile.id,
+      userId: user.id,
+      subjectId,
+      topicId,
+      tier,
+    });
+
+    // runAction reenvía el error de control de flujo de redirect().
+    redirect(`/dashboard/materias/${subjectId}/diagnostico/${sessionId}`);
   });
-
-  redirect(`/dashboard/materias/${subjectId}/diagnostico/${sessionId}`);
 }
 
 export type AnswerActionState =
