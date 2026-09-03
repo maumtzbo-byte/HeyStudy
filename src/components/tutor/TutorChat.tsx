@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import Link from "next/link";
+import { UpgradeLink } from "@/components/analytics/UpgradeLink";
 import { Mic, Volume2, Loader2, NotebookText, Sparkles } from "lucide-react";
 import { sendMessageAction, generateWrapUpAction } from "@/app/dashboard/materias/[id]/tutor/actions";
 import { startDiagnosticAction } from "@/app/dashboard/materias/[id]/diagnostico/actions";
@@ -275,9 +275,9 @@ export function TutorChat({
             </Button>
           ) : (
             <p className="text-xs text-subtle">
-              <Link href="/#precios" className="font-medium text-accent hover:underline">
+              <UpgradeLink source="tutor_voice_locked" className="font-medium text-accent hover:underline">
                 Mejora tu plan
-              </Link>{" "}
+              </UpgradeLink>{" "}
               para que el tutor te responda en voz.
             </p>
           )}

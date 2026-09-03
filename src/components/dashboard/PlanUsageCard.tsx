@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
+import { UpgradeLink } from "@/components/analytics/UpgradeLink";
 
 export function PlanUsageCard({ diagnosticsUsed, diagnosticsLimit }: { diagnosticsUsed: number; diagnosticsLimit: number }) {
   const remaining = Math.max(0, diagnosticsLimit - diagnosticsUsed);
@@ -24,9 +24,9 @@ export function PlanUsageCard({ diagnosticsUsed, diagnosticsLimit }: { diagnosti
         {remaining > 0
           ? `Te ${remaining === 1 ? "queda" : "quedan"} ${remaining} este mes.`
           : "Ya usaste todos tus diagnósticos de este mes."}{" "}
-        <Link href="/#precios" className="font-medium text-accent hover:underline">
+        <UpgradeLink source="plan_usage_card" className="font-medium text-accent hover:underline">
           Mejora tu plan
-        </Link>{" "}
+        </UpgradeLink>{" "}
         para diagnósticos ilimitados y el tutor más capaz.
       </CardDescription>
     </Card>

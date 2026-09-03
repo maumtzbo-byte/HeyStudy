@@ -1,6 +1,7 @@
 import "server-only";
 import { checkRateLimit } from "@/services/security/rateLimit";
 import type { AITier } from "@/services/ai/models";
+import { track } from "@/lib/analytics/server";
 
 // Cuotas mensuales de las operaciones de IA que sí cuestan dinero por uso.
 //
@@ -32,14 +33,28 @@ export async function claimTutorMessage(userId: string, tier: AITier): Promise<v
         "Mejora tu plan para seguir platicando con él."
       : `Ya usaste tus ${limit} mensajes con el tutor de este mes. Se reinician el próximo ciclo.`;
 
-  await checkRateLimit(`tutor-msg:${userId}`, limit, MONTH_SECONDS, message);
+  try {
+    await checkRateLimit(`tutor-msg:${userId}`, limit, MONTH_SECONDS, message);
+  } catch (err) {
+    // Se registra el tope alcanzado y se deja pasar el error tal cual: la
+    // analítica observa, no cambia el comportamiento.
+    await track(userId, "paywall_hit", { feature: "tutor_message", plan: tier === "paid" ? "PAID" : "FREE" });
+    throw err;
+  }
 }
 
 export async function claimVoicePlay(userId: string): Promise<void> {
-  await checkRateLimit(
-    `tts-month:${userId}`,
-    VOICE_PLAYS_PER_MONTH,
-    MONTH_SECONDS,
-    `Ya usaste tus ${VOICE_PLAYS_PER_MONTH} reproducciones de voz de este mes. Se reinician el próximo ciclo.`,
-  );
+  try {
+    await checkRateLimit(
+      `tts-month:${userId}`,
+      VOICE_PLAYS_PER_MONTH,
+      MONTH_SECONDS,
+      `Ya usaste tus ${VOICE_PLAYS_PER_MONTH} reproducciones de voz de este mes. Se reinician el próximo ciclo.`,
+    );
+  } catch (err) {
+    // La voz es exclusiva del plan pagado, así que quien llega hasta este
+    // tope siempre es PAID — el FREE se queda en la puerta de synthesizeSpeech.
+    await track(userId, "paywall_hit", { feature: "voice", plan: "PAID" });
+    throw err;
+  }
 }

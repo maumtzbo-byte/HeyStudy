@@ -62,10 +62,21 @@ export default function PrivacidadPage() {
             <section>
               <h2 className="text-base font-semibold text-foreground">Con quién compartimos información</h2>
               <p className="mt-2 text-sm leading-relaxed">
-                No vendemos tu información ni la compartimos con fines publicitarios. Sí la procesan dos
-                proveedores que operan el servicio: Anthropic (genera las respuestas del tutor y diagnósticos) y
-                Supabase (aloja la base de datos, el inicio de sesión y los archivos que subes). Ambos procesan
-                tus datos únicamente para darte el servicio, no para sus propios fines.
+                No vendemos tu información ni la compartimos con fines publicitarios. Sí la procesan los
+                proveedores que operan el servicio: <strong>Anthropic</strong> (genera las respuestas del tutor y
+                los diagnósticos), <strong>Supabase</strong> (aloja la base de datos, el inicio de sesión y los
+                archivos que subes), <strong>Vercel</strong> (aloja la aplicación), <strong>Resend</strong> (manda
+                los correos de recordatorio y los resúmenes), <strong>ElevenLabs</strong> (convierte a voz la
+                respuesta del tutor, sólo si activas el modo voz) y <strong>PostHog</strong> (mide cómo se usa el
+                producto). Todos procesan tus datos únicamente para darte el servicio, no para sus propios fines.
+              </p>
+              <p className="mt-2 text-sm leading-relaxed">
+                Sobre la medición de uso: registramos acciones como &ldquo;terminó un diagnóstico&rdquo; o
+                &ldquo;generó su plan&rdquo;, identificadas con el código interno de tu cuenta —nunca con tu
+                nombre ni tu correo—, junto con tu nivel educativo y tu método de estudio preferido, que elegiste
+                de una lista al registrarte. No grabamos tu pantalla ni tu navegación, y no mandamos a esa medición el
+                contenido de tus conversaciones con el tutor, los nombres de tus materias, de tus grupos ni de tus
+                archivos.
               </p>
             </section>
             <section>

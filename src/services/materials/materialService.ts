@@ -1,5 +1,7 @@
 import "server-only";
 import { UserFacingError } from "@/lib/actions/result";
+import { track } from "@/lib/analytics/server";
+import { sizeBucket } from "@/lib/analytics/events";
 import { prisma } from "@/lib/prisma/client";
 import { createClient } from "@/lib/supabase/server";
 import { assertSubjectOwnership } from "@/lib/auth/ownership";
@@ -22,6 +24,8 @@ function sanitizeFileName(name: string): string {
   return safe || "archivo";
 }
 
+// Sólo la cubeta de tamaño: el nombre del archivo lo pone el estudiante y
+// suele traer su nombre o el de su escuela.
 export async function uploadMaterial(params: {
   userId: string;
   studentProfileId: string;
@@ -54,7 +58,7 @@ export async function uploadMaterial(params: {
   });
   if (uploadError) throw new UserFacingError(`No se pudo subir el archivo: ${uploadError.message}`);
 
-  return prisma.material.create({
+  const material = await prisma.material.create({
     data: {
       subjectId,
       fileName: file.name,
@@ -63,6 +67,10 @@ export async function uploadMaterial(params: {
       fileSizeKb: Math.round(file.size / 1024),
     },
   });
+
+  await track(userId, "material_uploaded", { size_bucket: sizeBucket(file.size) });
+
+  return material;
 }
 
 export async function deleteMaterial(studentProfileId: string, materialId: string) {

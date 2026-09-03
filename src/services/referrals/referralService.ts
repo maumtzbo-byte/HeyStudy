@@ -1,6 +1,7 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma/client";
+import { track } from "@/lib/analytics/server";
 
 // Recompensa fija: días de plan pagado gratis para quien invita, cuando la
 // persona invitada termina su onboarding (no basta con abrir el link — eso
@@ -72,6 +73,9 @@ export async function grantReferralReward(referrerStudentProfileId: string): Pro
   const rewardedSoFar = await prisma.studentProfile.count({
     where: { referredByStudentProfileId: referrerStudentProfileId },
   });
+  // Se registra la conversión aunque ya no haya premio: para medir el bucle
+  // importa que alguien invitó y el invitado se registró, no si cobró.
+  await track(referrer.userId, "referral_converted", { rewarded: rewardedSoFar <= MAX_REWARDED_REFERRALS });
   if (rewardedSoFar > MAX_REWARDED_REFERRALS) return;
 
   const subscription = await prisma.subscription.findUnique({ where: { userId: referrer.userId } });

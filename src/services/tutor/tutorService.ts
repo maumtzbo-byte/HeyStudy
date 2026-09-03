@@ -5,6 +5,7 @@ import { tutorResponse, moderateTutorMessage, summarizeTutorConversation } from 
 import { MODE_TO_DB, MODE_FROM_DB, stripPromptDelimiters } from "@/services/tutor/customTutorService";
 import { assertSubjectOwnership } from "@/lib/auth/ownership";
 import { claimTutorMessage } from "@/services/usage/aiQuotas";
+import { track } from "@/lib/analytics/server";
 import type { AITier } from "@/services/ai/models";
 import type { TutorMode } from "@/services/ai/types";
 
@@ -220,6 +221,13 @@ export async function sendMessage(params: {
     data: { tutorConversationId: conversationId, role: "ASSISTANT", content: reply },
   });
 
+  // Sólo el modo y si usa tutor propio — nunca el mensaje ni el nombre del
+  // tutor, que los escribe el estudiante.
+  await track(userId, "tutor_message_sent", {
+    mode: MODE_FROM_DB[conversation.mode],
+    has_custom_tutor: conversation.customTutor !== null,
+  });
+
   const title = conversation.title ?? content.slice(0, 60);
   await prisma.tutorConversation.update({
     where: { id: conversationId },
@@ -286,6 +294,8 @@ export async function generateWrapUp(params: {
       data: { learningStyleNotes: stripPromptDelimiters(wrapUp.learningStyleUpdate) },
     });
   }
+
+  await track(userId, "tutor_wrapup_generated", {});
 
   const suggestedTopic = wrapUp.suggestedTopicId ? (topics.find((t) => t.id === wrapUp.suggestedTopicId) ?? null) : null;
 

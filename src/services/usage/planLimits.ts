@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
 import { getEffectivePlan } from "@/services/usage/effectivePlan";
+import { track } from "@/lib/analytics/server";
 
 // Límites de la sección 5 (tabla de freemium). "Documentos analizados/mes"
 // no se incluye: `analyzeDocument` en AIProvider no está conectado a ningún
@@ -30,6 +31,9 @@ export async function claimDiagnostic(userId: string): Promise<void> {
   });
 
   if (count === 0) {
+    // El evento más importante del catálogo: es la única señal de dónde la
+    // gente choca con el muro de pago. Sin esto, poner precio es adivinar.
+    await track(userId, "paywall_hit", { feature: "diagnostic", plan: "FREE" });
     throw new UserFacingError(
       `Ya usaste tus ${FREE_DIAGNOSTICS_PER_MONTH} diagnósticos de este mes en el plan gratuito. ` +
         "Mejora tu plan para seguir diagnosticando sin límite.",

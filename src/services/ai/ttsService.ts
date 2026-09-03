@@ -4,6 +4,7 @@ import { UserFacingError } from "@/lib/actions/result";
 import { checkRateLimit } from "@/services/security/rateLimit";
 import { getEffectivePlan } from "@/services/usage/effectivePlan";
 import { claimVoicePlay } from "@/services/usage/aiQuotas";
+import { track } from "@/lib/analytics/server";
 
 const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || "21m00Tcm4TlvDq8ikWAM";
 // Flash v2.5 en vez de multilingual v2: cuesta la mitad por carácter
@@ -23,6 +24,7 @@ const MAX_TTS_CHARS = 2000;
 export async function synthesizeSpeech(userId: string, rawText: string): Promise<Buffer> {
   const subscription = await prisma.subscription.findUnique({ where: { userId } });
   if (!subscription || getEffectivePlan(subscription) !== "PAID") {
+    await track(userId, "paywall_hit", { feature: "voice", plan: "FREE" });
     throw new UserFacingError("La voz del tutor es un beneficio del plan pagado.");
   }
 

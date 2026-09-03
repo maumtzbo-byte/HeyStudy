@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma/client";
 import { generateQuestions, diagnoseKnowledge } from "@/services/ai/AIProvider";
 import { applyDiagnosisToMastery } from "@/services/knowledge/masteryService";
 import { claimDiagnostic } from "@/services/usage/planLimits";
+import { track } from "@/lib/analytics/server";
 import type { AITier } from "@/services/ai/models";
 
 // Free (Haiku) hace un diagnóstico más corto y menos profundo que paid (Sonnet),
@@ -38,6 +39,14 @@ export async function startDiagnosticSession(params: {
 
   const session = await prisma.studySession.create({
     data: { studentProfileId, mode: "DIAGNOSTICO" },
+  });
+
+  // El prefijo lo pone selectAdmissionTarget al sembrar el temario (ver
+  // admissionExamService): distingue a quien se prepara para un examen de
+  // admisión de quien cargó sus propias materias, que son dos productos
+  // distintos en la práctica. Se manda el tipo, nunca el nombre.
+  await track(userId, "diagnostic_started", {
+    subject_kind: topic.subject.name.startsWith("Admisión —") ? "admission" : "custom",
   });
 
   const plan = DIFFICULTY_PLAN[tier];
@@ -128,8 +137,22 @@ export async function submitAnswer(params: {
 }
 
 export async function completeDiagnosticSession(studentProfileId: string, sessionId: string) {
-  return prisma.studySession.updateMany({
+  await prisma.studySession.updateMany({
     where: { id: sessionId, studentProfileId },
     data: { completedAt: new Date() },
   });
+
+  // Se devuelven los números del cierre para que la acción pueda registrar
+  // el evento sin volver a consultar. Es una sola agregación y sólo corre al
+  // terminar un diagnóstico, no en cada respuesta.
+  const stats = await prisma.answer.aggregate({
+    where: { question: { studySessionId: sessionId } },
+    _avg: { masteryEstimate: true },
+    _count: { _all: true },
+  });
+
+  return {
+    answeredCount: stats._count._all,
+    averageMastery: stats._avg.masteryEstimate ?? 0,
+  };
 }

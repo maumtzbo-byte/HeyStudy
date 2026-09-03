@@ -6,6 +6,7 @@ import { requireAuthUser } from "@/lib/auth/getCurrentUser";
 import { onboardingSchema } from "@/lib/validation/onboardingSchemas";
 import { completeOnboarding } from "@/services/onboarding/onboardingService";
 import { REFERRAL_COOKIE_NAME, isValidReferralCode } from "@/lib/referrals/cookie";
+import { track, identifyUser } from "@/lib/analytics/server";
 
 export type OnboardingActionState = { error?: string } | undefined;
 
@@ -38,6 +39,20 @@ export async function submitOnboardingAction(
   const referralCode = rawReferralCode && isValidReferralCode(rawReferralCode) ? rawReferralCode : null;
 
   await completeOnboarding({ userId: user.id, input: parsed.data, referralCode });
+
+  // Va antes del redirect: redirect() lanza para navegar, así que cualquier
+  // cosa después de él no corre nunca.
+  await identifyUser(user.id, {
+    education_level: parsed.data.educationLevel,
+    preferred_study_method: parsed.data.preferredStudyMethod,
+    plan: "FREE",
+  });
+  await track(user.id, "onboarding_completed", {
+    has_admission_target: Boolean(parsed.data.admissionTargetId),
+    subjects_count: parsed.data.subjectNames.length,
+    referred: Boolean(referralCode),
+  });
+
   cookieStore.delete(REFERRAL_COOKIE_NAME);
   redirect("/dashboard");
 }

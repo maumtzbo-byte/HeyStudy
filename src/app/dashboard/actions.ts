@@ -6,6 +6,8 @@ import { getAITier } from "@/services/usage/getAITier";
 import { generateTodayPlan, toggleStudyPlanItem } from "@/services/studyplan/studyPlanService";
 import { getOrGenerateVideoNotes } from "@/services/video/videoNotesService";
 import { runAction } from "@/lib/actions/result";
+import { prisma } from "@/lib/prisma/client";
+import { track } from "@/lib/analytics/server";
 
 export type PlanActionState = { error?: string } | undefined;
 
@@ -27,12 +29,30 @@ export async function generatePlanAction(_prev: PlanActionState, formData: FormD
     return { error: "Diagnostica al menos un tema antes de pedir tu plan de estudio." };
   }
 
+  // is_first separa el momento "ajá" (la primera vez que ve un plan hecho
+  // para él) del uso recurrente. Son dos preguntas distintas —activación vs
+  // retención— y mezcladas en un solo número no se responde ninguna.
+  const planCount = await prisma.studyPlan.count({ where: { studentProfileId: studentProfile.id } });
+  await track(user.id, "study_plan_generated", {
+    items_count: plan.items.length,
+    is_first: planCount <= 1,
+  });
+
   revalidatePath("/dashboard");
 }
 
 export async function toggleStudyPlanItemAction(itemId: string) {
-  const { studentProfile } = await requireStudentProfile();
-  await toggleStudyPlanItem(studentProfile.id, itemId);
+  const { user, studentProfile } = await requireStudentProfile();
+  const item = await toggleStudyPlanItem(studentProfile.id, itemId);
+
+  // Sólo al marcar como hecho, no al desmarcar: lo que se quiere medir es
+  // trabajo terminado, y contar los dos lados infla la cifra con el vaivén
+  // de quien se equivoca de casilla.
+  if (item.completed) {
+    const planItemCount = await prisma.studyPlanItem.count({ where: { studyPlanId: item.studyPlanId } });
+    await track(user.id, "study_plan_item_completed", { plan_items_total: planItemCount });
+  }
+
   revalidatePath("/dashboard");
 }
 

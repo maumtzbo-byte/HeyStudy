@@ -4,14 +4,18 @@ import { revalidatePath } from "next/cache";
 import { requireStudentProfile } from "@/lib/auth/getCurrentUser";
 import { runAction, type ActionResult } from "@/lib/actions/result";
 import { sendFriendRequest, respondToFriendRequest, removeFriendship } from "@/services/friends/friendService";
+import { track } from "@/lib/analytics/server";
 
 export async function sendFriendRequestAction(
   _prev: ActionResult | undefined,
   formData: FormData,
 ): Promise<ActionResult> {
   return runAction(async () => {
-    const { studentProfile } = await requireStudentProfile();
+    const { user, studentProfile } = await requireStudentProfile();
     await sendFriendRequest(studentProfile.id, String(formData.get("username") ?? ""));
+    // Sin propiedades a propósito: el @usuario del destinatario identifica a
+    // otra persona, y aquí sólo interesa el volumen del bucle social.
+    await track(user.id, "friend_request_sent", {});
     revalidatePath("/dashboard/amigos");
   });
 }

@@ -11,6 +11,8 @@ import {
   submitAnswer,
   completeDiagnosticSession,
 } from "@/services/knowledge/diagnosisService";
+import { track } from "@/lib/analytics/server";
+import { scoreBucket } from "@/lib/analytics/events";
 
 // Estas tres iban sin runAction, y no era un detalle de estilo: el
 // UserFacingError de claimDiagnostic ("Ya usaste tus N diagnósticos de este
@@ -89,8 +91,14 @@ export async function submitAnswerAction(
 }
 
 export async function finishSessionAction(sessionId: string, subjectId: string) {
-  const { studentProfile } = await requireStudentProfile();
-  await completeDiagnosticSession(studentProfile.id, sessionId);
+  const { user, studentProfile } = await requireStudentProfile();
+  const { answeredCount, averageMastery } = await completeDiagnosticSession(studentProfile.id, sessionId);
+
+  await track(user.id, "diagnostic_completed", {
+    score_bucket: scoreBucket(averageMastery),
+    questions_answered: answeredCount,
+  });
+
   revalidatePath(`/dashboard/materias/${subjectId}`);
   redirect(`/dashboard/materias/${subjectId}/diagnostico`);
 }

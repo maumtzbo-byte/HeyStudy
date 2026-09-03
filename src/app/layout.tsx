@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <Toaster position="top-center" richColors />
         <Analytics />
+        <PostHogProvider />
       </body>
     </html>
   );
