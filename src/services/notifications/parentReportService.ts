@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
-import { resend, REPORT_FROM } from "@/lib/email/resend";
+import { sendTransactionalEmail } from "@/lib/email/resend";
 import { buildWeeklyStats, type WeeklyStats } from "@/services/notifications/weeklyStats";
 
 const MIN_DAYS_BETWEEN_REPORTS = 6;
@@ -94,11 +94,13 @@ export async function sendParentReports(): Promise<ParentReportRunSummary> {
       continue;
     }
 
-    const { error } = await resend.emails.send({
-      from: REPORT_FROM,
+    const { error } = await sendTransactionalEmail({
       to: candidate.parentEmail,
       subject: `Resumen semanal de ${candidate.studentDisplayName} en HeyStudy`,
       html: buildEmailHtml(candidate.studentDisplayName, candidate.stats),
+      // El padre o tutor no tiene cuenta en HeyStudy: su baja no puede ser
+      // un interruptor del perfil.
+      audience: "parent",
     });
 
     if (error) {

@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
-import { resend, REPORT_FROM } from "@/lib/email/resend";
+import { sendTransactionalEmail } from "@/lib/email/resend";
 import { buildWeeklyStats, type WeeklyStats as WeeklyStatsBase } from "@/services/notifications/weeklyStats";
 
 // El cron corre semanalmente; tolera unos días de jitter sin duplicar el
@@ -72,9 +72,6 @@ function buildEmailHtml(stats: WeeklyStats): string {
           Ver mi plan de hoy
         </a>
       </p>
-      <p style="font-size:12px;color:#888;margin-top:24px;">
-        ¿No quieres este resumen semanal? Apágalo desde tu perfil en HeyStudy.
-      </p>
     </div>
   `;
 }
@@ -96,11 +93,11 @@ export async function sendWeeklyReports(): Promise<WeeklyReportRunSummary> {
     // inactiva): mandar un correo vacío no aporta y se siente a spam.
     if (stats.minutesStudied === 0 && stats.sessionsCompleted === 0 && stats.upcomingExams.length === 0) continue;
 
-    const { error } = await resend.emails.send({
-      from: REPORT_FROM,
+    const { error } = await sendTransactionalEmail({
       to: stats.email,
       subject: "Tu semana en HeyStudy",
       html: buildEmailHtml(stats),
+      audience: "student",
     });
 
     if (error) {

@@ -4,9 +4,18 @@ import { prisma } from "@/lib/prisma/client";
 
 // Recompensa fija: días de plan pagado gratis para quien invita, cuando la
 // persona invitada termina su onboarding (no basta con abrir el link — eso
-// evita regalar días por un simple clic). No hay tope de referidos: a la
-// escala de un MVP no vale la pena la complejidad de un límite todavía.
+// evita regalar días por un simple clic).
 export const REFERRAL_REWARD_DAYS = 7;
+
+// Tope de por vida. Antes no había ninguno, y el plan pagado no es un
+// detalle cosmético: desbloquea Sonnet en vez de Haiku (3× el costo por
+// token), diagnósticos ilimitados y la voz del tutor, que es el rubro más
+// caro del producto. Como el registro sólo está limitado por IP, tener
+// PAID perpetuo gratis era un script de una tarde.
+//
+// 10 × 7 = 70 días es más que suficiente para premiar a quien de verdad
+// trae gente, sin que la cola sea infinita.
+export const MAX_REWARDED_REFERRALS = 10;
 
 function generateCode(): string {
   // 8 caracteres en base36 de un UUID — suficiente espacio para no chocar
@@ -54,6 +63,16 @@ export async function grantReferralReward(referrerStudentProfileId: string): Pro
     select: { userId: true },
   });
   if (!referrer) return;
+
+  // El perfil del referido YA existe cuando llegamos aquí (completeOnboarding
+  // lo crea con referredByStudentProfileId y después llama a esta función),
+  // así que este conteo ya lo incluye. Por eso la comparación es contra
+  // "mayor que" el tope y no "mayor o igual": el referido número 10 todavía
+  // premia, el 11 ya no.
+  const rewardedSoFar = await prisma.studentProfile.count({
+    where: { referredByStudentProfileId: referrerStudentProfileId },
+  });
+  if (rewardedSoFar > MAX_REWARDED_REFERRALS) return;
 
   const subscription = await prisma.subscription.findUnique({ where: { userId: referrer.userId } });
   if (!subscription) return;

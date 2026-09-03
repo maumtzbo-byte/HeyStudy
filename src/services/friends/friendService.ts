@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
+import { checkRateLimit } from "@/services/security/rateLimit";
 
 const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/;
 
@@ -30,6 +31,22 @@ export async function updateUsername(studentProfileId: string, rawUsername: stri
 export async function sendFriendRequest(studentProfileId: string, rawUsername: string) {
   const username = normalizeUsername(rawUsername.replace(/^@/, ""));
   if (!username) throw new UserFacingError("Escribe un nombre de usuario.");
+
+  // Rechazar una solicitud BORRA la fila (ver respondToFriendRequest), así
+  // que no queda constancia de que alguien ya dijo que no: sin límite, la
+  // misma persona puede reenviar para siempre. El tope también acota el
+  // sondeo de qué @usuarios existen.
+  //
+  // El mensaje distinto de "no encontramos a nadie con ese usuario" se
+  // queda a propósito: el @username es un handle público opt-in, se
+  // comparte justamente para que te agreguen, y esconder el error sólo
+  // empeora la experiencia sin cerrar nada real.
+  await checkRateLimit(
+    `friend-request:${studentProfileId}`,
+    20,
+    60 * 60,
+    "Mandaste muchas solicitudes seguidas. Espera un rato antes de mandar otra.",
+  );
 
   const target = await prisma.studentProfile.findUnique({ where: { username }, select: { id: true } });
   if (!target) throw new UserFacingError("No encontramos a nadie con ese usuario.");

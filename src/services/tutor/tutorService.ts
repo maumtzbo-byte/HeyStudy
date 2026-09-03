@@ -2,7 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
 import { tutorResponse, moderateTutorMessage, summarizeTutorConversation } from "@/services/ai/AIProvider";
-import { MODE_TO_DB, MODE_FROM_DB } from "@/services/tutor/customTutorService";
+import { MODE_TO_DB, MODE_FROM_DB, stripPromptDelimiters } from "@/services/tutor/customTutorService";
 import { assertSubjectOwnership } from "@/lib/auth/ownership";
 import { claimTutorMessage } from "@/services/usage/aiQuotas";
 import type { AITier } from "@/services/ai/models";
@@ -278,7 +278,12 @@ export async function generateWrapUp(params: {
   if (wrapUp.learningStyleUpdate) {
     await prisma.studentProfile.update({
       where: { id: studentProfileId },
-      data: { learningStyleNotes: wrapUp.learningStyleUpdate },
+      // Se escapa igual que las instrucciones de un tutor personalizado, y
+      // aquí importa más: este texto lo redacta la IA a partir del chat del
+      // propio estudiante y luego se reinyecta en el system prompt de TODAS
+      // sus conversaciones futuras, así que una etiqueta de cierre metida
+      // por el chat quedaría persistida.
+      data: { learningStyleNotes: stripPromptDelimiters(wrapUp.learningStyleUpdate) },
     });
   }
 

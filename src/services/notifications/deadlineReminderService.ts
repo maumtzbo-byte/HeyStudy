@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
-import { resend, REPORT_FROM } from "@/lib/email/resend";
+import { sendTransactionalEmail } from "@/lib/email/resend";
 import { todayInTimezone } from "@/lib/utils/dates";
 
 // Cron diario; tolera jitter sin duplicar el correo el mismo día (mismo
@@ -105,9 +105,6 @@ function buildEmailHtml(displayName: string, items: DueItem[]): string {
           Ver mi plan
         </a>
       </p>
-      <p style="font-size:12px;color:#888;margin-top:24px;">
-        ¿No quieres estos avisos? Apágalos desde tu perfil en HeyStudy.
-      </p>
     </div>
   `;
 }
@@ -125,11 +122,11 @@ export async function sendDeadlineReminders(): Promise<DeadlineReminderRunSummar
   let failedCount = 0;
 
   for (const group of groups) {
-    const { error } = await resend.emails.send({
-      from: REPORT_FROM,
+    const { error } = await sendTransactionalEmail({
       to: group.email,
       subject: `Tienes ${group.items.length} pendiente${group.items.length === 1 ? "" : "s"} por vencer`,
       html: buildEmailHtml(group.displayName, group.items),
+      audience: "student",
     });
 
     if (error) {

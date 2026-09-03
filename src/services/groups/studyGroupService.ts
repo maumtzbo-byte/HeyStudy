@@ -2,6 +2,7 @@ import "server-only";
 import { randomInt } from "node:crypto";
 import { prisma } from "@/lib/prisma/client";
 import { UserFacingError } from "@/lib/actions/result";
+import { checkRateLimit } from "@/services/security/rateLimit";
 import { todayInTimezone } from "@/lib/utils/dates";
 
 // Sin 0/O ni 1/I/L: los códigos se dictan en voz alta y se escriben a mano.
@@ -58,6 +59,19 @@ export async function createStudyGroup(studentProfileId: string, rawName: string
 export async function joinStudyGroup(studentProfileId: string, rawCode: string) {
   const joinCode = rawCode.trim().toUpperCase();
   if (!joinCode) throw new UserFacingError("Escribe el código del grupo.");
+
+  // El código es de 6 caracteres sobre un alfabeto de 31: ~8.9×10⁸
+  // combinaciones. Suena mucho, pero sin límite de intentos y con unos
+  // cuantos miles de grupos vivos, caer en alguno por fuerza bruta es
+  // cuestión de horas — y entrar a un grupo da acceso al ranking y a los
+  // planes que sus miembros compartieron. El límite se cobra ANTES de
+  // buscar el código, para que un intento fallido también cuente.
+  await checkRateLimit(
+    `group-join:${studentProfileId}`,
+    5,
+    60 * 60,
+    "Demasiados intentos con códigos de grupo. Espera un rato antes de volver a intentar.",
+  );
 
   const group = await prisma.studyGroup.findUnique({
     where: { joinCode },

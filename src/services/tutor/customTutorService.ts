@@ -31,9 +31,19 @@ export interface CustomTutorInput {
   subjectId: string | null;
 }
 
+// Las instrucciones del tutor viajan dentro de una sección delimitada del
+// system prompt (<preferencias-del-estudiante> en AIProvider). Sin escapar
+// los signos de menor/mayor, el estudiante puede escribir literalmente el
+// cierre de esa etiqueta y seguir escribiendo lo que parece texto de
+// sistema. La barrera real la pone la instrucción del prompt, pero una
+// cerca que se puede cerrar desde adentro no es una cerca.
+export function stripPromptDelimiters(text: string): string {
+  return text.replace(/[<>]/g, "");
+}
+
 function normalize(input: CustomTutorInput) {
   const name = input.name.trim();
-  const instructions = input.instructions.trim();
+  const instructions = stripPromptDelimiters(input.instructions.trim());
 
   if (name.length < 2) throw new UserFacingError("Ponle un nombre de al menos 2 caracteres.");
   if (name.length > MAX_NAME_LENGTH) throw new UserFacingError(`El nombre no puede pasar de ${MAX_NAME_LENGTH} caracteres.`);

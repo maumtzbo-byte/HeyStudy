@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
-import { resend, REPORT_FROM } from "@/lib/email/resend";
+import { sendTransactionalEmail } from "@/lib/email/resend";
 import { buildLeaderboard } from "@/services/groups/studyGroupService";
 
 // Se compara el ranking de hoy contra `lastKnownRank` guardado la última vez
@@ -102,11 +102,11 @@ export async function sendGroupRankNotifications(): Promise<GroupRankNotificatio
   let failedCount = 0;
 
   for (const drop of drops) {
-    const { error } = await resend.emails.send({
-      from: REPORT_FROM,
+    const { error } = await sendTransactionalEmail({
       to: drop.email,
       subject: `Te rebasaron en ${drop.groupName}`,
       html: buildEmailHtml(drop.displayName, drop.groupName, drop.newRank, drop.totalMembers),
+      audience: "student",
     });
 
     if (error) {

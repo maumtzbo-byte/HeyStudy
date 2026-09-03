@@ -1,6 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma/client";
-import { resend, REVIEW_REMINDER_FROM } from "@/lib/email/resend";
+import { sendTransactionalEmail } from "@/lib/email/resend";
 
 // Tolera que el cron diario tenga jitter (no siempre dispara a la misma
 // hora exacta) sin mandar el recordatorio dos veces el mismo día.
@@ -75,9 +75,6 @@ function buildEmailHtml(displayName: string, topics: string[]): string {
           Repasar ahora
         </a>
       </p>
-      <p style="font-size:12px;color:#888;margin-top:24px;">
-        ¿No quieres estos correos? Apágalos desde tu perfil en HeyStudy.
-      </p>
     </div>
   `;
 }
@@ -98,11 +95,11 @@ export async function sendReviewReminders(): Promise<ReviewReminderRunSummary> {
 
   for (const group of groups) {
     const topicCount = group.topics.length;
-    const { error } = await resend.emails.send({
-      from: REVIEW_REMINDER_FROM,
+    const { error } = await sendTransactionalEmail({
       to: group.email,
       subject: `Tienes ${topicCount} repaso${topicCount === 1 ? "" : "s"} pendiente${topicCount === 1 ? "" : "s"}`,
       html: buildEmailHtml(group.displayName, group.topics),
+      audience: "student",
     });
 
     if (error) {

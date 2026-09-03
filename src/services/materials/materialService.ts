@@ -3,6 +3,7 @@ import { UserFacingError } from "@/lib/actions/result";
 import { prisma } from "@/lib/prisma/client";
 import { createClient } from "@/lib/supabase/server";
 import { assertSubjectOwnership } from "@/lib/auth/ownership";
+import { checkRateLimit } from "@/services/security/rateLimit";
 
 const MATERIALS_BUCKET = "materials";
 const ALLOWED_TYPES: Record<string, "PDF" | "IMAGEN"> = {
@@ -29,6 +30,16 @@ export async function uploadMaterial(params: {
 }) {
   const { userId, studentProfileId, subjectId, file } = params;
   await assertSubjectOwnership(studentProfileId, subjectId);
+
+  // 25 MB por archivo pero archivos ilimitados: sin contador, subir es un
+  // drenaje de storage gratis. El límite va después de verificar que la
+  // materia es suya, para no gastar cuota en un intento que igual falla.
+  await checkRateLimit(
+    `material-upload:${studentProfileId}`,
+    30,
+    60 * 60,
+    "Subiste muchos archivos seguidos. Espera un rato antes de subir otro.",
+  );
 
   const fileType = ALLOWED_TYPES[file.type];
   if (!fileType) throw new UserFacingError("Solo se permiten PDF o imágenes (PNG, JPG, WEBP)");
