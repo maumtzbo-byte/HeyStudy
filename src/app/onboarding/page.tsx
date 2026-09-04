@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import { requireAuthUser } from "@/lib/auth/getCurrentUser";
 import { prisma } from "@/lib/prisma/client";
 import { OnboardingForm } from "@/components/onboarding/OnboardingForm";
 import { Logo } from "@/components/ui/Logo";
+import { CapsuleRow } from "@/components/ui/Capsule";
 
 export const metadata: Metadata = { title: "Bienvenido — HeyStudy" };
 
@@ -15,22 +15,12 @@ export default async function OnboardingPage() {
   if (existing) redirect("/dashboard");
 
   return (
-    <div className="force-light relative flex min-h-screen flex-1 items-center justify-center overflow-hidden bg-background px-4 py-12">
-      <div
-        className="pointer-events-none absolute -top-20 -right-20 h-72 w-72 rounded-full bg-accent/15 blur-3xl"
-        aria-hidden
-      />
+    <div className="force-light relative flex min-h-dvh flex-1 items-center justify-center overflow-hidden bg-background px-4 py-12">
       <div className="relative w-full max-w-md">
-        <Image
-          src="/mascot/mascota-lectura.png"
-          alt=""
-          aria-hidden
-          width={278}
-          height={222}
-          priority
-          className="pointer-events-none relative mx-auto h-20 w-auto"
-        />
-        <div className="mt-2 mb-8 flex justify-center">
+        {/* El estado real de quien empieza: nada medido todavía. Estas
+            mismas cápsulas se irán llenando conforme se diagnostique. */}
+        <CapsuleRow fills={[null, null, null, null, null]} className="justify-center" />
+        <div className="mt-6 mb-8 flex justify-center">
           <Logo />
         </div>
         <div className="rounded-2xl border border-border bg-surface p-8 shadow-soft">

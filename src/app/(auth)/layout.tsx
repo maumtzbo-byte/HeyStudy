@@ -1,26 +1,16 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
+import { CapsuleRow } from "@/components/ui/Capsule";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="force-light relative flex min-h-screen flex-1 items-center justify-center overflow-hidden bg-background px-4 py-12">
-      <div
-        className="pointer-events-none absolute -top-20 -right-20 h-72 w-72 rounded-full bg-accent/15 blur-3xl"
-        aria-hidden
-      />
+    <div className="force-light relative flex min-h-dvh flex-1 items-center justify-center overflow-hidden bg-background px-4 py-12">
       <div className="relative w-full max-w-sm">
-        <Image
-          src="/mascot/mascota-saludo.png"
-          alt=""
-          aria-hidden
-          width={288}
-          height={216}
-          priority
-          className="pointer-events-none relative mx-auto h-20 w-auto"
-        />
-        <div className="mt-2 mb-8 flex justify-center">
+        {/* Cápsulas vacías: nadie ha sido medido todavía. Es el estado
+            honesto de una pantalla de acceso, y sustituye a la mascota. */}
+        <CapsuleRow fills={[null, null, null, null]} className="justify-center" />
+        <div className="mt-6 mb-8 flex justify-center">
           <Link href="/">
             <Logo />
           </Link>

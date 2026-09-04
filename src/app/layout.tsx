@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Bricolage_Grotesque } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { Toaster } from "sonner";
@@ -7,16 +7,26 @@ import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
-// Plus Jakarta Sans en peso extra para titulares: geométrica, de bowls
-// redondos y 'a' de doble piso, que es la voz del mockup — titulares que
-// pesan y se aprietan, no editoriales. Inter se queda para interfaz/lectura.
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
+// Bricolage Grotesque para display. Tres razones, en orden de peso:
+//
+// 1. Licencia y entrega. Sustituye a Helvetica Now, que se cargaba desde un
+//    CDN que redistribuye tipografías comerciales sin licencia del fundidor
+//    y además bloqueaba el render de la única página pública. next/font la
+//    autoaloja en build: cero terceros en runtime, cero CLS.
+// 2. Español. Variable con subset latin-ext, así que acentos, ñ y los
+//    signos invertidos ¿ ¡ están dibujados, no parcheados. El copy de este
+//    producto es 100% español mexicano.
+// 3. Carácter. Sus terminaciones y su contraste irregular la separan de la
+//    grotesca neutra por default, que es justo lo que hace que un producto
+//    de IA se vea igual a los demás.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://heystudy.app";
@@ -47,17 +57,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${inter.variable} ${jakarta.variable} h-full antialiased`}>
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://db.onlinewebfonts.com/c/5ac3fe7c6abd2f62067f266d89671492?family=HelveticaNowDisplay-Medium"
-        />
-        <link
-          rel="stylesheet"
-          href="https://db.onlinewebfonts.com/c/1aa3377e489837a26d019bba501e779d?family=HelveticaNowDisplayW01-Rg"
-        />
-      </head>
+    <html lang="es" className={`${inter.variable} ${bricolage.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
         <Toaster position="top-center" richColors />

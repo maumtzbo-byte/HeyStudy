@@ -246,7 +246,9 @@ export function TutorChat({
   return (
     // 8rem = DashboardHeader's h-16 (4rem) + dashboard layout's py-8 (4rem)
     // — si cualquiera de los dos cambia, este cálculo hay que revisarlo.
-    <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-2xl flex-col gap-4">
+    <div // dvh y no vh: en Safari móvil 100vh incluye la barra de URL que no
+    // está, así que el campo de escritura quedaba debajo del pliegue.
+    className="mx-auto flex h-[calc(100dvh-8rem)] max-w-2xl flex-col gap-4">
       <audio ref={audioRef} onEnded={() => setPlayingIndex(null)} className="hidden" />
 
       <div className="flex flex-wrap items-start justify-between gap-2">

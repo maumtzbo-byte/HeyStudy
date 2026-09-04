@@ -7,7 +7,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
       <textarea
         ref={ref}
         className={cn(
-          "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground",
+          // text-base por la misma razón que Input: evita el zoom de iOS.
+        "w-full rounded-lg border border-border bg-surface px-3 py-2 text-base text-foreground",
           "placeholder:text-muted",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-transparent",
           "disabled:opacity-50",

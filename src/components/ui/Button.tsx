@@ -10,40 +10,41 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
 }
 
-// La pulsación (active:scale) es lo que le falta al lift de hover para
-// sentirse física, tipo Instagram: se hunde levemente al tocar y rebota de
-// vuelta al soltar, en vez de sólo cancelar el lift. motion-reduce apaga el
-// transform, no sólo la transición, para que quien pidió menos movimiento
-// no reciba ni el salto instantáneo.
+// Cápsula, no rectángulo redondeado: el botón es parte del sistema de
+// medición de la marca (misma geometría que el logo, los chips de materia y
+// las barras de dominio). Una sola forma propagada sostiene más
+// reconocimiento que varias formas bonitas sin relación.
+//
+// El feedback de pulsación se queda —confirma el toque— pero sin escalar el
+// botón: escalar controles al tocarlos es un tic de plantilla y, en móvil,
+// mueve el objetivo justo cuando el dedo ya se comprometió.
 const baseClasses = cn(
-  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-100 ease-out",
-  "active:scale-[0.97] motion-reduce:active:scale-100",
+  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors duration-150",
+  "[transition-timing-function:cubic-bezier(0.2,0,0,1)]",
   "disabled:pointer-events-none disabled:opacity-50",
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
 );
 
-// primary/danger llevan el botón "tecla" (estilo Duolingo): un borde sólido
-// abajo que hace de sombra dura, no difusa, así el botón se lee como un
-// objeto con volumen en vez de una superficie plana con blur. Al soltar, se
-// hunde (translate-y) y el borde se acorta — la misma física que un botón
-// físico, sin usar scale (eso ya lo cubre el active:scale de baseClasses,
-// mezclarlo aquí se sentía como doble rebote). motion-reduce cancela el
-// hundido igual que cancela el scale.
+// Se retiró el botón "tecla" con borde inferior grueso. Era una imitación
+// declarada de Duolingo, y esta marca no compite ahí: HeyStudy es un
+// instrumento de medición, no una app que celebra. Superficie plana, sin
+// sombra y sin degradado — el peso lo cargan el color y la forma.
 const variantClasses: Record<Variant, string> = {
-  primary:
-    "bg-accent text-accent-foreground border-b-4 border-accent-hover hover:brightness-105 active:translate-y-1 active:border-b-0 motion-reduce:active:translate-y-0",
-  secondary:
-    "border border-border-strong/60 bg-surface text-foreground hover:-translate-y-px hover:border-border-strong hover:bg-surface-elevated hover:shadow-sm",
+  primary: "bg-accent text-accent-foreground hover:bg-accent-hover",
+  secondary: "border border-border-strong/60 bg-surface text-foreground hover:border-border-strong hover:bg-surface-elevated",
   ghost: "text-foreground hover:bg-border/40",
-  danger:
-    "bg-danger text-white border-b-4 border-danger/60 hover:brightness-105 active:translate-y-1 active:border-b-0 motion-reduce:active:translate-y-0",
+  danger: "bg-danger text-white hover:brightness-95",
 };
 
+// Ningún tamaño baja de 44px de alto: es el objetivo táctil mínimo cómodo
+// en un teléfono, y el usuario de este producto llega desde uno. `sm` sigue
+// siendo visualmente más chico gracias al padding horizontal y al texto,
+// pero su área de toque ya no lo es.
 const sizeClasses: Record<Size, string> = {
-  sm: "h-9 px-4 text-sm",
+  sm: "h-11 px-4 text-sm",
   md: "h-11 px-5 text-sm",
   lg: "h-[3.25rem] px-7 text-base",
-  icon: "h-9 w-9 p-0",
+  icon: "h-11 w-11 p-0",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
