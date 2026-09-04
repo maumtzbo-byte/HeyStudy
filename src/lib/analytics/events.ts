@@ -44,6 +44,21 @@ export interface EventProperties {
   tutor_wrapup_generated: Record<string, never>;
   material_uploaded: { size_bucket: SizeBucket };
 
+  // --- Micro-diagnóstico: el embudo del hero ---------------------------
+  // Nunca se manda el texto de la respuesta. Lo que un estudiante escribe
+  // sobre lo que no sabe no tiene por qué salir del navegador; la longitud
+  // basta para ver dónde abandona.
+  subject_selected: { subject: string };
+  answer_submitted: { subject: string; answer_length: number };
+  // El evento del embudo: cuántos llegan al momento de valor.
+  measurement_shown: { subject: string; score_bucket: ScoreBucket };
+  demo_error: { stage: "question" | "measure"; kind: string };
+  // La pregunta que decide el rumbo del producto: ¿convierte mejor quien
+  // salió bajo o quien salió alto? Si es bajo, ver el hueco motiva y la
+  // tesis funciona. Si es alto, la gente compra por orgullo y hay que
+  // replantear el encuadre.
+  signup_from_demo: { subject: string; score_bucket: ScoreBucket };
+
   // --- Monetización ---------------------------------------------------
   paywall_hit: { feature: PaywallFeature; plan: PlanTier };
   upgrade_clicked: { source: string };
