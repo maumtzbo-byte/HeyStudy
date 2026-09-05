@@ -153,7 +153,10 @@ export function MicroDiagnostic() {
       {/* --- Región del resultado. aria-live para que un lector de pantalla
              anuncie la medición en texto, no sólo la vea quien puede ver el
              llenado de la cápsula. ------------------------------------- */}
-      <div aria-live="polite" className="min-h-[168px]">
+      {/* Reserva de altura para que la llegada del resultado no empuje la
+          página (CLS). Ajustada al estado inicial: de más deja un hueco
+          muerto en móvil, de menos la página salta al medir. */}
+      <div aria-live="polite" className="min-h-[112px]">
         {state.kind === "idle" && (
           <div className="flex flex-col gap-3">
             <CapsuleRow fills={[null, null, null, null, null, null]} />

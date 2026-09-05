@@ -20,7 +20,7 @@ export function MainframeNavbar() {
       <header className="fixed inset-x-0 top-0 z-10 flex items-center justify-between px-5 py-4 sm:px-8 sm:py-5">
         <Link href="/" className="flex flex-row items-center gap-3">
           <span
-            className="text-[21px] tracking-tight text-black sm:text-[26px]"
+            className="text-[21px] tracking-tight text-foreground sm:text-[24px]"
             style={{ fontFamily: "var(--font-heading)" }}
           >
             HeyStudy
@@ -28,10 +28,10 @@ export function MainframeNavbar() {
           <LogoMark className="h-6 w-6 shrink-0 text-accent sm:h-7 sm:w-7" />
         </Link>
 
-        <nav className="hidden flex-row text-[23px] text-black md:flex">
+        <nav className="hidden flex-row text-sm font-medium text-muted md:flex">
           {NAV_LINKS.map((link, i) => (
             <span key={link.href} className="flex flex-row">
-              <a href={link.href} className="transition-opacity hover:opacity-60">
+              <a href={link.href} className="transition-colors hover:text-foreground">
                 {link.label}
               </a>
               {i < NAV_LINKS.length - 1 && <span>,&nbsp;</span>}
@@ -41,7 +41,7 @@ export function MainframeNavbar() {
 
         <Link
           href="/registro"
-          className="hidden text-[23px] text-accent underline underline-offset-2 transition-opacity hover:opacity-60 md:block"
+          className="hidden text-sm font-medium text-accent underline underline-offset-4 transition-opacity hover:opacity-70 md:block"
         >
           Comenzar gratis
         </Link>
@@ -51,18 +51,20 @@ export function MainframeNavbar() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
-          className="flex flex-col items-center justify-center gap-[5px] md:hidden"
+          // -mr-2.5 compensa el padding para que las barras queden alineadas
+          // con el borde: el objetivo crece a 44px, la composición no cambia.
+          className="-mr-2.5 flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded-lg focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none md:hidden"
         >
           <span
-            className={`h-[2px] w-6 bg-black transition-all duration-300 ${
+            className={`h-[2px] w-6 bg-foreground transition-all duration-300 ${
               open ? "translate-y-[7px] rotate-45" : ""
             }`}
           />
           <span
-            className={`h-[2px] w-6 bg-black transition-all duration-300 ${open ? "opacity-0" : "opacity-100"}`}
+            className={`h-[2px] w-6 bg-foreground transition-all duration-300 ${open ? "opacity-0" : "opacity-100"}`}
           />
           <span
-            className={`h-[2px] w-6 bg-black transition-all duration-300 ${
+            className={`h-[2px] w-6 bg-foreground transition-all duration-300 ${
               open ? "-translate-y-[7px] -rotate-45" : ""
             }`}
           />
@@ -79,7 +81,7 @@ export function MainframeNavbar() {
             key={link.href}
             href={link.href}
             onClick={() => setOpen(false)}
-            className="text-left text-[32px] font-medium text-black"
+            className="text-left text-[28px] font-medium text-foreground"
           >
             {link.label}
           </a>

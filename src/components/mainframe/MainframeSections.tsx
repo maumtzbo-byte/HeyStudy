@@ -527,23 +527,25 @@ export function MainframeFooter() {
     <footer className="border-t border-black/10 px-5 py-10 sm:px-8 md:px-10">
       <div className="mx-auto flex w-full max-w-[1180px] flex-col items-center justify-between gap-6 sm:flex-row">
         <div className="flex items-center gap-3">
-          <span className="text-[18px] tracking-tight text-black" style={{ fontFamily: "var(--font-heading)" }}>
+          <span className="text-[18px] tracking-tight text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
             HeyStudy
           </span>
           <LogoMark className="h-5 w-5 shrink-0 text-accent" />
         </div>
-        <nav className="flex items-center gap-6 text-sm text-black/60">
-          <Link href="/login" className="transition-opacity hover:opacity-60">
+        {/* py-3 -my-3 agranda el área de toque a 44px sin cambiar el tamaño
+            visual del pie: el objetivo crece, el diseño no se mueve. */}
+        <nav className="flex items-center gap-6 text-sm text-muted">
+          <Link href="/login" className="-my-3 py-3 transition-colors hover:text-foreground">
             Iniciar sesión
           </Link>
-          <Link href="/terminos" className="transition-opacity hover:opacity-60">
+          <Link href="/terminos" className="-my-3 py-3 transition-colors hover:text-foreground">
             Términos
           </Link>
-          <Link href="/privacidad" className="transition-opacity hover:opacity-60">
+          <Link href="/privacidad" className="-my-3 py-3 transition-colors hover:text-foreground">
             Privacidad
           </Link>
         </nav>
-        <p className="text-sm text-black/40">© {new Date().getFullYear()} HeyStudy</p>
+        <p className="text-sm text-subtle">© {new Date().getFullYear()} HeyStudy</p>
       </div>
     </footer>
   );
