@@ -15,7 +15,7 @@ import { MicroDiagnostic } from "@/components/diagnostic/MicroDiagnostic";
 // abajo hay más y nadie crea que la página se acaba ahí.
 export function MainframeHero() {
   return (
-    <section className="px-5 pt-28 pb-16 sm:px-8 sm:pt-36 sm:pb-28 md:px-10">
+    <section className="px-5 pt-16 pb-16 sm:px-8 sm:pt-24 sm:pb-28 md:px-10">
       <div className="mx-auto grid w-full max-w-[1180px] gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           {/* El objeto más grande de la página, y en la primera pantalla.

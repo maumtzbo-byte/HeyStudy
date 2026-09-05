@@ -17,7 +17,11 @@ export function MainframeNavbar() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-10 flex items-center justify-between px-5 py-4 sm:px-8 sm:py-5">
+      {/* sticky con fondo, no fixed transparente. Fijo y sin fondo, el
+        contenido se le encimaba al hacer scroll y los títulos de sección se
+        leían encima del logo y del menú. Sticky mantiene el CTA siempre
+        alcanzable sin taparse con nada, y no necesita JavaScript. */}
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-transparent bg-background px-5 py-4 sm:px-8 sm:py-5">
         <Link href="/" className="flex flex-row items-center gap-3">
           <span
             className="text-[21px] tracking-tight text-foreground sm:text-[24px]"

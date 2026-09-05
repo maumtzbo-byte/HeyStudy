@@ -4,6 +4,7 @@ import { getAuthUser } from "@/lib/auth/getCurrentUser";
 import { MainframeNavbar } from "@/components/mainframe/MainframeNavbar";
 import { MainframeHero } from "@/components/mainframe/MainframeHero";
 import {
+  ElHueco,
   HowItWorks,
   ProductShowcase,
   Exams,
@@ -29,6 +30,7 @@ export default async function Home() {
     <div className="mainframe-page force-light bg-[#fbfaf9]">
       <MainframeNavbar />
       <MainframeHero />
+      <ElHueco />
       <HowItWorks />
       <ProductShowcase />
       <Exams />
